@@ -21,13 +21,9 @@ public class UserInteraction {
     final static int ROW_INDEX_OF_MONTH = 1;
     final static int ROW_INDEX_OF_NORM_TIME = 2;
     final static int ROW_INDEX_OF_SHORT_DAY = 3;
-    final static int ROW_INDEX_OF_HOLIDAY = 5;
+    final static int ROW_INDEX_OF_DAY_OFF = 5;
     final static int COL_INDEX_OF_DATE = 1;
     final static int DELTA_INDEX_AND_VALUE = 3;
-
-    final static int MAX_AMOUNT_DAY = 31;
-
-
 
     public static int readYearAndMonth(){
         int yearAndMonth = 0;
@@ -57,13 +53,13 @@ public class UserInteraction {
 
 
 
-    public static int readNormTime(){
-        int normTime = 0;
+    public static double readNormTime(){
+        double normTime = 0;
         try{
 
             FileInputStream fis = new FileInputStream("./lib/userInput.xls");
             Workbook wb = new HSSFWorkbook(fis);
-            normTime = (int) wb.getSheetAt(INDEX_OF_SHEET).getRow(ROW_INDEX_OF_NORM_TIME).getCell(COL_INDEX_OF_DATE).getNumericCellValue();
+            normTime = wb.getSheetAt(INDEX_OF_SHEET).getRow(ROW_INDEX_OF_NORM_TIME).getCell(COL_INDEX_OF_DATE).getNumericCellValue();
             if(normTime < MIN_NORM_TIME || normTime > MAX_NORM_TIME)
                 throw new Exception("Некорректно указана норма времени!");
 
@@ -80,22 +76,26 @@ public class UserInteraction {
 
 
 
-    public static Map<Integer, Integer> readHolidays(Map<Integer, Integer> holidays){
+    public static  void readShortDayAndHolidays(Map<Integer, Integer> shortDayAndHolidays, int amountDay){
         try{
 
             FileInputStream fis = new FileInputStream("./lib/userInput.xls");
             Workbook wb = new HSSFWorkbook(fis);
 
-            for(int indexRow = ROW_INDEX_OF_SHORT_DAY; indexRow <= ROW_INDEX_OF_HOLIDAY; ++indexRow){
-                for(int indexCol = COL_INDEX_OF_DATE; indexCol <= MAX_AMOUNT_DAY; ++indexCol){
+            for(int indexRow = ROW_INDEX_OF_SHORT_DAY; indexRow <= ROW_INDEX_OF_DAY_OFF; ++indexRow){
+                for(int indexCol = COL_INDEX_OF_DATE; indexCol <= amountDay; ++indexCol){
                     try{
 
                         int indexDay = (int) wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(indexCol).getNumericCellValue();
                         if(indexDay == 0) throw new NullPointerException();
 
-                        boolean isNewDate = holidays.get(indexDay) == null;
+                        boolean isNewDate = shortDayAndHolidays.get(indexDay) == null;
                         if(!isNewDate) throw new Exception("Значение " + indexDay + " не может быть указано дважды");
-                        holidays.put(indexDay, indexRow - DELTA_INDEX_AND_VALUE);
+
+                        if(indexDay <= 0 || indexDay > amountDay)
+                            throw new Exception(indexDay + "-й день не существует");
+
+                        shortDayAndHolidays.put(indexDay, indexRow - DELTA_INDEX_AND_VALUE);
 
                     }catch(NullPointerException nullExc){
                         break;
@@ -110,7 +110,5 @@ public class UserInteraction {
             exc.printStackTrace();
             System.exit(0);
         }
-
-        return holidays;
     }
 }

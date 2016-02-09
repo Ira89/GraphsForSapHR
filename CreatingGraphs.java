@@ -1,16 +1,16 @@
 package ru.polynkina.irina.graphs;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
 
 public class CreatingGraphs {
 
     final static int MAX_DEBUG_LEVEL = 4;
-    final static int DEBUG_USER_DATA = 3;
+    final static int DEBUG_USER_DATA = 0;
+    final static int DEBUG_FILE_DATA = 1;
     final static char ACTIVATED_DEBUG = '1';
-
-
 
     public static void main(String[] debugLevel) {
         System.out.println("Начинаю генерацию графиков!");
@@ -19,19 +19,24 @@ public class CreatingGraphs {
         final int YEAR = yearAndMonth >> UserInteraction.BITS_IN_MONTH;
         final int MONTH = yearAndMonth & UserInteraction.MASK_FOR_MONTH;
         final int AMOUNT_DAY = Calendar.getAmountDay(MONTH, YEAR);
-        final int NORM_TIME = UserInteraction.readNormTime();
+        final double NORM_TIME = UserInteraction.readNormTime();
 
-        Map<Integer, Integer> holidays = new HashMap<Integer, Integer>();
-        holidays = UserInteraction.readHolidays(holidays);
+        Map<Integer, Integer> shortDayAndHolidays = new HashMap<Integer, Integer>();
+        UserInteraction.readShortDayAndHolidays(shortDayAndHolidays, AMOUNT_DAY);
+
+        List<Graph> graphs = new ArrayList<Graph>();
+        FileInteraction.fabricateGraphs(graphs);
+        FileInteraction.readCountersForGraphs(graphs, MONTH, YEAR);
 
         if(MAX_DEBUG_LEVEL == debugLevel[0].length()){
             String commandLine = debugLevel[0];
             if(commandLine.charAt(DEBUG_USER_DATA) == ACTIVATED_DEBUG){
-                System.out.println("AMOUNT_DAY/MONTH/YEAR: " + AMOUNT_DAY + "/" + MONTH + "/" + YEAR);
-                System.out.println("NORM_TIME: " + NORM_TIME);
-                for(Map.Entry<Integer, Integer> map : holidays.entrySet()){
-                    System.out.println("DAY: " + map.getKey() + " CODE: " + map.getValue());
-                }
+                Debug.printDayMonthAndYear(AMOUNT_DAY, MONTH, YEAR);
+                Debug.printNormTime(NORM_TIME);
+                Debug.printShortDayAndHoliday(shortDayAndHolidays);
+            }
+            if(commandLine.charAt(DEBUG_FILE_DATA) == ACTIVATED_DEBUG){
+                Debug.printInfoAboutGraphs(graphs);
             }
         }
 
