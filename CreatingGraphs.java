@@ -7,9 +7,10 @@ import java.util.Map;
 
 public class CreatingGraphs {
 
-    final static int MAX_DEBUG_LEVEL = 4;
+    final static int MAX_DEBUG_LEVEL = 6;
     final static int DEBUG_USER_DATA = 0;
     final static int DEBUG_FILE_DATA = 1;
+    final static int DEBUG_GENERATION_TIME = 2;
     final static char ACTIVATED_DEBUG = '1';
 
     public static void main(String[] debugLevel) {
@@ -28,6 +29,17 @@ public class CreatingGraphs {
         FileInteraction.fabricateGraphs(graphs);
         FileInteraction.readCountersForGraphs(graphs, MONTH, YEAR);
 
+        for(Graph obj : graphs){
+            obj.createUninitializedWorkTimeArray(AMOUNT_DAY);
+            obj.setWeekend(AMOUNT_DAY);
+            obj.setShortDayAndHolidays(AMOUNT_DAY, shortDayAndHolidays);
+
+            int amountUninitializedDays = obj.getAmountUninitializedDays(AMOUNT_DAY);
+            double sumTimeInitializedDays = obj.getSumTimeInitializedDays(AMOUNT_DAY);
+            double sumTimesUninitializedDays = NORM_TIME - sumTimeInitializedDays;
+            obj.generateGraph(AMOUNT_DAY, amountUninitializedDays, sumTimesUninitializedDays);
+        }
+
         if(MAX_DEBUG_LEVEL == debugLevel[0].length()){
             String commandLine = debugLevel[0];
             if(commandLine.charAt(DEBUG_USER_DATA) == ACTIVATED_DEBUG){
@@ -37,6 +49,9 @@ public class CreatingGraphs {
             }
             if(commandLine.charAt(DEBUG_FILE_DATA) == ACTIVATED_DEBUG){
                 Debug.printInfoAboutGraphs(graphs);
+            }
+            if(commandLine.charAt(DEBUG_GENERATION_TIME) == ACTIVATED_DEBUG){
+                Debug.printInfoAboutWorkTime(graphs, AMOUNT_DAY);
             }
         }
 

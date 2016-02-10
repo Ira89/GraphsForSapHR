@@ -22,4 +22,8 @@ public class Debug {
     public static void printInfoAboutGraphs(List<Graph> graphs){
         for(Graph obj : graphs) obj.printInfo();
     }
+
+    public static void printInfoAboutWorkTime(List<Graph> graphs, int amountDay){
+        for(Graph obj : graphs) obj.printWorkTime(amountDay);
+    }
 }
