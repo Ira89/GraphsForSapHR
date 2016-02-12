@@ -23,6 +23,7 @@ public class UserInteraction {
     final static int ROW_INDEX_OF_SHORT_DAY = 3;
     final static int ROW_INDEX_OF_DAY_OFF = 5;
     final static int COL_INDEX_OF_DATE = 1;
+
     final static int DELTA_INDEX_AND_VALUE = 3;
 
     public static int readYearAndMonth(){

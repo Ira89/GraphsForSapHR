@@ -6,6 +6,13 @@ public class Graph {
 
     final static double UNINITIALIZED_VALUE = -1;
     final static char TYPE_DESIGNATION_WEEKEND = 'f';
+    final static char TYPE_DESIGNATION_DAY = 'd';
+    final static char TYPE_DESIGNATION_NIGHT = 'n';
+    final static char TYPE_DESIGNATION_UNIVERSAL_DAY = 'u';
+
+    final static int TYPE_DESIGNATION_SHORT_DAY = 0;
+    final static int TYPE_DESIGNATION_HOLIDAY = 1;
+    final static int TYPE_DESIGNATION_DAY_OFF = 2;
 
     private int id;
     private String name;
@@ -52,25 +59,29 @@ public class Graph {
         return id;
     }
 
+    public String getName(){
+        return name;
+    }
+
     public int getLengthRule(){
         return rule.length();
     }
-
 
     public char getRuleOfDay(int indexDay){
         return rule.charAt(indexDay);
     }
 
-
     public double getDaytime(){
         return daytime;
     }
 
+    public String getDaytimeSign(){
+        return daytimeSign;
+    }
 
     public int getCounter(){
         return counter;
     }
-
 
     public double getWorkTime(int indexDay){
         return workTime[indexDay];
@@ -96,10 +107,10 @@ public class Graph {
     private double calculateFrequency(int amountDaysWithMinTime, int amountDaysWithMaxTime){
         double frequency;
         if(amountDaysWithMinTime > amountDaysWithMaxTime){
-            if(amountDaysWithMaxTime != 0) frequency = amountDaysWithMinTime / amountDaysWithMaxTime;
+            if(amountDaysWithMaxTime != 0) frequency = (double) amountDaysWithMinTime / amountDaysWithMaxTime;
             else frequency = amountDaysWithMinTime;
         } else{
-            if(amountDaysWithMinTime != 0) frequency = amountDaysWithMaxTime / amountDaysWithMinTime;
+            if(amountDaysWithMinTime != 0) frequency = (double) amountDaysWithMaxTime / amountDaysWithMinTime;
             else frequency = amountDaysWithMaxTime;
         }
         return frequency;
@@ -207,10 +218,20 @@ public class Graph {
         int amountDaysWithMaxTime = amountUninitializedDays - amountDaysWithMinTime;
 
         double frequency = calculateFrequency(amountDaysWithMinTime, amountDaysWithMaxTime);
-        int spreadValue = amountDaysWithMinTime > amountDaysWithMaxTime ? minWorkTime : maxWorkTime;
-        int amountSpreadValue = amountDaysWithMinTime > amountDaysWithMaxTime ? minWorkTime : maxWorkTime;
+        int spreadValue = amountDaysWithMinTime >= amountDaysWithMaxTime ? minWorkTime : maxWorkTime;
+        int amountSpreadValue = amountDaysWithMinTime >= amountDaysWithMaxTime ? amountDaysWithMinTime : amountDaysWithMaxTime;
         int rareValue = amountDaysWithMinTime < amountDaysWithMaxTime ? minWorkTime : maxWorkTime;
-        int amountRareValue = amountDaysWithMinTime < amountDaysWithMaxTime ? minWorkTime : maxWorkTime;
+        int amountRareValue = amountDaysWithMinTime < amountDaysWithMaxTime ? amountDaysWithMinTime : amountDaysWithMaxTime;
         setUninitializedWorkingTime(spreadValue, amountSpreadValue, rareValue, amountRareValue, frequency, amountDay);
+    }
+
+
+
+    public double getSumWorkTime(int amountDay){
+        double sumWorkTime = 0;
+        for(int indexDay = 0; indexDay < amountDay; ++indexDay) {
+            sumWorkTime += getWorkTime(indexDay);
+        }
+        return sumWorkTime;
     }
 }

@@ -15,7 +15,7 @@ public class Debug {
 
     public static void printShortDayAndHoliday(Map<Integer, Integer> shortDayAndHolidays){
         for(Map.Entry<Integer, Integer> map : shortDayAndHolidays.entrySet()) {
-            System.out.println("day: " + map.getKey() + " code: " + map.getValue());
+            System.out.println("day: " + map.getKey() + " \tcode: " + map.getValue());
         }
     }
 
@@ -25,5 +25,11 @@ public class Debug {
 
     public static void printInfoAboutWorkTime(List<Graph> graphs, int amountDay){
         for(Graph obj : graphs) obj.printWorkTime(amountDay);
+    }
+
+    public static void printHours(Map<Double, String> hours){
+        for(Map.Entry<Double, String> map : hours.entrySet()){
+            System.out.println("hourName: " + map.getValue() + "\thour: " + map.getKey());
+        }
     }
 }
