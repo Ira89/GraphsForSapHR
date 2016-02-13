@@ -28,7 +28,7 @@ public class CreatingGraphs {
         UserInteraction.readShortDayAndHolidays(shortDayAndHolidays, AMOUNT_DAY);
 
         List<Graph> graphs = new ArrayList<Graph>();
-        FileInteraction.fabricateGraphs(graphs);
+        FileInteraction.fabricateGraphs(graphs, NORM_TIME);
         FileInteraction.readCountersForGraphs(graphs, MONTH, YEAR);
 
         for(Graph obj : graphs){
@@ -38,7 +38,7 @@ public class CreatingGraphs {
 
             int amountUninitializedDays = obj.getAmountUninitializedDays(AMOUNT_DAY);
             double sumTimeInitializedDays = obj.getSumTimeInitializedDays(AMOUNT_DAY);
-            double sumTimesUninitializedDays = NORM_TIME - sumTimeInitializedDays;
+            double sumTimesUninitializedDays = obj.getWorkTimeInMonth() - sumTimeInitializedDays;
             obj.generateGraph(AMOUNT_DAY, amountUninitializedDays, sumTimesUninitializedDays);
         }
 

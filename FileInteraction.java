@@ -18,7 +18,14 @@ public class FileInteraction {
     final static int COL_INDEX_OF_TYPE = 3;
     final static int COL_INDEX_OF_DAYTIME = 4;
     final static int COL_INDEX_OF_DAYTIME_SIGN = 5;
+    final static int COL_INDEX_OF_NIGHTTIME = 6;
+    final static int COL_INDEX_OF_NIGHTTIME_SIGN = 7;
+
     final static String TYPE_DESIGNATION_OF_DAY_GRAPHS = "DAY";
+    final static String TYPE_DESIGNATION_OF_SHORT_DAY_GRAPHS = "SHORT";
+    final static String TYPE_DESIGNATION_OF_STANDARD_GRAPHS = "STANDARD";
+    final static String TYPE_DESIGNATION_OF_UNIQUE_GRAPHS = "UNIQUE";
+    final static String TYPE_DESIGNATION_OF_FLOAT_GRAPHS = "FLOAT";
 
     // constants in the file counter_...xls
     final static int COL_INDEX_COUNTER_ID = 0;
@@ -63,7 +70,7 @@ public class FileInteraction {
      ******************************************************************************************************************************************/
 
 
-    public static void fabricateGraphs(List<Graph> graphs){
+    public static void fabricateGraphs(List<Graph> graphs, double normTimeInMonth){
         try{
 
             FileInputStream fis = new FileInputStream("./lib/graphs.xls");
@@ -79,14 +86,30 @@ public class FileInteraction {
                     String type = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_OF_TYPE).getStringCellValue();
                     double daytime = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_OF_DAYTIME).getNumericCellValue();
                     String daytimeSign = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_OF_DAYTIME_SIGN).getStringCellValue();
-                    ++indexRow;
 
                     if(type.equals(TYPE_DESIGNATION_OF_DAY_GRAPHS)){
-                        graphs.add(new Graph(id, name, rule, daytime, daytimeSign));
-                    }else{
-                        //TODO
-                        graphs.add(new Graph(id, name, rule, daytime, daytimeSign));
+                        graphs.add(new Graph(id, name, rule, daytime, daytimeSign, normTimeInMonth));
                     }
+                    else if(type.equals(TYPE_DESIGNATION_OF_SHORT_DAY_GRAPHS)){
+                        graphs.add(new GraphShort(id, name, rule, daytime, daytimeSign, normTimeInMonth));
+                    }
+                    else if(type.equals(TYPE_DESIGNATION_OF_STANDARD_GRAPHS)){
+                        graphs.add(new GraphsStandard(id, name, rule, daytime, daytimeSign, normTimeInMonth));
+                    }
+                    else if(type.equals(TYPE_DESIGNATION_OF_UNIQUE_GRAPHS)){
+                        double uniqueTime = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_OF_NIGHTTIME).getNumericCellValue();
+                        String uniqueNameTime = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_OF_NIGHTTIME_SIGN).getStringCellValue();
+                        graphs.add(new GraphsUnique(id, name, rule, daytime, daytimeSign, uniqueTime, uniqueNameTime, normTimeInMonth));
+                    }
+                    else if(type.equals(TYPE_DESIGNATION_OF_FLOAT_GRAPHS)){
+                        graphs.add(new GraphFloat(id, name, rule, daytime, daytimeSign, normTimeInMonth));
+                    }
+                    else{
+                        //TODO
+                        graphs.add(new Graph(id, name, rule, daytime, daytimeSign, normTimeInMonth));
+                    }
+
+                    ++indexRow;
 
                 }catch(NullPointerException nullExc){
                     break;
@@ -274,7 +297,7 @@ public class FileInteraction {
                 for(int indexDay = 0; indexDay < amountDay; ++indexDay){
                     double hour = obj.getWorkTime(indexDay);
                     Integer codeDay = shortDayAndHoliday.get(indexDay + 1);
-                    if(codeDay != null && codeDay == Graph.TYPE_DESIGNATION_SHORT_DAY){
+                    if(codeDay != null && codeDay == Graph.CODE_SHORT_DAY){
                         if(obj.getWorkTime(indexDay) != 0) ++hour;
                     }
 
@@ -295,26 +318,32 @@ public class FileInteraction {
                     cell = row.createCell(DELTA_COL_IN_TEMPLATE + indexDay * SIZE_STEP);
                     cell.setCellValue(hourName);
 
-                    if(obj.getRuleOfDay(currentCounter) == Graph.TYPE_DESIGNATION_WEEKEND && obj.getWorkTime(indexDay) == 0);
+                    if(obj.getRuleOfDay(currentCounter) == Graph.TYPE_DESIGNATION_WEEKEND && obj.getWorkTime(indexDay) == 0); // without instruction!
                     else if(obj.getRuleOfDay(currentCounter) == Graph.TYPE_DESIGNATION_NIGHT) cell.setCellStyle(styleForNighttime);
                     else cell.setCellStyle(styleForDaytime);
 
                     // set sign short day and holiday
                     if(codeDay != null){
                         switch(codeDay){
-                            case Graph.TYPE_DESIGNATION_SHORT_DAY:{
+                            case Graph.CODE_SHORT_DAY:{
                                 if(obj.getRuleOfDay(currentCounter) != Graph.TYPE_DESIGNATION_WEEKEND){
                                     cell = row.createCell(DELTA_COL_IN_TEMPLATE + (indexDay + 1) * SIZE_STEP - CELL_OFFSET_FOR_TEXT);
                                     cell.setCellValue(SIGN_SHORT_DAY);
                                 }
                             } break;
-                            case Graph.TYPE_DESIGNATION_HOLIDAY:{
+                            case Graph.CODE_HOLIDAY:{
                                 cell = row.createCell(DELTA_COL_IN_TEMPLATE + (indexDay + 1) * SIZE_STEP - CELL_OFFSET_FOR_NUMBER);
                                 cell.setCellValue(SIGN_HOLIDAY);
-                                //TODO
-                            } break;
-                            case Graph.TYPE_DESIGNATION_DAY_OFF:{
-                                //TODO
+                            } // without break!
+                            case Graph.CODE_DAY_OFF:{
+                                boolean isStandardOrUniqueGraph = (obj instanceof GraphsStandard) || (obj instanceof GraphsUnique);
+                                if(isStandardOrUniqueGraph && obj.getRuleOfDay(currentCounter) != Graph.TYPE_DESIGNATION_WEEKEND){
+                                    cell = row.createCell(DELTA_COL_IN_TEMPLATE + indexDay * SIZE_STEP);
+                                    if(obj.getRuleOfDay(currentCounter) != Graph.TYPE_DESIGNATION_UNIVERSAL_DAY) cell.setCellValue(obj.getDaytimeSign());
+                                    else cell.setCellValue(obj.getUniqueTimeSign());
+                                    cell = row.createCell(DELTA_COL_IN_TEMPLATE + (indexDay + 1) * SIZE_STEP - CELL_OFFSET_FOR_TEXT);
+                                    cell.setCellValue(SIGN_DAY_OFF);
+                                }
                             }
                         }
                     }

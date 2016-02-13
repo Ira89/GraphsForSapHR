@@ -5,14 +5,18 @@ import java.util.Map;
 public class Graph {
 
     final static double UNINITIALIZED_VALUE = -1;
+    final static double STANDARD_TIME_IN_DAY = 8;
+    final static double FLOAT_TIME_IN_DAY = 7.2;
     final static char TYPE_DESIGNATION_WEEKEND = 'f';
     final static char TYPE_DESIGNATION_DAY = 'd';
     final static char TYPE_DESIGNATION_NIGHT = 'n';
     final static char TYPE_DESIGNATION_UNIVERSAL_DAY = 'u';
 
-    final static int TYPE_DESIGNATION_SHORT_DAY = 0;
-    final static int TYPE_DESIGNATION_HOLIDAY = 1;
-    final static int TYPE_DESIGNATION_DAY_OFF = 2;
+    final static int CODE_SHORT_DAY = 0;
+    final static int CODE_HOLIDAY = 1;
+    final static int CODE_DAY_OFF = 2;
+    final static double ACCEPTABLE_ACCURACY = 1.0e-10;
+    final static double ACCEPTABLE_ACCURACY_TO_TIME = 0.001;
 
     private int id;
     private String name;
@@ -20,19 +24,21 @@ public class Graph {
     private double daytime;
     private String daytimeSign;
     private int counter;
+    private double workTimeInMonth;
     private double workTime[];
 
-    Graph(int id, String name, String rule, double daytime, String daytimeSign){
+    Graph(int id, String name, String rule, double daytime, String daytimeSign, double workTimeInMonth){
         this.id = id;
         this.name = name;
         this.rule = rule;
         this.daytime = daytime;
         this.daytimeSign = daytimeSign;
+        this.workTimeInMonth = workTimeInMonth;
     }
 
     public void printInfo(){
-        System.out.print("id: " + id + "\tname: " + name + "\trule: " + rule);
-        System.out.println("\tdaytime: " + daytime + "\tdaytimeSign: " + daytimeSign + "\tcounter: " + counter);
+        System.out.print("id: " + id + "\tname: " + name + "\trule: " + rule + "\tdaytime: " + daytime);
+        System.out.println("\tdaytimeSign: " + daytimeSign + "\tworkTimeInMonth: " + workTimeInMonth + "\tcounter: " + counter);
     }
 
     public void printWorkTime(int amountDay){
@@ -49,6 +55,10 @@ public class Graph {
 
     public void setCounter(int counter){
         this.counter = counter;
+    }
+
+    public void setWorkTimeInMonth(double workTimeInMonth){
+        this.workTimeInMonth = workTimeInMonth;
     }
 
     public void setWorkTime(int indexDay, double time){
@@ -79,8 +89,16 @@ public class Graph {
         return daytimeSign;
     }
 
+    public String getUniqueTimeSign(){
+        return getDaytimeSign();
+    }
+
     public int getCounter(){
         return counter;
+    }
+
+    public double getWorkTimeInMonth(){
+        return workTimeInMonth;
     }
 
     public double getWorkTime(int indexDay){
@@ -97,28 +115,14 @@ public class Graph {
         int daysWithMinTime;
         for(daysWithMinTime = 0; daysWithMinTime <= amountDay; ++daysWithMinTime){
             int daysWithMaxTime = amountDay - daysWithMinTime;
-            if(daysWithMinTime * minWorkTime + daysWithMaxTime * maxWorkTime == sumWorkTime) break;
+            if(daysWithMinTime * minWorkTime + daysWithMaxTime * maxWorkTime - sumWorkTime < ACCEPTABLE_ACCURACY) return daysWithMinTime;
         }
         return daysWithMinTime;
     }
 
 
 
-    private double calculateFrequency(int amountDaysWithMinTime, int amountDaysWithMaxTime){
-        double frequency;
-        if(amountDaysWithMinTime > amountDaysWithMaxTime){
-            if(amountDaysWithMaxTime != 0) frequency = (double) amountDaysWithMinTime / amountDaysWithMaxTime;
-            else frequency = amountDaysWithMinTime;
-        } else{
-            if(amountDaysWithMinTime != 0) frequency = (double) amountDaysWithMaxTime / amountDaysWithMinTime;
-            else frequency = amountDaysWithMaxTime;
-        }
-        return frequency;
-    }
-
-
-
-    private void setUninitializedWorkingTime(int spreadValue, int amountSpreadValue, int rareValue, int amountRareValue, double frequency, int amountDay){
+    private void fillUninitializedWorkingTime(int spreadValue, int amountSpreadValue, int rareValue, int amountRareValue, double frequency, int amountDay){
         int lengthRule = getLengthRule();
         int currentCounter = getCounter();
 
@@ -144,8 +148,22 @@ public class Graph {
 
 
     /*******************************************************************************************************************************************
-                                                        public methods
+     public methods
      ******************************************************************************************************************************************/
+
+
+    public double calculateFrequency(int amountDaysWithMinTime, int amountDaysWithMaxTime){
+        double frequency;
+        if(amountDaysWithMinTime > amountDaysWithMaxTime){
+            if(amountDaysWithMaxTime != 0) frequency = (double) amountDaysWithMinTime / amountDaysWithMaxTime;
+            else frequency = amountDaysWithMinTime;
+        } else{
+            if(amountDaysWithMinTime != 0) frequency = (double) amountDaysWithMaxTime / amountDaysWithMinTime;
+            else frequency = amountDaysWithMaxTime;
+        }
+        return frequency;
+    }
+
 
 
     public void createUninitializedWorkTimeArray(int amountDay){
@@ -175,8 +193,8 @@ public class Graph {
             if(getRuleOfDay(currentCounter) != TYPE_DESIGNATION_WEEKEND){
                 for(Map.Entry<Integer, Integer> container : shortDayAndHolidays.entrySet()){
                     if(container.getKey() == indexDay + 1){
-                        if(container.getValue() == 0) setWorkTime(indexDay, getDaytime() - 1);
-                        else if(container.getValue() == 1) setWorkTime(indexDay, getDaytime());
+                        if(container.getValue() == CODE_SHORT_DAY) setWorkTime(indexDay, getDaytime() - 1);
+                        else if(container.getValue() == CODE_HOLIDAY) setWorkTime(indexDay, getDaytime());
                     }
                 }
             }
@@ -222,7 +240,7 @@ public class Graph {
         int amountSpreadValue = amountDaysWithMinTime >= amountDaysWithMaxTime ? amountDaysWithMinTime : amountDaysWithMaxTime;
         int rareValue = amountDaysWithMinTime < amountDaysWithMaxTime ? minWorkTime : maxWorkTime;
         int amountRareValue = amountDaysWithMinTime < amountDaysWithMaxTime ? amountDaysWithMinTime : amountDaysWithMaxTime;
-        setUninitializedWorkingTime(spreadValue, amountSpreadValue, rareValue, amountRareValue, frequency, amountDay);
+        fillUninitializedWorkingTime(spreadValue, amountSpreadValue, rareValue, amountRareValue, frequency, amountDay);
     }
 
 
