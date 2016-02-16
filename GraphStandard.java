@@ -2,9 +2,9 @@ package ru.polynkina.irina.graphs;
 
 import java.util.Map;
 
-public class GraphsStandard extends Graph {
+public class GraphStandard extends Graph {
 
-    GraphsStandard(int id, String name, String rule, double daytime, String daytimeSign, double workTimeInMonth){
+    GraphStandard(int id, String name, String rule, double daytime, String daytimeSign, double workTimeInMonth){
         super(id, name, rule, daytime, daytimeSign, workTimeInMonth);
     }
 
@@ -14,7 +14,7 @@ public class GraphsStandard extends Graph {
         int currentCounter = getCounter();
 
         for(int indexDay = 0; indexDay < amountDay; ++indexDay){
-            if(getRuleOfDay(currentCounter) != TYPE_DESIGNATION_WEEKEND){
+            if(getRuleOfDay(currentCounter) != CHAR_DESIGNATION_WEEKEND){
                 for(Map.Entry<Integer, Integer> container : shortDayAndHolidays.entrySet()){
                     if(container.getKey() == indexDay + 1){
                         if(container.getValue() == CODE_SHORT_DAY) setWorkTime(indexDay, getDaytime() - 1);

@@ -56,7 +56,7 @@ public class GraphFloat extends Graph {
 
         int counterFloatDay = 0;
         double sumFloatDay = 0;
-        while((sumTimesUninitializedDays - sumFloatDay + ACCEPTABLE_ACCURACY) % 1 > ACCEPTABLE_ACCURACY_TO_TIME){
+        while((sumTimesUninitializedDays - sumFloatDay + ACCEPTABLE_ACCURACY) % 1 > NEGLIGIBLE_TIME_INTERVAL){
             sumFloatDay += floatTime;
             ++counterFloatDay;
         }

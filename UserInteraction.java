@@ -16,6 +16,7 @@ public class UserInteraction {
     final static int BITS_IN_MONTH = 4;
     final static int MASK_FOR_MONTH = 0xF;
 
+    // constants in the file graphs.xls
     final static int INDEX_OF_SHEET = 0;
     final static int ROW_INDEX_OF_YEAR = 0;
     final static int ROW_INDEX_OF_MONTH = 1;
@@ -61,8 +62,9 @@ public class UserInteraction {
             FileInputStream fis = new FileInputStream("./lib/userInput.xls");
             Workbook wb = new HSSFWorkbook(fis);
             normTime = wb.getSheetAt(INDEX_OF_SHEET).getRow(ROW_INDEX_OF_NORM_TIME).getCell(COL_INDEX_OF_DATE).getNumericCellValue();
-            if(normTime < MIN_NORM_TIME || normTime > MAX_NORM_TIME)
+            if(normTime < MIN_NORM_TIME || normTime > MAX_NORM_TIME) {
                 throw new Exception("Некорректно указана норма времени!");
+            }
 
             wb.close();
             fis.close();
@@ -93,8 +95,9 @@ public class UserInteraction {
                         boolean isNewDate = shortDayAndHolidays.get(indexDay) == null;
                         if(!isNewDate) throw new Exception("Значение " + indexDay + " не может быть указано дважды");
 
-                        if(indexDay <= 0 || indexDay > amountDay)
+                        if(indexDay <= 0 || indexDay > amountDay) {
                             throw new Exception(indexDay + "-й день не существует");
+                        }
 
                         shortDayAndHolidays.put(indexDay, indexRow - DELTA_INDEX_AND_VALUE);
 

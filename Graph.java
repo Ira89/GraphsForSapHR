@@ -7,16 +7,16 @@ public class Graph {
     final static double UNINITIALIZED_VALUE = -1;
     final static double STANDARD_TIME_IN_DAY = 8;
     final static double FLOAT_TIME_IN_DAY = 7.2;
-    final static char TYPE_DESIGNATION_WEEKEND = 'f';
-    final static char TYPE_DESIGNATION_DAY = 'd';
-    final static char TYPE_DESIGNATION_NIGHT = 'n';
-    final static char TYPE_DESIGNATION_UNIVERSAL_DAY = 'u';
+    final static char CHAR_DESIGNATION_WEEKEND = 'f';
+    final static char CHAR_DESIGNATION_DAY = 'd';
+    final static char CHAR_DESIGNATION_NIGHT = 'n';
+    final static char CHAR_DESIGNATION_UNIVERSAL_DAY = 'u';
 
     final static int CODE_SHORT_DAY = 0;
     final static int CODE_HOLIDAY = 1;
     final static int CODE_DAY_OFF = 2;
     final static double ACCEPTABLE_ACCURACY = 1.0e-10;
-    final static double ACCEPTABLE_ACCURACY_TO_TIME = 0.001;
+    final static double NEGLIGIBLE_TIME_INTERVAL = 0.001;
 
     private int id;
     private String name;
@@ -43,7 +43,9 @@ public class Graph {
 
     public void printWorkTime(int amountDay){
         System.out.print(name + ": \t");
-        for(int indexDay = 0; indexDay < amountDay; ++indexDay) System.out.print(workTime[indexDay] + " ");
+        for(int indexDay = 0; indexDay < amountDay; ++indexDay){
+            System.out.print(workTime[indexDay] + " ");
+        }
         System.out.println();
     }
 
@@ -85,11 +87,23 @@ public class Graph {
         return daytime;
     }
 
+    public double getUniqueTime(){
+        return getDaytime();
+    }
+
+    public double getNightTime(){
+        return getDaytime();
+    }
+
     public String getDaytimeSign(){
         return daytimeSign;
     }
 
     public String getUniqueTimeSign(){
+        return getDaytimeSign();
+    }
+
+    public String getNightTimeSigh(){
         return getDaytimeSign();
     }
 
@@ -148,7 +162,7 @@ public class Graph {
 
 
     /*******************************************************************************************************************************************
-     public methods
+                                                        public methods
      ******************************************************************************************************************************************/
 
 
@@ -178,7 +192,7 @@ public class Graph {
         int currentCounter = getCounter();
 
         for(int indexDay = 0; indexDay < amountDay; ++indexDay){
-            if(getRuleOfDay(currentCounter) == TYPE_DESIGNATION_WEEKEND) setWorkTime(indexDay, 0);
+            if(getRuleOfDay(currentCounter) == CHAR_DESIGNATION_WEEKEND) setWorkTime(indexDay, 0);
             if(++currentCounter == lengthRule) currentCounter = 0;
         }
     }
@@ -190,7 +204,7 @@ public class Graph {
         int currentCounter = getCounter();
 
         for(int indexDay = 0; indexDay < amountDay; ++indexDay){
-            if(getRuleOfDay(currentCounter) != TYPE_DESIGNATION_WEEKEND){
+            if(getRuleOfDay(currentCounter) != CHAR_DESIGNATION_WEEKEND){
                 for(Map.Entry<Integer, Integer> container : shortDayAndHolidays.entrySet()){
                     if(container.getKey() == indexDay + 1){
                         if(container.getValue() == CODE_SHORT_DAY) setWorkTime(indexDay, getDaytime() - 1);

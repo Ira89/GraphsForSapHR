@@ -2,12 +2,12 @@ package ru.polynkina.irina.graphs;
 
 import java.util.Map;
 
-public class GraphsUnique extends Graph {
+public class GraphUnique extends Graph {
 
     private double uniqueTime;
     private String uniqueTimeSign;
 
-    GraphsUnique(int id, String name, String rule, double daytime, String daytimeSign, double uniqueTime, String uniqueTimeSign, double workTimeInMonth){
+    GraphUnique(int id, String name, String rule, double daytime, String daytimeSign, double uniqueTime, String uniqueTimeSign, double workTimeInMonth){
         super(id, name, rule, daytime, daytimeSign, workTimeInMonth);
         this.uniqueTime = uniqueTime;
         this.uniqueTimeSign = uniqueTimeSign;
@@ -29,12 +29,12 @@ public class GraphsUnique extends Graph {
         int currentCounter = getCounter();
 
         for(int indexDay = 0; indexDay < amountDay; ++indexDay){
-            if(getRuleOfDay(currentCounter) != TYPE_DESIGNATION_WEEKEND){
+            if(getRuleOfDay(currentCounter) != CHAR_DESIGNATION_WEEKEND){
                 for(Map.Entry<Integer, Integer> container : shortDayAndHolidays.entrySet()){
                     if(container.getKey() == indexDay + 1){
                         if(container.getValue() == CODE_SHORT_DAY){
-                            if(getRuleOfDay(currentCounter) == TYPE_DESIGNATION_DAY) setWorkTime(indexDay, getDaytime() - 1);
-                            else if(getRuleOfDay(currentCounter) == TYPE_DESIGNATION_UNIVERSAL_DAY) setWorkTime(indexDay, getUniqueTime() - 1);
+                            if(getRuleOfDay(currentCounter) == CHAR_DESIGNATION_DAY) setWorkTime(indexDay, getDaytime() - 1);
+                            else if(getRuleOfDay(currentCounter) == CHAR_DESIGNATION_UNIVERSAL_DAY) setWorkTime(indexDay, getUniqueTime() - 1);
                         }
                         else if(container.getValue() == CODE_HOLIDAY) setWorkTime(indexDay, 0);
                         else if(container.getValue() == CODE_DAY_OFF) setWorkTime(indexDay, 0);
@@ -51,8 +51,8 @@ public class GraphsUnique extends Graph {
         int currentCounter = getCounter();
         for(int indexDay = 0; indexDay < amountDay; ++indexDay){
             if(getWorkTime(indexDay) == UNINITIALIZED_VALUE){
-                if(getRuleOfDay(currentCounter) == TYPE_DESIGNATION_DAY) setWorkTime(indexDay, getDaytime());
-                else if(getRuleOfDay(currentCounter) == TYPE_DESIGNATION_UNIVERSAL_DAY) setWorkTime(indexDay, getUniqueTime());
+                if(getRuleOfDay(currentCounter) == CHAR_DESIGNATION_DAY) setWorkTime(indexDay, getDaytime());
+                else if(getRuleOfDay(currentCounter) == CHAR_DESIGNATION_UNIVERSAL_DAY) setWorkTime(indexDay, getUniqueTime());
             }
             if(++currentCounter == lengthRule) currentCounter = 0;
         }
