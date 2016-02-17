@@ -2,7 +2,10 @@ package ru.polynkina.irina.graphs;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +30,7 @@ public class FileInteraction {
     final static String STRING_DESIGNATION_OF_UNIQUE_GRAPHS = "UNIQUE";
     final static String STRING_DESIGNATION_OF_FLOAT_GRAPHS = "FLOAT";
     final static String STRING_DESIGNATION_OF_DIURNAL_GRAPHS = "DIURNAL";
+    final static String STRING_DESIGNATION_OF_MIX_GRAPHS = "MIX";
 
     // constants in the file counter_...xls
     final static int COL_INDEX_COUNTER_ID = 0;
@@ -71,7 +75,7 @@ public class FileInteraction {
      ******************************************************************************************************************************************/
 
 
-    public static void fabricateGraphs(List<Graph> graphs, double normTimeInMonth){
+    public static void fabricateGraphs(List<Graph> graphs, final double NORM_TIME){
         try{
 
             FileInputStream fis = new FileInputStream("./lib/graphs.xls");
@@ -89,28 +93,33 @@ public class FileInteraction {
                     String daytimeSign = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_OF_DAYTIME_SIGN).getStringCellValue();
 
                     if(type.equals(STRING_DESIGNATION_OF_DAY_GRAPHS)){
-                        graphs.add(new Graph(id, name, rule, daytime, daytimeSign, normTimeInMonth));
+                        graphs.add(new Graph(id, name, rule, daytime, daytimeSign, NORM_TIME));
                     }
                     else if(type.equals(STRING_DESIGNATION_OF_SHORT_DAY_GRAPHS)){
-                        graphs.add(new GraphShort(id, name, rule, daytime, daytimeSign, normTimeInMonth));
+                        graphs.add(new GraphShort(id, name, rule, daytime, daytimeSign, NORM_TIME));
                     }
                     else if(type.equals(STRING_DESIGNATION_OF_STANDARD_GRAPHS)){
-                        graphs.add(new GraphStandard(id, name, rule, daytime, daytimeSign, normTimeInMonth));
+                        graphs.add(new GraphStandard(id, name, rule, daytime, daytimeSign, NORM_TIME));
                     }
                     else if(type.equals(STRING_DESIGNATION_OF_UNIQUE_GRAPHS)){
                         double uniqueTime = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_OF_NIGHTTIME).getNumericCellValue();
-                        String uniqueNameTime = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_OF_NIGHTTIME_SIGN).getStringCellValue();
-                        graphs.add(new GraphUnique(id, name, rule, daytime, daytimeSign, uniqueTime, uniqueNameTime, normTimeInMonth));
+                        String uniqueTimeSign = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_OF_NIGHTTIME_SIGN).getStringCellValue();
+                        graphs.add(new GraphUnique(id, name, rule, daytime, daytimeSign, uniqueTime, uniqueTimeSign, NORM_TIME));
                     }
                     else if(type.equals(STRING_DESIGNATION_OF_FLOAT_GRAPHS)){
-                        graphs.add(new GraphFloat(id, name, rule, daytime, daytimeSign, normTimeInMonth));
+                        graphs.add(new GraphFloat(id, name, rule, daytime, daytimeSign, NORM_TIME));
                     }
                     else if(type.equals(STRING_DESIGNATION_OF_DIURNAL_GRAPHS)){
-                        graphs.add(new GraphDiurnal(id, name, rule, daytime, daytimeSign, normTimeInMonth));
+                        graphs.add(new GraphDiurnal(id, name, rule, daytime, daytimeSign, NORM_TIME));
+                    }
+                    else if(type.equals(STRING_DESIGNATION_OF_MIX_GRAPHS)){
+                        double nightTime = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_OF_NIGHTTIME).getNumericCellValue();
+                        String nightTimeSign = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_OF_NIGHTTIME_SIGN).getStringCellValue();
+                        graphs.add(new GraphMix(id, name, rule, daytime, daytimeSign, nightTime, nightTimeSign, NORM_TIME));
                     }
                     else{
-                        //TODO
-                        graphs.add(new Graph(id, name, rule, daytime, daytimeSign, normTimeInMonth));
+                        System.out.println("Тип графика: " + type + " неизвестен!");
+                        graphs.add(new Graph(id, name, rule, daytime, daytimeSign, NORM_TIME));
                     }
 
                     ++indexRow;
@@ -131,25 +140,26 @@ public class FileInteraction {
 
 
 
-    public static void readCountersForGraphs(List<Graph> graphs, int indexMonth, int indexYear){
-        try{
-
-            String filename = "counter_" + indexMonth + "_" + indexYear + ".xls";
+    public static void readCountersForGraphs(List<Graph> graphs, final int INDEX_MONTH, final int INDEX_YEAR){
+        try {
+            String filename = "counter_" + INDEX_MONTH + "_" + INDEX_YEAR + ".xls";
             FileInputStream fis = new FileInputStream("./count/" + filename);
             Workbook wb = new HSSFWorkbook(fis);
 
-            for(Graph obj : graphs){
+            for (Graph obj : graphs) {
                 int idGraph = obj.getId();
                 int idCounter = (int) wb.getSheetAt(INDEX_OF_SHEET).getRow(idGraph).getCell(COL_INDEX_COUNTER_ID).getNumericCellValue();
                 int valueCounter = (int) wb.getSheetAt(INDEX_OF_SHEET).getRow(idGraph).getCell(COL_INDEX_COUNTER_VALUE).getNumericCellValue();
 
-                if(idGraph != idCounter) throw new Exception("Вероятно, файл " + filename + " поврежден");
+                if (idGraph != idCounter) throw new Exception("Файл " + filename + " поврежден");
                 obj.setCounter(valueCounter);
             }
 
             wb.close();
             fis.close();
-
+        }catch(FileNotFoundException excFile){
+            System.out.println("Не сгенерирован график за предыдущий месяц!");
+            System.exit(0);
         }catch(Exception exc){
             exc.printStackTrace();
             System.exit(0);
@@ -158,7 +168,7 @@ public class FileInteraction {
 
 
 
-    public static void writeWorkTimeInFile(List<Graph> graphs, int amountDay){
+    public static void writeWorkTimeInFile(final List<Graph> graphs, final int AMOUNT_OF_DAYS){
         try{
 
             FileInputStream fis = new FileInputStream("./lib/templateWorkingTime.xls");
@@ -177,19 +187,18 @@ public class FileInteraction {
                 Cell cell = row.createCell(COL_INDEX_NAME_GRAPH_IN_TEMPLATE);
                 cell.setCellValue(obj.getName());
                 cell = row.createCell(COL_INDEX_WORK_TIME_IN_TEMPLATE);
-                cell.setCellValue(obj.getSumWorkTime(amountDay));
+                cell.setCellValue(obj.getSumWorkTime(AMOUNT_OF_DAYS));
 
                 int lengthRule = obj.getLengthRule();
                 int currentCounter = obj.getCounter();
-                for(int indexDay = 0; indexDay < amountDay; ++indexDay){
+                for(int indexDay = 0; indexDay < AMOUNT_OF_DAYS; ++indexDay){
                     if(obj.getWorkTime(indexDay) != 0){
                         cell = row.createCell(indexDay + DELTA_COL_IN_TEMPLATE);
                         cell.setCellValue(obj.getWorkTime(indexDay));
                         if(obj.getRuleOfDay(currentCounter) == Graph.CHAR_DESIGNATION_NIGHT){
                             cell.setCellStyle(styleForNighttime);
                         }
-                        else if((obj.getRuleOfDay(currentCounter) == Graph.CHAR_DESIGNATION_DAY) ||
-                                (obj.getRuleOfDay(currentCounter) == Graph.CHAR_DESIGNATION_UNIVERSAL_DAY)){
+                        else{
                             cell.setCellStyle(styleForDaytime);
                         }
                     }
@@ -212,7 +221,7 @@ public class FileInteraction {
 
 
 
-    public static void readDayHours(Map<Double, String> dayHours){
+    public static void readDayHours(Map<Double, String> nameDayHours){
         try{
 
             FileInputStream fis = new FileInputStream("./lib/dayHours.xls");
@@ -224,7 +233,7 @@ public class FileInteraction {
 
                     double hour = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_HOUR).getNumericCellValue();
                     String hourName = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_HOUR_NAME).getStringCellValue();
-                    dayHours.put(hour, hourName);
+                    nameDayHours.put(hour, hourName);
                     ++indexRow;
 
                 }catch(NullPointerException nullExc){
@@ -243,7 +252,7 @@ public class FileInteraction {
 
 
 
-    public static void readNightHours(Map<Double, String> nightHours){
+    public static void readNightHours(Map<Double, String> nameNightHours){
         try{
 
             FileInputStream fis = new FileInputStream("./lib/nightHours.xls");
@@ -255,7 +264,7 @@ public class FileInteraction {
 
                     double hour = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_HOUR).getNumericCellValue();
                     String hourName = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_HOUR_NAME).getStringCellValue();
-                    nightHours.put(hour, hourName);
+                    nameNightHours.put(hour, hourName);
                     ++indexRow;
 
                 }catch(NullPointerException nullExc){
@@ -274,8 +283,8 @@ public class FileInteraction {
 
 
 
-    public static void writeGraphsIntoTemplate(List<Graph> graphs, Map<Double, String> dayHours, Map<Double, String> nightHours,
-                                               Map<Integer, Integer> shortDayAndHoliday, int amountDay){
+    public static void writeGraphsIntoTemplate(final List<Graph> graphs, final Map<Double, String> nameDayHours, final Map<Double, String> nameNightHours,
+                                               final Map<Integer, Integer> shortDayAndHoliday, final int AMOUNT_OF_DAYS){
         try{
 
             FileInputStream fis = new FileInputStream("./lib/templateForSapHR.xls");
@@ -294,11 +303,11 @@ public class FileInteraction {
                 Cell cell = row.createCell(COL_INDEX_NAME_GRAPH_IN_TEMPLATE);
                 cell.setCellValue(obj.getName());
                 cell = row.createCell(COL_INDEX_WORK_TIME_IN_TEMPLATE);
-                cell.setCellValue(obj.getSumWorkTime(amountDay));
+                cell.setCellValue(obj.getSumWorkTime(AMOUNT_OF_DAYS));
 
                 int lengthRule = obj.getLengthRule();
                 int currentCounter = obj.getCounter();
-                for(int indexDay = 0; indexDay < amountDay; ++indexDay){
+                for(int indexDay = 0; indexDay < AMOUNT_OF_DAYS; ++indexDay){
                     double hour = obj.getWorkTime(indexDay);
                     Integer codeDay = shortDayAndHoliday.get(indexDay + 1);
                     if(codeDay != null && codeDay == Graph.CODE_SHORT_DAY){
@@ -308,15 +317,15 @@ public class FileInteraction {
                     String hourName;
                     if(obj.getRuleOfDay(currentCounter) == Graph.CHAR_DESIGNATION_DAY){
                         if(hour == obj.getDaytime()) hourName = obj.getDaytimeSign();
-                        else hourName = findHourName(dayHours, hour);
+                        else hourName = findHourName(nameDayHours, hour);
                     }
                     else if(obj.getRuleOfDay(currentCounter) == Graph.CHAR_DESIGNATION_NIGHT){
-                        if(hour == obj.getNightTime()) hourName = obj.getNightTimeSigh();
-                        else hourName = findHourName(nightHours, hour);
+                        if(hour == obj.getNightTime()) hourName = obj.getNightTimeSign();
+                        else hourName = findHourName(nameNightHours, hour);
                     }
                     else{
                         if(hour == obj.getUniqueTime()) hourName = obj.getUniqueTimeSign();
-                        else hourName = findHourName(dayHours, hour);
+                        else hourName = findHourName(nameDayHours, hour);
                     }
 
                     cell = row.createCell(DELTA_COL_IN_TEMPLATE + indexDay * SIZE_STEP);
@@ -363,6 +372,54 @@ public class FileInteraction {
             fis.close();
 
         }catch(Exception exc){
+            exc.printStackTrace();
+            System.exit(0);
+        }
+    }
+
+
+
+    public static void writeNextCounter(final List<Graph> graphs, final int AMOUNT_OF_DAYS, final int INDEX_MONTH, final int INDEX_YEAR){
+        String filename = "counter_" + INDEX_MONTH + "_" + INDEX_YEAR + ".xls";
+        try{
+            FileInputStream fis = new FileInputStream("./count/" + filename);
+            Workbook wb = new HSSFWorkbook(fis);
+
+            for(Graph obj : graphs){
+                Row row = wb.getSheetAt(INDEX_OF_SHEET).getRow(obj.getId());
+                Cell cell = row.createCell(COL_INDEX_COUNTER_ID);
+                cell.setCellValue(obj.getId());
+
+                int nextCounter = AMOUNT_OF_DAYS % obj.getLengthRule();
+                nextCounter += obj.getCounter();
+                nextCounter %= obj.getLengthRule();
+                cell = row.createCell(COL_INDEX_COUNTER_VALUE);
+                cell.setCellValue(nextCounter);
+            }
+
+            int nextMonth = INDEX_MONTH + 1 > 12 ? 1 : INDEX_MONTH + 1;
+            int nextYear = INDEX_MONTH + 1 > 12 ? INDEX_YEAR + 1 : INDEX_YEAR;
+            String nextFilename = "counter_" + nextMonth + "_" + nextYear + ".xls";
+            FileOutputStream fos = new FileOutputStream("./count/" + nextFilename);
+            wb.write(fos);
+
+            fos.close();
+            wb.close();
+            fis.close();
+        }catch (Exception exc){
+            exc.printStackTrace();
+            System.exit(0);
+        }
+    }
+
+
+
+    public static void deleteOldCounter(final int INDEX_MONTH, final int INDEX_YEAR){
+        try{
+            String filenameOldCounter = "counter_" + INDEX_MONTH + "_" + (INDEX_YEAR - 1) + ".xls";
+            File oldFile = new File("./count/" + filenameOldCounter);
+            oldFile.delete();
+        }catch (Exception exc){
             exc.printStackTrace();
             System.exit(0);
         }

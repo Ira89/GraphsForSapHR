@@ -10,29 +10,29 @@ public class GraphDiurnal extends Graph {
     }
 
 
-    private void setAdditionalWorkDay(double additionalTime, int amountDay){
+    private void setAdditionalWorkDay(double additionalTime, final int AMOUNT_OF_DAYS){
         int lengthRule = getLengthRule();
-        int currentCounter = getCounter();
-        for(int indexDay = 0; indexDay < amountDay && additionalTime != 0; ++indexDay){
-            if(getWorkTime(indexDay) == CHAR_DESIGNATION_NIGHT && indexDay + INDEX_MIDDLE_DAY_OFF < amountDay){
+        int positionForRule = getCounter();
+        for(int indexDay = 0; indexDay < AMOUNT_OF_DAYS && additionalTime != 0; ++indexDay){
+            if(getRuleOfDay(positionForRule) == CHAR_DESIGNATION_NIGHT && indexDay + INDEX_MIDDLE_DAY_OFF < AMOUNT_OF_DAYS){
                 double additionalHours = additionalTime < MAX_WORK_TIME_IN_DAY ? additionalTime : MAX_WORK_TIME_IN_DAY;
-                setWorkTime(indexDay, additionalHours);
+                setWorkTime(indexDay + INDEX_MIDDLE_DAY_OFF, additionalHours);
                 additionalTime -= additionalHours;
             }
-            if(++currentCounter == lengthRule) currentCounter = 0;
+            if(++positionForRule == lengthRule) positionForRule = 0;
         }
     }
 
 
-    public void generateGraph(int amountDay, int amountUninitializedDays, double sumTimesUninitializedDays){
+    public void generateGraph(final int AMOUNT_OF_DAYS, int amountUninitializedDays, double sumTimesUninitializedDays){
         double averageWorkTime;
-        if(amountDay != 0) averageWorkTime = sumTimesUninitializedDays / amountDay;
+        if(amountUninitializedDays != 0) averageWorkTime = sumTimesUninitializedDays / amountUninitializedDays;
         else averageWorkTime = sumTimesUninitializedDays;
         if(averageWorkTime > MAX_WORK_TIME_IN_DAY){
             double additionalTime = sumTimesUninitializedDays - (amountUninitializedDays * MAX_WORK_TIME_IN_DAY);
-            setAdditionalWorkDay(additionalTime, amountDay);
+            setAdditionalWorkDay(additionalTime, AMOUNT_OF_DAYS);
             sumTimesUninitializedDays -= additionalTime;
         }
-        super.generateGraph(amountDay, amountUninitializedDays, sumTimesUninitializedDays);
+        super.generateGraph(AMOUNT_OF_DAYS, amountUninitializedDays, sumTimesUninitializedDays);
     }
 }

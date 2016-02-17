@@ -79,14 +79,14 @@ public class UserInteraction {
 
 
 
-    public static  void readShortDayAndHolidays(Map<Integer, Integer> shortDayAndHolidays, int amountDay){
+    public static  void readShortDayAndHolidays(Map<Integer, Integer> shortDayAndHolidays, final int AMOUNT_OF_DAYS){
         try{
 
             FileInputStream fis = new FileInputStream("./lib/userInput.xls");
             Workbook wb = new HSSFWorkbook(fis);
 
             for(int indexRow = ROW_INDEX_OF_SHORT_DAY; indexRow <= ROW_INDEX_OF_DAY_OFF; ++indexRow){
-                for(int indexCol = COL_INDEX_OF_DATE; indexCol <= amountDay; ++indexCol){
+                for(int indexCol = COL_INDEX_OF_DATE; indexCol <= AMOUNT_OF_DAYS; ++indexCol){
                     try{
 
                         int indexDay = (int) wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(indexCol).getNumericCellValue();
@@ -95,7 +95,7 @@ public class UserInteraction {
                         boolean isNewDate = shortDayAndHolidays.get(indexDay) == null;
                         if(!isNewDate) throw new Exception("Значение " + indexDay + " не может быть указано дважды");
 
-                        if(indexDay <= 0 || indexDay > amountDay) {
+                        if(indexDay <= 0 || indexDay > AMOUNT_OF_DAYS) {
                             throw new Exception(indexDay + "-й день не существует");
                         }
 

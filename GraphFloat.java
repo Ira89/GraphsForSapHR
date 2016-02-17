@@ -22,14 +22,12 @@ public class GraphFloat extends Graph {
     }
 
 
-    private void setFloatDay(double floatTime, int counterFloatDay, int amountUninitializedDays, int amountDay){
+    private void setFloatDay(double floatTime, int counterFloatDay, int amountUninitializedDays, final int AMOUNT_OF_DAYS){
         double frequency = calculateFrequency(counterFloatDay, amountUninitializedDays);
-        int lengthRule = getLengthRule();
-        int currentCounter = getCounter();
-
         double currentFrequency = 0;
         int amountWorkDay = 0;
-        for(int indexDay = 0; indexDay < amountDay; ++indexDay){
+
+        for(int indexDay = 0; indexDay < AMOUNT_OF_DAYS; ++indexDay){
             if(getWorkTime(indexDay) == UNINITIALIZED_VALUE){
                 if(currentFrequency + 1 < frequency  && amountWorkDay < amountUninitializedDays - counterFloatDay){
                     ++currentFrequency;
@@ -40,12 +38,11 @@ public class GraphFloat extends Graph {
                     currentFrequency = 0;
                 }
             }
-            if(++currentCounter == lengthRule) currentCounter = 0;
         }
     }
 
 
-    public void generateGraph(int amountDay, int amountUninitializedDays, double sumTimesUninitializedDays){
+    public void generateGraph(final int AMOUNT_OF_DAYS, int amountUninitializedDays, double sumTimesUninitializedDays){
         double averageWorkTime;
         if(amountUninitializedDays != 0) averageWorkTime = sumTimesUninitializedDays / amountUninitializedDays;
         else averageWorkTime = sumTimesUninitializedDays;
@@ -60,10 +57,10 @@ public class GraphFloat extends Graph {
             sumFloatDay += floatTime;
             ++counterFloatDay;
         }
-        if(counterFloatDay != 0) setFloatDay(floatTime, counterFloatDay, amountUninitializedDays, amountDay);
+        if(counterFloatDay != 0) setFloatDay(floatTime, counterFloatDay, amountUninitializedDays, AMOUNT_OF_DAYS);
 
         amountUninitializedDays -= counterFloatDay;
         sumTimesUninitializedDays -= sumFloatDay;
-        super.generateGraph(amountDay, amountUninitializedDays, sumTimesUninitializedDays);
+        super.generateGraph(AMOUNT_OF_DAYS, amountUninitializedDays, sumTimesUninitializedDays);
     }
 }

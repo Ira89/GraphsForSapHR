@@ -21,38 +21,40 @@ public class CreatingGraphs {
         int yearAndMonth = UserInteraction.readYearAndMonth();
         final int YEAR = yearAndMonth >> UserInteraction.BITS_IN_MONTH;
         final int MONTH = yearAndMonth & UserInteraction.MASK_FOR_MONTH;
-        final int AMOUNT_DAY = Calendar.getAmountDay(MONTH, YEAR);
+        final int AMOUNT_OF_DAYS = Calendar.getAmountDay(MONTH, YEAR);
         final double NORM_TIME = UserInteraction.readNormTime();
 
         Map<Integer, Integer> shortDayAndHolidays = new HashMap<Integer, Integer>();
-        UserInteraction.readShortDayAndHolidays(shortDayAndHolidays, AMOUNT_DAY);
+        UserInteraction.readShortDayAndHolidays(shortDayAndHolidays, AMOUNT_OF_DAYS);
 
         List<Graph> graphs = new ArrayList<Graph>();
         FileInteraction.fabricateGraphs(graphs, NORM_TIME);
         FileInteraction.readCountersForGraphs(graphs, MONTH, YEAR);
 
         for(Graph obj : graphs){
-            obj.createUninitializedWorkTimeArray(AMOUNT_DAY);
-            obj.setWeekend(AMOUNT_DAY);
-            obj.setShortDayAndHolidays(AMOUNT_DAY, shortDayAndHolidays);
+            obj.createUninitializedWorkTimeArray(AMOUNT_OF_DAYS);
+            obj.setWeekend(AMOUNT_OF_DAYS);
+            obj.setShortDayAndHolidays(AMOUNT_OF_DAYS, shortDayAndHolidays);
 
-            int amountUninitializedDays = obj.getAmountUninitializedDays(AMOUNT_DAY);
-            double sumTimeInitializedDays = obj.getSumTimeInitializedDays(AMOUNT_DAY);
+            int amountUninitializedDays = obj.getAmountUninitializedDays(AMOUNT_OF_DAYS);
+            double sumTimeInitializedDays = obj.getSumTimeInitializedDays(AMOUNT_OF_DAYS);
             double sumTimesUninitializedDays = obj.getWorkTimeInMonth() - sumTimeInitializedDays;
-            obj.generateGraph(AMOUNT_DAY, amountUninitializedDays, sumTimesUninitializedDays);
+            obj.generateGraph(AMOUNT_OF_DAYS, amountUninitializedDays, sumTimesUninitializedDays);
         }
 
-        Map<Double, String> dayHours = new HashMap<Double, String>();
-        FileInteraction.readDayHours(dayHours);
-        Map<Double, String> nightHours = new HashMap<Double, String>();
-        FileInteraction.readNightHours(nightHours);
+        Map<Double, String> nameDayHours = new HashMap<Double, String>();
+        FileInteraction.readDayHours(nameDayHours);
+        Map<Double, String> nameNightHours = new HashMap<Double, String>();
+        FileInteraction.readNightHours(nameNightHours);
 
-        FileInteraction.writeGraphsIntoTemplate(graphs, dayHours, nightHours, shortDayAndHolidays, AMOUNT_DAY);
+        FileInteraction.writeGraphsIntoTemplate(graphs, nameDayHours, nameNightHours, shortDayAndHolidays, AMOUNT_OF_DAYS);
+        FileInteraction.writeNextCounter(graphs, AMOUNT_OF_DAYS, MONTH, YEAR);
+        FileInteraction.deleteOldCounter(MONTH, YEAR);
 
         if(MAX_DEBUG_LEVEL == debugLevel[0].length()){
             String commandLine = debugLevel[0];
             if(commandLine.charAt(DEBUG_USER_INPUT) == ACTIVATED_DEBUG){
-                Debug.printDayMonthAndYear(AMOUNT_DAY, MONTH, YEAR);
+                Debug.printDayMonthAndYear(AMOUNT_OF_DAYS, MONTH, YEAR);
                 Debug.printNormTime(NORM_TIME);
                 Debug.printShortDayAndHoliday(shortDayAndHolidays);
             }
@@ -60,14 +62,14 @@ public class CreatingGraphs {
                 Debug.printInfoAboutGraphs(graphs);
             }
             if(commandLine.charAt(DEBUG_GENERATION_TIME) == ACTIVATED_DEBUG){
-                Debug.printInfoAboutWorkTime(graphs, AMOUNT_DAY);
+                Debug.printInfoAboutWorkTime(graphs, AMOUNT_OF_DAYS);
             }
             if(commandLine.charAt(WRITTEN_WORK_TIME) == ACTIVATED_DEBUG){
-                FileInteraction.writeWorkTimeInFile(graphs, AMOUNT_DAY);
+                FileInteraction.writeWorkTimeInFile(graphs, AMOUNT_OF_DAYS);
             }
             if(commandLine.charAt(DEBUG_READ_HOURS) == ACTIVATED_DEBUG){
-                Debug.printHours(dayHours);
-                Debug.printHours(nightHours);
+                Debug.printHoursName(nameDayHours);
+                Debug.printHoursName(nameNightHours);
             }
         }
 

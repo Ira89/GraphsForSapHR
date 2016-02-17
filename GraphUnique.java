@@ -14,6 +14,12 @@ public class GraphUnique extends Graph {
     }
 
 
+    public void printInfo(){
+        System.out.print("id: " + getId() + "\tname: " + getName() + "\trule: " + getRule() + "\tdaytime: " + getDaytime() + "\tdaytimeSign: " + getDaytimeSign());
+        System.out.println("\tuniqueTime: " + uniqueTime + "\tuniqueTimeSign: " + uniqueTimeSign + "\tworkTimeInMonth: " + getWorkTimeInMonth() + "\tcounter: " + getCounter());
+    }
+
+
     public double getUniqueTime(){
         return uniqueTime;
     }
@@ -24,32 +30,32 @@ public class GraphUnique extends Graph {
     }
 
 
-    public void setShortDayAndHolidays(int amountDay, Map<Integer, Integer> shortDayAndHolidays){
+    public void setShortDayAndHolidays(final int AMOUNT_OF_DAYS, final Map<Integer, Integer> shortDayAndHolidays){
         int lengthRule = getLengthRule();
-        int currentCounter = getCounter();
+        int positionForRule = getCounter();
 
-        for(int indexDay = 0; indexDay < amountDay; ++indexDay){
-            if(getRuleOfDay(currentCounter) != CHAR_DESIGNATION_WEEKEND){
+        for(int indexDay = 0; indexDay < AMOUNT_OF_DAYS; ++indexDay){
+            if(getRuleOfDay(positionForRule) != CHAR_DESIGNATION_WEEKEND){
                 for(Map.Entry<Integer, Integer> container : shortDayAndHolidays.entrySet()){
                     if(container.getKey() == indexDay + 1){
                         if(container.getValue() == CODE_SHORT_DAY){
-                            if(getRuleOfDay(currentCounter) == CHAR_DESIGNATION_DAY) setWorkTime(indexDay, getDaytime() - 1);
-                            else if(getRuleOfDay(currentCounter) == CHAR_DESIGNATION_UNIVERSAL_DAY) setWorkTime(indexDay, getUniqueTime() - 1);
+                            if(getRuleOfDay(positionForRule) == CHAR_DESIGNATION_DAY) setWorkTime(indexDay, getDaytime() - 1);
+                            else if(getRuleOfDay(positionForRule) == CHAR_DESIGNATION_UNIVERSAL_DAY) setWorkTime(indexDay, getUniqueTime() - 1);
                         }
                         else if(container.getValue() == CODE_HOLIDAY) setWorkTime(indexDay, 0);
                         else if(container.getValue() == CODE_DAY_OFF) setWorkTime(indexDay, 0);
                     }
                 }
             }
-            if(++currentCounter == lengthRule) currentCounter = 0;
+            if(++positionForRule == lengthRule) positionForRule = 0;
         }
     }
 
 
-    public void generateGraph(int amountDay, int amountUninitializedDays, double sumTimesUninitializedDays){
+    public void generateGraph(final int AMOUNT_OF_DAYS, int amountUninitializedDays, double sumTimesUninitializedDays){
         int lengthRule = getLengthRule();
         int currentCounter = getCounter();
-        for(int indexDay = 0; indexDay < amountDay; ++indexDay){
+        for(int indexDay = 0; indexDay < AMOUNT_OF_DAYS; ++indexDay){
             if(getWorkTime(indexDay) == UNINITIALIZED_VALUE){
                 if(getRuleOfDay(currentCounter) == CHAR_DESIGNATION_DAY) setWorkTime(indexDay, getDaytime());
                 else if(getRuleOfDay(currentCounter) == CHAR_DESIGNATION_UNIVERSAL_DAY) setWorkTime(indexDay, getUniqueTime());
