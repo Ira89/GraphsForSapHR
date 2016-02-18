@@ -2,8 +2,12 @@ package ru.polynkina.irina.graphs;
 
 public class Calendar {
 
-    public static final int[] DAY_IN_MONTH = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    public static final int INDEX_MONTH_EXCLUSION = 2;
+    private static final int[] DAY_IN_MONTH = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    private static final int INDEX_MONTH_EXCLUSION = 2;
+
+    final static int MIN_INDEX_MONTH = 1;
+    final static int MAX_INDEX_MONTH = 12;
+
 
     public static int getAmountDay(final int INDEX_MONTH, final int INDEX_YEAR){
         if(INDEX_MONTH != INDEX_MONTH_EXCLUSION) return DAY_IN_MONTH[INDEX_MONTH];

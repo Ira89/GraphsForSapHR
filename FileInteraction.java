@@ -24,12 +24,12 @@ public class FileInteraction {
     final static int COL_INDEX_OF_NIGHTTIME = 6;
     final static int COL_INDEX_OF_NIGHTTIME_SIGN = 7;
 
-    final static String STRING_DESIGNATION_OF_DAY_GRAPHS = "DAY";
-    final static String STRING_DESIGNATION_OF_SHORT_DAY_GRAPHS = "SHORT";
     final static String STRING_DESIGNATION_OF_STANDARD_GRAPHS = "STANDARD";
+    final static String STRING_DESIGNATION_OF_DIURNAL_GRAPHS = "DIURNAL";
+    final static String STRING_DESIGNATION_OF_SHORT_DAY_GRAPHS = "SHORT";
     final static String STRING_DESIGNATION_OF_UNIQUE_GRAPHS = "UNIQUE";
     final static String STRING_DESIGNATION_OF_FLOAT_GRAPHS = "FLOAT";
-    final static String STRING_DESIGNATION_OF_DIURNAL_GRAPHS = "DIURNAL";
+    final static String STRING_DESIGNATION_OF_DAY_GRAPHS = "DAY";
     final static String STRING_DESIGNATION_OF_MIX_GRAPHS = "MIX";
 
     // constants in the file counter_...xls
@@ -55,10 +55,6 @@ public class FileInteraction {
     final static int COL_INDEX_HOUR_NAME = 1;
 
 
-    /*******************************************************************************************************************************************
-                                                        private methods
-     ******************************************************************************************************************************************/
-
 
     private static String findHourName(Map<Double, String> hours, double desiredValue){
         String hourName = hours.get(desiredValue);
@@ -70,22 +66,19 @@ public class FileInteraction {
     }
 
 
-    /*******************************************************************************************************************************************
-                                                        public methods
-     ******************************************************************************************************************************************/
-
 
     public static void fabricateGraphs(List<Graph> graphs, final double NORM_TIME){
         try{
-
-            FileInputStream fis = new FileInputStream("./lib/graphs.xls");
+            String filename = "graphs.xls";
+            FileInputStream fis = new FileInputStream("./lib/" + filename);
             Workbook wb = new HSSFWorkbook(fis);
 
             int indexRow = 0;
             while(true){
                 try{
-
                     int id = (int) wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_OF_ID).getNumericCellValue();
+                    if (id != indexRow) throw new Exception("Файл " + filename + " поврежден!");
+
                     String name = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_OF_NAME).getStringCellValue();
                     String rule = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_OF_RULE).getStringCellValue();
                     String type = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_OF_TYPE).getStringCellValue();
@@ -118,12 +111,10 @@ public class FileInteraction {
                         graphs.add(new GraphMix(id, name, rule, daytime, daytimeSign, nightTime, nightTimeSign, NORM_TIME));
                     }
                     else{
-                        System.out.println("Тип графика: " + type + " неизвестен!");
-                        graphs.add(new Graph(id, name, rule, daytime, daytimeSign, NORM_TIME));
+                        throw new Exception("Тип графика: " + type + " неизвестен!");
                     }
 
                     ++indexRow;
-
                 }catch(NullPointerException nullExc){
                     break;
                 }
@@ -131,7 +122,6 @@ public class FileInteraction {
 
             wb.close();
             fis.close();
-
         }catch(Exception exc){
             exc.printStackTrace();
             System.exit(0);
@@ -170,7 +160,6 @@ public class FileInteraction {
 
     public static void writeWorkTimeInFile(final List<Graph> graphs, final int AMOUNT_OF_DAYS){
         try{
-
             FileInputStream fis = new FileInputStream("./lib/templateWorkingTime.xls");
             Workbook wb = new HSSFWorkbook(fis);
 
@@ -187,22 +176,20 @@ public class FileInteraction {
                 Cell cell = row.createCell(COL_INDEX_NAME_GRAPH_IN_TEMPLATE);
                 cell.setCellValue(obj.getName());
                 cell = row.createCell(COL_INDEX_WORK_TIME_IN_TEMPLATE);
-                cell.setCellValue(obj.getSumWorkTime(AMOUNT_OF_DAYS));
+                cell.setCellValue(obj.getWorkHoursPerMonth(AMOUNT_OF_DAYS));
 
                 int lengthRule = obj.getLengthRule();
-                int currentCounter = obj.getCounter();
+                int positionForRule = obj.getCounter();
                 for(int indexDay = 0; indexDay < AMOUNT_OF_DAYS; ++indexDay){
                     if(obj.getWorkTime(indexDay) != 0){
                         cell = row.createCell(indexDay + DELTA_COL_IN_TEMPLATE);
                         cell.setCellValue(obj.getWorkTime(indexDay));
-                        if(obj.getRuleOfDay(currentCounter) == Graph.CHAR_DESIGNATION_NIGHT){
-                            cell.setCellStyle(styleForNighttime);
-                        }
-                        else{
-                            cell.setCellStyle(styleForDaytime);
-                        }
+
+                        boolean isNightGraph = obj.getRuleOfDay(positionForRule) == Graph.CHAR_DESIGNATION_NIGHT;
+                        if(isNightGraph) cell.setCellStyle(styleForNighttime);
+                        else cell.setCellStyle(styleForDaytime);
                     }
-                    if(++currentCounter == lengthRule) currentCounter = 0;
+                    if(++positionForRule == lengthRule) positionForRule = 0;
                 }
             }
 
@@ -212,7 +199,6 @@ public class FileInteraction {
             fos.close();
             wb.close();
             fis.close();
-
         }catch(Exception exc){
             exc.printStackTrace();
             System.exit(0);
@@ -221,21 +207,18 @@ public class FileInteraction {
 
 
 
-    public static void readDayHours(Map<Double, String> nameDayHours){
+    public static void readDayHours(Map<Double, String> dayHours){
         try{
-
             FileInputStream fis = new FileInputStream("./lib/dayHours.xls");
             Workbook wb = new HSSFWorkbook(fis);
 
             int indexRow = 0;
             while(true){
                 try{
-
                     double hour = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_HOUR).getNumericCellValue();
                     String hourName = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_HOUR_NAME).getStringCellValue();
-                    nameDayHours.put(hour, hourName);
+                    dayHours.put(hour, hourName);
                     ++indexRow;
-
                 }catch(NullPointerException nullExc){
                     break;
                 }
@@ -243,7 +226,6 @@ public class FileInteraction {
 
             wb.close();
             fis.close();
-
         }catch(Exception exc){
             exc.printStackTrace();
             System.exit(0);
@@ -252,21 +234,18 @@ public class FileInteraction {
 
 
 
-    public static void readNightHours(Map<Double, String> nameNightHours){
+    public static void readNightHours(Map<Double, String> nightHours){
         try{
-
             FileInputStream fis = new FileInputStream("./lib/nightHours.xls");
             Workbook wb = new HSSFWorkbook(fis);
 
             int indexRow = 0;
             while(true){
                 try{
-
                     double hour = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_HOUR).getNumericCellValue();
                     String hourName = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_HOUR_NAME).getStringCellValue();
-                    nameNightHours.put(hour, hourName);
+                    nightHours.put(hour, hourName);
                     ++indexRow;
-
                 }catch(NullPointerException nullExc){
                     break;
                 }
@@ -274,7 +253,6 @@ public class FileInteraction {
 
             wb.close();
             fis.close();
-
         }catch(Exception exc){
             exc.printStackTrace();
             System.exit(0);
@@ -282,11 +260,15 @@ public class FileInteraction {
     }
 
 
+    /*******************************************************************************************************************************************
+                                                        All data written to the file at a time.
+                                                        Otherwise, the data will be overwritten.
+     /*******************************************************************************************************************************************/
 
-    public static void writeGraphsIntoTemplate(final List<Graph> graphs, final Map<Double, String> nameDayHours, final Map<Double, String> nameNightHours,
+
+    public static void writeGraphsIntoTemplate(final List<Graph> graphs, final Map<Double, String> dayHours, final Map<Double, String> nightHours,
                                                final Map<Integer, Integer> shortDayAndHoliday, final int AMOUNT_OF_DAYS){
         try{
-
             FileInputStream fis = new FileInputStream("./lib/templateForSapHR.xls");
             Workbook wb = new HSSFWorkbook(fis);
 
@@ -303,10 +285,10 @@ public class FileInteraction {
                 Cell cell = row.createCell(COL_INDEX_NAME_GRAPH_IN_TEMPLATE);
                 cell.setCellValue(obj.getName());
                 cell = row.createCell(COL_INDEX_WORK_TIME_IN_TEMPLATE);
-                cell.setCellValue(obj.getSumWorkTime(AMOUNT_OF_DAYS));
+                cell.setCellValue(obj.getWorkHoursPerMonth(AMOUNT_OF_DAYS));
 
                 int lengthRule = obj.getLengthRule();
-                int currentCounter = obj.getCounter();
+                int positionForRule = obj.getCounter();
                 for(int indexDay = 0; indexDay < AMOUNT_OF_DAYS; ++indexDay){
                     double hour = obj.getWorkTime(indexDay);
                     Integer codeDay = shortDayAndHoliday.get(indexDay + 1);
@@ -315,31 +297,31 @@ public class FileInteraction {
                     }
 
                     String hourName;
-                    if(obj.getRuleOfDay(currentCounter) == Graph.CHAR_DESIGNATION_DAY){
+                    if(obj.getRuleOfDay(positionForRule) == Graph.CHAR_DESIGNATION_DAY){
                         if(hour == obj.getDaytime()) hourName = obj.getDaytimeSign();
-                        else hourName = findHourName(nameDayHours, hour);
+                        else hourName = findHourName(dayHours, hour);
                     }
-                    else if(obj.getRuleOfDay(currentCounter) == Graph.CHAR_DESIGNATION_NIGHT){
+                    else if(obj.getRuleOfDay(positionForRule) == Graph.CHAR_DESIGNATION_NIGHT){
                         if(hour == obj.getNightTime()) hourName = obj.getNightTimeSign();
-                        else hourName = findHourName(nameNightHours, hour);
+                        else hourName = findHourName(nightHours, hour);
                     }
                     else{
                         if(hour == obj.getUniqueTime()) hourName = obj.getUniqueTimeSign();
-                        else hourName = findHourName(nameDayHours, hour);
+                        else hourName = findHourName(dayHours, hour);
                     }
 
                     cell = row.createCell(DELTA_COL_IN_TEMPLATE + indexDay * SIZE_STEP);
                     cell.setCellValue(hourName);
 
-                    if(obj.getRuleOfDay(currentCounter) == Graph.CHAR_DESIGNATION_WEEKEND && obj.getWorkTime(indexDay) == 0); // without instruction!
-                    else if(obj.getRuleOfDay(currentCounter) == Graph.CHAR_DESIGNATION_NIGHT) cell.setCellStyle(styleForNighttime);
+                    if(obj.getRuleOfDay(positionForRule) == Graph.CHAR_DESIGNATION_WEEKEND && obj.getWorkTime(indexDay) == 0); // without instruction!
+                    else if(obj.getRuleOfDay(positionForRule) == Graph.CHAR_DESIGNATION_NIGHT) cell.setCellStyle(styleForNighttime);
                     else cell.setCellStyle(styleForDaytime);
 
                     // set sign short day and holiday
                     if(codeDay != null){
                         switch(codeDay){
                             case Graph.CODE_SHORT_DAY:{
-                                if(obj.getRuleOfDay(currentCounter) != Graph.CHAR_DESIGNATION_WEEKEND){
+                                if(obj.getRuleOfDay(positionForRule) != Graph.CHAR_DESIGNATION_WEEKEND){
                                     cell = row.createCell(DELTA_COL_IN_TEMPLATE + (indexDay + 1) * SIZE_STEP - CELL_OFFSET_FOR_TEXT);
                                     cell.setCellValue(SIGN_SHORT_DAY);
                                 }
@@ -350,27 +332,30 @@ public class FileInteraction {
                             } // without break!
                             case Graph.CODE_DAY_OFF:{
                                 boolean isStandardOrUniqueGraph = (obj instanceof GraphStandard) || (obj instanceof GraphUnique);
-                                if(isStandardOrUniqueGraph && obj.getRuleOfDay(currentCounter) != Graph.CHAR_DESIGNATION_WEEKEND){
+                                if(isStandardOrUniqueGraph && obj.getRuleOfDay(positionForRule) != Graph.CHAR_DESIGNATION_WEEKEND){
                                     cell = row.createCell(DELTA_COL_IN_TEMPLATE + indexDay * SIZE_STEP);
-                                    if(obj.getRuleOfDay(currentCounter) != Graph.CHAR_DESIGNATION_UNIVERSAL_DAY) cell.setCellValue(obj.getDaytimeSign());
-                                    else cell.setCellValue(obj.getUniqueTimeSign());
+                                    cell.setCellStyle(styleForDaytime);
+                                    if(obj.getRuleOfDay(positionForRule) != Graph.CHAR_DESIGNATION_UNIVERSAL_DAY){
+                                        cell.setCellValue(obj.getDaytimeSign());
+                                    }
+                                    else{
+                                        cell.setCellValue(obj.getUniqueTimeSign());
+                                    }
                                     cell = row.createCell(DELTA_COL_IN_TEMPLATE + (indexDay + 1) * SIZE_STEP - CELL_OFFSET_FOR_TEXT);
                                     cell.setCellValue(SIGN_DAY_OFF);
                                 }
                             }
                         }
                     }
-                    if(++currentCounter == lengthRule) currentCounter = 0;
+                    if(++positionForRule == lengthRule) positionForRule = 0;
                 }
             }
-
             FileOutputStream fos = new FileOutputStream("./fileForSapHR.xls");
             wb.write(fos);
 
             fos.close();
             wb.close();
             fis.close();
-
         }catch(Exception exc){
             exc.printStackTrace();
             System.exit(0);
@@ -397,8 +382,8 @@ public class FileInteraction {
                 cell.setCellValue(nextCounter);
             }
 
-            int nextMonth = INDEX_MONTH + 1 > 12 ? 1 : INDEX_MONTH + 1;
-            int nextYear = INDEX_MONTH + 1 > 12 ? INDEX_YEAR + 1 : INDEX_YEAR;
+            int nextMonth = INDEX_MONTH + 1 > Calendar.MAX_INDEX_MONTH ? 1 : INDEX_MONTH + 1;
+            int nextYear = INDEX_MONTH + 1 > Calendar.MAX_INDEX_MONTH ? INDEX_YEAR + 1 : INDEX_YEAR;
             String nextFilename = "counter_" + nextMonth + "_" + nextYear + ".xls";
             FileOutputStream fos = new FileOutputStream("./count/" + nextFilename);
             wb.write(fos);
@@ -418,7 +403,9 @@ public class FileInteraction {
         try{
             String filenameOldCounter = "counter_" + INDEX_MONTH + "_" + (INDEX_YEAR - 1) + ".xls";
             File oldFile = new File("./count/" + filenameOldCounter);
-            oldFile.delete();
+            if(oldFile.delete()){
+                System.out.println("Программа удалила файл за " + INDEX_MONTH + "." + (INDEX_YEAR - 1));
+            }
         }catch (Exception exc){
             exc.printStackTrace();
             System.exit(0);

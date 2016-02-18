@@ -15,7 +15,9 @@ public class CreatingGraphs {
     final static int DEBUG_READ_HOURS = 4;
     final static char ACTIVATED_DEBUG = '1';
 
+
     public static void main(String[] debugLevel) {
+        System.out.println("Version of the program: 1.0.0");
         System.out.println("Начинаю генерацию графиков!");
 
         int yearAndMonth = UserInteraction.readYearAndMonth();
@@ -34,20 +36,20 @@ public class CreatingGraphs {
         for(Graph obj : graphs){
             obj.createUninitializedWorkTimeArray(AMOUNT_OF_DAYS);
             obj.setWeekend(AMOUNT_OF_DAYS);
-            obj.setShortDayAndHolidays(AMOUNT_OF_DAYS, shortDayAndHolidays);
+            obj.setShortDayAndHolidays(shortDayAndHolidays, AMOUNT_OF_DAYS);
 
             int amountUninitializedDays = obj.getAmountUninitializedDays(AMOUNT_OF_DAYS);
             double sumTimeInitializedDays = obj.getSumTimeInitializedDays(AMOUNT_OF_DAYS);
             double sumTimesUninitializedDays = obj.getWorkTimeInMonth() - sumTimeInitializedDays;
-            obj.generateGraph(AMOUNT_OF_DAYS, amountUninitializedDays, sumTimesUninitializedDays);
+            obj.generateGraph(amountUninitializedDays, sumTimesUninitializedDays, AMOUNT_OF_DAYS);
         }
 
-        Map<Double, String> nameDayHours = new HashMap<Double, String>();
-        FileInteraction.readDayHours(nameDayHours);
-        Map<Double, String> nameNightHours = new HashMap<Double, String>();
-        FileInteraction.readNightHours(nameNightHours);
+        Map<Double, String> dayHours = new HashMap<Double, String>();
+        FileInteraction.readDayHours(dayHours);
+        Map<Double, String> nightHours = new HashMap<Double, String>();
+        FileInteraction.readNightHours(nightHours);
 
-        FileInteraction.writeGraphsIntoTemplate(graphs, nameDayHours, nameNightHours, shortDayAndHolidays, AMOUNT_OF_DAYS);
+        FileInteraction.writeGraphsIntoTemplate(graphs, dayHours, nightHours, shortDayAndHolidays, AMOUNT_OF_DAYS);
         FileInteraction.writeNextCounter(graphs, AMOUNT_OF_DAYS, MONTH, YEAR);
         FileInteraction.deleteOldCounter(MONTH, YEAR);
 
@@ -68,11 +70,11 @@ public class CreatingGraphs {
                 FileInteraction.writeWorkTimeInFile(graphs, AMOUNT_OF_DAYS);
             }
             if(commandLine.charAt(DEBUG_READ_HOURS) == ACTIVATED_DEBUG){
-                Debug.printHoursName(nameDayHours);
-                Debug.printHoursName(nameNightHours);
+                Debug.printHoursName(dayHours);
+                Debug.printHoursName(nightHours);
             }
         }
 
-        System.out.println("Генерация графиков завершена!");
+        System.out.println("Генерация графиков завершена успешно!");
     }
 }
