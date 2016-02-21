@@ -32,15 +32,15 @@ public class UserInteraction {
             Workbook wb = new HSSFWorkbook(fis);
             int year = (int) wb.getSheetAt(INDEX_OF_SHEET).getRow(ROW_INDEX_OF_YEAR).getCell(COL_INDEX_OF_DATE).getNumericCellValue();
             int month = (int) wb.getSheetAt(INDEX_OF_SHEET).getRow(ROW_INDEX_OF_MONTH).getCell(COL_INDEX_OF_DATE).getNumericCellValue();
+            wb.close();
+            fis.close();
 
             boolean isIncorrectInput = false;
             if(year < MIN_INDEX_YEAR || year > MAX_INDEX_YEAR) isIncorrectInput = true;
             if(month < Calendar.MIN_INDEX_MONTH || month > Calendar.MAX_INDEX_MONTH) isIncorrectInput = true;
             if(isIncorrectInput) throw new Exception("Некорректно указан месяц или год!");
-            yearAndMonth = year << BITS_IN_MONTH | month;
 
-            wb.close();
-            fis.close();
+            yearAndMonth = year << BITS_IN_MONTH | month;
         }catch(Exception exc){
             exc.printStackTrace();
             System.exit(0);
@@ -56,13 +56,12 @@ public class UserInteraction {
             FileInputStream fis = new FileInputStream("./lib/userInput.xls");
             Workbook wb = new HSSFWorkbook(fis);
             normTime = wb.getSheetAt(INDEX_OF_SHEET).getRow(ROW_INDEX_OF_NORM_TIME).getCell(COL_INDEX_OF_DATE).getNumericCellValue();
+            wb.close();
+            fis.close();
 
             boolean isIncorrectInput = false;
             if(normTime < MIN_NORM_TIME || normTime > MAX_NORM_TIME) isIncorrectInput = true;
             if(isIncorrectInput) throw new Exception("Некорректно указана норма времени!");
-
-            wb.close();
-            fis.close();
         }catch(Exception exc){
             exc.printStackTrace();
             System.exit(0);
@@ -84,11 +83,19 @@ public class UserInteraction {
                         if(indexDay == 0) throw new NullPointerException();
 
                         boolean isNewDate = shortDayAndHolidays.get(indexDay) == null;
-                        if(!isNewDate) throw new Exception("Значение " + indexDay + " не может быть указано дважды");
+                        if(!isNewDate){
+                            wb.close();
+                            fis.close();
+                            throw new Exception("Значение " + indexDay + " не может быть указано дважды");
+                        }
 
                         boolean isIncorrectInput = false;
                         if(indexDay <= 0 || indexDay > AMOUNT_OF_DAYS) isIncorrectInput = true;
-                        if(isIncorrectInput) throw new Exception(indexDay + "-й день не существует");
+                        if(isIncorrectInput){
+                            wb.close();
+                            fis.close();
+                            throw new Exception(indexDay + "-й день не существует");
+                        }
 
                         shortDayAndHolidays.put(indexDay, indexRow - DELTA_INDEX_AND_VALUE);
                     }catch(NullPointerException nullExc){

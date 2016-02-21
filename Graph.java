@@ -74,7 +74,7 @@ public class Graph {
      ******************************************************************************************************************************************/
 
 
-    public void setCounter(int counter){
+    public void setCounter(final int counter){
         try{
             if(counter >= getLengthRule())
                 throw new Exception("Позиция счетчика не может быть больше, чем длина правила");
@@ -86,12 +86,12 @@ public class Graph {
     }
 
 
-    public void setWorkTimeInMonth(double workTimeInMonth){
+    public void setWorkTimeInMonth(final double workTimeInMonth){
         this.workTimeInMonth = workTimeInMonth;
     }
 
 
-    public void setWorkTime(int indexDay, double time){
+    public void setWorkTime(final int indexDay, final double time){
         try{
             if(indexDay >= workTime.length) throw new Exception("Попытка выхода за пределы массива");
         }catch (Exception exc){
@@ -122,7 +122,7 @@ public class Graph {
     }
 
 
-    public char getRuleOfDay(int positionForRule){
+    public char getRuleOfDay(final int positionForRule){
         try{
             if(positionForRule >= getLengthRule()) throw new Exception("Попытка выхода за пределы правила");
         }catch (Exception exc){
@@ -173,7 +173,7 @@ public class Graph {
     }
 
 
-    public double getWorkTime(int indexDay){
+    public double getWorkTime(final int indexDay){
         try{
             if(indexDay >= workTime.length) throw new Exception("Попытка выхода за пределы массива");
         }catch (Exception exc){
@@ -189,7 +189,7 @@ public class Graph {
      ******************************************************************************************************************************************/
 
 
-    private boolean checkRuleInput(String rule){
+    private boolean checkRuleInput(final String rule){
         int sizeRule = rule.length();
         for(int positionForRule = 0; positionForRule < sizeRule; ++positionForRule){
             switch(rule.charAt(positionForRule)){
@@ -205,8 +205,8 @@ public class Graph {
 
 
 
-    private void fillUninitializedWorkDays(int spreadValue, int amountSpreadValue,
-                                           int rareValue, int amountRareValue, double frequency, final int AMOUNT_OF_DAYS){
+    private void fillUninitializedWorkDays(final int spreadValue, final int amountSpreadValue, final int rareValue,
+                                           final int amountRareValue, final double frequency, final int AMOUNT_OF_DAYS){
         double currentFrequency = 0;
         int counterSpreadTime = 0;
         int counterRareTime = 0;
@@ -232,13 +232,13 @@ public class Graph {
      ******************************************************************************************************************************************/
 
 
-    public boolean checkTimeInput(double daytime){
+    public boolean checkTimeInput(final double daytime){
         return (daytime > 0 && daytime <= GraphDiurnal.MAX_WORK_TIME_IN_DAY);
     }
 
 
 
-    public int getAmountDaysWithMinTime(int minWorkTime, int maxWorkTime, double sumWorkTime, int amountWorkDays){
+    public int getAmountDaysWithMinTime(final int minWorkTime, final int maxWorkTime, final double sumWorkTime, final int amountWorkDays){
         int daysWithMinTime;
         for(daysWithMinTime = 0; daysWithMinTime <= amountWorkDays; ++daysWithMinTime){
             int daysWithMaxTime = amountWorkDays - daysWithMinTime;
@@ -249,7 +249,7 @@ public class Graph {
 
 
 
-    public double calculateFrequency(int amountDaysWithMinTime, int amountDaysWithMaxTime){
+    public double calculateFrequency(final int amountDaysWithMinTime, final int amountDaysWithMaxTime){
         double frequency;
         if(amountDaysWithMinTime > amountDaysWithMaxTime){
             if(amountDaysWithMaxTime != 0) frequency = (double) amountDaysWithMinTime / amountDaysWithMaxTime;
@@ -325,7 +325,7 @@ public class Graph {
 
 
 
-    public void generateGraph(int amountUninitializedDays, double sumTimesUninitializedDays, final int AMOUNT_OF_DAYS){
+    public void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays, final int AMOUNT_OF_DAYS){
         double averageWorkTime = sumTimesUninitializedDays;
         if(amountUninitializedDays != 0) averageWorkTime /= amountUninitializedDays;
 

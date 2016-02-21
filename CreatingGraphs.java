@@ -18,7 +18,6 @@ public class CreatingGraphs {
 
     public static void main(String[] debugLevel) {
         System.out.println("Version of the program: 1.0.0");
-        System.out.println("Начинаю генерацию графиков!");
 
         int yearAndMonth = UserInteraction.readYearAndMonth();
         final int YEAR = yearAndMonth >> UserInteraction.BITS_IN_MONTH;

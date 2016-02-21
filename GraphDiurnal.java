@@ -11,6 +11,10 @@ public class GraphDiurnal extends Graph {
     }
 
 
+    /*******************************************************************************************************************************************
+                                                        private methods
+     ******************************************************************************************************************************************/
+
 
     private void setAdditionalWorkDay(double additionalTime, final int AMOUNT_OF_DAYS){
         int lengthRule = getLengthRule();
@@ -27,16 +31,20 @@ public class GraphDiurnal extends Graph {
     }
 
 
+    /*******************************************************************************************************************************************
+                                                        public methods
+     ******************************************************************************************************************************************/
 
-    public void generateGraph(int amountUninitializedDays, double sumTimesUninitializedDays, final int AMOUNT_OF_DAYS){
+
+    public void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays, final int AMOUNT_OF_DAYS){
         double averageWorkTime = sumTimesUninitializedDays;
         if(amountUninitializedDays != 0) averageWorkTime /= amountUninitializedDays;
 
+        double additionalTime = 0;
         if(averageWorkTime > MAX_WORK_TIME_IN_DAY){
-            double additionalTime = sumTimesUninitializedDays - (amountUninitializedDays * MAX_WORK_TIME_IN_DAY);
+            additionalTime = sumTimesUninitializedDays - (amountUninitializedDays * MAX_WORK_TIME_IN_DAY);
             setAdditionalWorkDay(additionalTime, AMOUNT_OF_DAYS);
-            sumTimesUninitializedDays -= additionalTime;
         }
-        super.generateGraph(amountUninitializedDays, sumTimesUninitializedDays, AMOUNT_OF_DAYS);
+        super.generateGraph(amountUninitializedDays, sumTimesUninitializedDays - additionalTime, AMOUNT_OF_DAYS);
     }
 }

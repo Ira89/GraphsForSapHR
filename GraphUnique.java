@@ -8,7 +8,8 @@ public class GraphUnique extends Graph {
     private String uniqueTimeSign;
 
 
-    GraphUnique(int id, String name, String rule, double daytime, String daytimeSign, double uniqueTime, String uniqueTimeSign, double workTimeInMonth){
+    GraphUnique(int id, String name, String rule, double daytime, String daytimeSign,
+                double uniqueTime, String uniqueTimeSign, double workTimeInMonth){
         super(id, name, rule, daytime, daytimeSign, workTimeInMonth);
 
         try{
@@ -26,10 +27,15 @@ public class GraphUnique extends Graph {
 
 
     public void printInfo(){
-        System.out.print("id: " + getId() + "\tname: " + getName() + "\trule: " + getRule() + "\tdaytime: " + getDaytime() + "\tdaytimeSign: " + getDaytimeSign());
-        System.out.println("\tuniqueTime: " + uniqueTime + "\tuniqueTimeSign: " + uniqueTimeSign + "\tworkTimeInMonth: " + getWorkTimeInMonth() + "\tcounter: " + getCounter());
+        System.out.print("id: " + getId() + "\tname: " + getName() + "\trule: " + getRule() + "\tdaytime: " + getDaytime());
+        System.out.print("\tdaytimeSign: " + getDaytimeSign() + "\tuniqueTime: " + uniqueTime + "\tuniqueTimeSign: " + uniqueTimeSign);
+        System.out.println("\tworkTimeInMonth: " + getWorkTimeInMonth() + "\tcounter: " + getCounter());
     }
 
+
+    /*******************************************************************************************************************************************
+                                                        getters and setters
+     ******************************************************************************************************************************************/
 
 
     public double getUniqueTime(){
@@ -41,6 +47,10 @@ public class GraphUnique extends Graph {
         return uniqueTimeSign;
     }
 
+
+    /*******************************************************************************************************************************************
+                                                        public methods
+     ******************************************************************************************************************************************/
 
 
     public void setShortDayAndHolidays(final Map<Integer, Integer> shortDayAndHolidays, final int AMOUNT_OF_DAYS){
@@ -65,7 +75,8 @@ public class GraphUnique extends Graph {
     }
 
 
-    public void generateGraph(int amountUninitializedDays, double sumTimesUninitializedDays, final int AMOUNT_OF_DAYS){
+
+    public void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays, final int AMOUNT_OF_DAYS){
         int lengthRule = getLengthRule();
         int positionForRule = getCounter();
 
@@ -77,6 +88,4 @@ public class GraphUnique extends Graph {
             if(++positionForRule == lengthRule) positionForRule = 0;
         }
     }
-
-
 }

@@ -6,7 +6,8 @@ public class GraphMix extends Graph {
     private String nightTimeSign;
 
 
-    GraphMix(int id, String name, String rule, double daytime, String daytimeSign, double nightTime, String nightTimeSign, double workTimeInMonth){
+    GraphMix(int id, String name, String rule, double daytime, String daytimeSign,
+             double nightTime, String nightTimeSign, double workTimeInMonth){
         super(id, name, rule, daytime, daytimeSign, workTimeInMonth);
 
         try{
@@ -24,10 +25,15 @@ public class GraphMix extends Graph {
 
 
     public void printInfo(){
-        System.out.print("id: " + getId() + "\tname: " + getName() + "\trule: " + getRule() + "\tdaytime: " + getDaytime() + "\tdaytimeSign: " + getDaytimeSign());
-        System.out.println("\tnightTime: " + nightTime + "\tnightTimeSign: " + nightTimeSign + "\tworkTimeInMonth: " + getWorkTimeInMonth() + "\tcounter: " + getCounter());
+        System.out.print("id: " + getId() + "\tname: " + getName() + "\trule: " + getRule() + "\tdaytime: " + getDaytime());
+        System.out.print("\tdaytimeSign: " + getDaytimeSign() + "\tnightTime: " + nightTime + "\tnightTimeSign: " + nightTimeSign);
+        System.out.println("\tworkTimeInMonth: " + getWorkTimeInMonth() + "\tcounter: " + getCounter());
     }
 
+
+    /*******************************************************************************************************************************************
+                                                        getters and setters
+     ******************************************************************************************************************************************/
 
 
     public double getNightTime(){
@@ -40,8 +46,12 @@ public class GraphMix extends Graph {
     }
 
 
+    /*******************************************************************************************************************************************
+                                                        private methods
+     ******************************************************************************************************************************************/
 
-    private void fillWorkTimeByType(char dayType, double setValue, int maxAmountSetting, final int AMOUNT_OF_DAYS){
+
+    private void fillWorkTimeByType(final char dayType, final double setValue, final int maxAmountSetting, final int AMOUNT_OF_DAYS){
         int amountSetting = 0;
         int lengthRule = getLengthRule();
         int positionForRule = getCounter();
@@ -56,8 +66,12 @@ public class GraphMix extends Graph {
     }
 
 
+    /*******************************************************************************************************************************************
+                                                        public methods
+     ******************************************************************************************************************************************/
 
-    public void generateGraph(int amountUninitializedDays, double sumTimesUninitializedDays, final int AMOUNT_OF_DAYS){
+
+    public void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays, final int AMOUNT_OF_DAYS){
         double averageWorkTime = sumTimesUninitializedDays;
         if(amountUninitializedDays != 0) averageWorkTime /= amountUninitializedDays;
 
@@ -75,9 +89,9 @@ public class GraphMix extends Graph {
         else mostFrequentTypeOfDay = Graph.CHAR_DESIGNATION_DAY;
         fillWorkTimeByType(mostFrequentTypeOfDay, spreadValue, amountSpreadValue, AMOUNT_OF_DAYS);
 
-        amountUninitializedDays = getAmountUninitializedDays(AMOUNT_OF_DAYS);
+        int newAmountUninitializedDays = getAmountUninitializedDays(AMOUNT_OF_DAYS);
         double sumTimeInitializedDays = getSumTimeInitializedDays(AMOUNT_OF_DAYS);
-        sumTimesUninitializedDays = getWorkTimeInMonth() - sumTimeInitializedDays;
-        super.generateGraph(amountUninitializedDays, sumTimesUninitializedDays, AMOUNT_OF_DAYS);
+        double newSumTimesUninitializedDays = getWorkTimeInMonth() - sumTimeInitializedDays;
+        super.generateGraph(newAmountUninitializedDays, newSumTimesUninitializedDays, AMOUNT_OF_DAYS);
     }
 }

@@ -11,6 +11,10 @@ public class GraphFloat extends Graph {
     }
 
 
+    /*******************************************************************************************************************************************
+                                                        private methods
+     ******************************************************************************************************************************************/
+
 
     private void setNormTimeForStandardGraphs(double standardNormTimeInMonth){
         int hoursInShortDays = 0;
@@ -25,7 +29,7 @@ public class GraphFloat extends Graph {
 
 
 
-    private void setFloatDay(double floatTime, int counterFloatDay, int amountUninitializedDays, final int AMOUNT_OF_DAYS){
+    private void setFloatDay(final double floatTime, final int counterFloatDay, final int amountUninitializedDays, final int AMOUNT_OF_DAYS){
         double frequency = calculateFrequency(counterFloatDay, amountUninitializedDays);
         double currentFrequency = 0;
         int amountWorkDay = 0;
@@ -45,8 +49,12 @@ public class GraphFloat extends Graph {
     }
 
 
+    /*******************************************************************************************************************************************
+                                                        public methods
+     ******************************************************************************************************************************************/
 
-    public void generateGraph(int amountUninitializedDays, double sumTimesUninitializedDays, final int AMOUNT_OF_DAYS){
+
+    public void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays, final int AMOUNT_OF_DAYS){
         double averageWorkTime = sumTimesUninitializedDays;
         if(amountUninitializedDays != 0) averageWorkTime /= amountUninitializedDays;
 
@@ -62,9 +70,6 @@ public class GraphFloat extends Graph {
         }
 
         if(counterFloatDay != 0) setFloatDay(floatTime, counterFloatDay, amountUninitializedDays, AMOUNT_OF_DAYS);
-
-        amountUninitializedDays -= counterFloatDay;
-        sumTimesUninitializedDays -= sumFloatDay;
-        super.generateGraph(amountUninitializedDays, sumTimesUninitializedDays, AMOUNT_OF_DAYS);
+        super.generateGraph(amountUninitializedDays - counterFloatDay, sumTimesUninitializedDays - sumFloatDay, AMOUNT_OF_DAYS);
     }
 }

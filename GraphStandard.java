@@ -28,7 +28,7 @@ public class GraphStandard extends Graph {
     }
 
 
-    public void generateGraph(int amountUninitializedDays, double sumTimesUninitializedDays, final int AMOUNT_OF_DAYS){
+    public void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays, final int AMOUNT_OF_DAYS){
         for(int indexDay = 0; indexDay < AMOUNT_OF_DAYS; ++indexDay){
             if(getWorkTime(indexDay) == UNINITIALIZED_VALUE) setWorkTime(indexDay, getDaytime());
         }
