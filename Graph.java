@@ -7,6 +7,8 @@ public class Graph {
     final static double UNINITIALIZED_VALUE = -1;
     final static double STANDARD_TIME_IN_DAY = 8;
     final static double FLOAT_TIME_IN_DAY = 7.2;
+    final static double MAX_WORK_TIME_IN_DAY = 15;
+    final static double MAX_WORK_TIME_IN_DIURNAL = 22;
 
     final static double NEGLIGIBLE_TIME_INTERVAL = 0.001;
     final static double ACCEPTABLE_ACCURACY = 1.0e-10;
@@ -233,7 +235,7 @@ public class Graph {
 
 
     public boolean checkTimeInput(final double daytime){
-        return (daytime > 0 && daytime <= GraphDiurnal.MAX_WORK_TIME_IN_DAY);
+        return (daytime > 0 && daytime <= MAX_WORK_TIME_IN_DIURNAL);
     }
 
 

@@ -3,8 +3,6 @@ package ru.polynkina.irina.graphs;
 public class GraphDiurnal extends Graph {
 
     final static int INDEX_MIDDLE_DAY_OFF = 2;
-    final static double MAX_WORK_TIME_IN_DAY = 22;
-
 
     GraphDiurnal(int id, String name, String rule, double daytime, String daytimeSign, double workTimeInMonth){
         super(id, name, rule, daytime, daytimeSign, workTimeInMonth);
@@ -36,13 +34,14 @@ public class GraphDiurnal extends Graph {
      ******************************************************************************************************************************************/
 
 
+    @Override
     public void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays, final int AMOUNT_OF_DAYS){
         double averageWorkTime = sumTimesUninitializedDays;
         if(amountUninitializedDays != 0) averageWorkTime /= amountUninitializedDays;
 
         double additionalTime = 0;
-        if(averageWorkTime > MAX_WORK_TIME_IN_DAY){
-            additionalTime = sumTimesUninitializedDays - (amountUninitializedDays * MAX_WORK_TIME_IN_DAY);
+        if(averageWorkTime > MAX_WORK_TIME_IN_DIURNAL){
+            additionalTime = sumTimesUninitializedDays - (amountUninitializedDays * MAX_WORK_TIME_IN_DIURNAL);
             setAdditionalWorkDay(additionalTime, AMOUNT_OF_DAYS);
         }
         super.generateGraph(amountUninitializedDays, sumTimesUninitializedDays - additionalTime, AMOUNT_OF_DAYS);

@@ -5,7 +5,6 @@ public class GraphMix extends Graph {
     private double nightTime;
     private String nightTimeSign;
 
-
     GraphMix(int id, String name, String rule, double daytime, String daytimeSign,
              double nightTime, String nightTimeSign, double workTimeInMonth){
         super(id, name, rule, daytime, daytimeSign, workTimeInMonth);
@@ -23,7 +22,7 @@ public class GraphMix extends Graph {
     }
 
 
-
+    @Override
     public void printInfo(){
         System.out.print("id: " + getId() + "\tname: " + getName() + "\trule: " + getRule() + "\tdaytime: " + getDaytime());
         System.out.print("\tdaytimeSign: " + getDaytimeSign() + "\tnightTime: " + nightTime + "\tnightTimeSign: " + nightTimeSign);
@@ -36,11 +35,13 @@ public class GraphMix extends Graph {
      ******************************************************************************************************************************************/
 
 
+    @Override
     public double getNightTime(){
         return nightTime;
     }
 
 
+    @Override
     public String getNightTimeSign(){
         return nightTimeSign;
     }
@@ -71,6 +72,7 @@ public class GraphMix extends Graph {
      ******************************************************************************************************************************************/
 
 
+    @Override
     public void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays, final int AMOUNT_OF_DAYS){
         double averageWorkTime = sumTimesUninitializedDays;
         if(amountUninitializedDays != 0) averageWorkTime /= amountUninitializedDays;

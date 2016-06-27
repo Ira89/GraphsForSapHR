@@ -4,7 +4,6 @@ public class GraphFloat extends Graph {
 
     public static double MINUTE_FOR_FLOAT_TIME = 0.2;
 
-
     GraphFloat(int id, String name, String rule, double daytime, String daytimeSign, double workTimeInMonth){
         super(id, name, rule, daytime, daytimeSign, workTimeInMonth);
         setNormTimeForStandardGraphs(workTimeInMonth);
@@ -54,6 +53,7 @@ public class GraphFloat extends Graph {
      ******************************************************************************************************************************************/
 
 
+    @Override
     public void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays, final int AMOUNT_OF_DAYS){
         double averageWorkTime = sumTimesUninitializedDays;
         if(amountUninitializedDays != 0) averageWorkTime /= amountUninitializedDays;
