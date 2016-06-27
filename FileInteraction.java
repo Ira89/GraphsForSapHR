@@ -31,6 +31,7 @@ public class FileInteraction {
     final static String STRING_DESIGNATION_OF_FLOAT_GRAPHS = "FLOAT";
     final static String STRING_DESIGNATION_OF_DAY_GRAPHS = "DAY";
     final static String STRING_DESIGNATION_OF_MIX_GRAPHS = "MIX";
+    final static String SECOND_NIGHT_SHIFT_FOR_HOLIDAYS = "C_33";
 
     // constants in the file counter_...xls
     final static int COL_INDEX_COUNTER_ID = 0;
@@ -315,10 +316,20 @@ public class FileInteraction {
                         else hourName = findHourName(dayHours, hour);
                     }
                     else if(obj.getRuleOfDay(positionForRule) == Graph.CHAR_DESIGNATION_NIGHT){
-                        if(hour == obj.getNightTime()) hourName = obj.getNightTimeSign();
+                        if(hour == obj.getNightTime()){
+                            hourName = obj.getNightTimeSign();
+                            if(codeDay != null){
+                                int positionForRulePreviousDay = positionForRule - 1;
+                                if(positionForRulePreviousDay < 0) positionForRulePreviousDay = lengthRule - 1;
+                                if(codeDay == Graph.CODE_HOLIDAY && obj.getRuleOfDay(positionForRulePreviousDay) == Graph.CHAR_DESIGNATION_NIGHT){
+                                    hourName = SECOND_NIGHT_SHIFT_FOR_HOLIDAYS;
+                                }
+                            }
+                        }
                         else hourName = findHourName(nightHours, hour);
                     }
                     else{
+
                         if(hour == obj.getUniqueTime()) hourName = obj.getUniqueTimeSign();
                         else hourName = findHourName(dayHours, hour);
                     }
