@@ -318,10 +318,10 @@ public class FileInteraction {
                     else if(obj.getRuleOfDay(positionForRule) == Graph.CHAR_DESIGNATION_NIGHT){
                         if(hour == obj.getNightTime()){
                             hourName = obj.getNightTimeSign();
-                            if(codeDay != null){
+                            if(codeDay != null && codeDay == Graph.CODE_HOLIDAY){
                                 int positionForRulePreviousDay = positionForRule - 1;
                                 if(positionForRulePreviousDay < 0) positionForRulePreviousDay = lengthRule - 1;
-                                if(codeDay == Graph.CODE_HOLIDAY && obj.getRuleOfDay(positionForRulePreviousDay) == Graph.CHAR_DESIGNATION_NIGHT){
+                                if(obj.getRuleOfDay(positionForRulePreviousDay) == Graph.CHAR_DESIGNATION_NIGHT){
                                     hourName = SECOND_NIGHT_SHIFT_FOR_HOLIDAYS;
                                 }
                             }
@@ -329,7 +329,6 @@ public class FileInteraction {
                         else hourName = findHourName(nightHours, hour);
                     }
                     else{
-
                         if(hour == obj.getUniqueTime()) hourName = obj.getUniqueTimeSign();
                         else hourName = findHourName(dayHours, hour);
                     }
