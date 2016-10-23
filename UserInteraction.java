@@ -11,8 +11,6 @@ public class UserInteraction {
     final static int MIN_INDEX_YEAR = 2016;
     final static int MAX_NORM_TIME = 200;
     final static int MIN_NORM_TIME = 100;
-    final static int BITS_IN_MONTH = 4;
-    final static int MASK_FOR_MONTH = 0xF;
 
     // constants in the file graphs.xls
     final static int DELTA_INDEX_AND_VALUE = 3;
@@ -25,27 +23,43 @@ public class UserInteraction {
     final static int COL_INDEX_OF_DATE = 1;
 
 
-    public static int readYearAndMonth(){
-        int yearAndMonth = 0;
+    public static int readYear(){
+        int year = 0;
         try{
             FileInputStream fis = new FileInputStream("./lib/userInput.xls");
             Workbook wb = new HSSFWorkbook(fis);
-            int year = (int) wb.getSheetAt(INDEX_OF_SHEET).getRow(ROW_INDEX_OF_YEAR).getCell(COL_INDEX_OF_DATE).getNumericCellValue();
-            int month = (int) wb.getSheetAt(INDEX_OF_SHEET).getRow(ROW_INDEX_OF_MONTH).getCell(COL_INDEX_OF_DATE).getNumericCellValue();
+            year = (int) wb.getSheetAt(INDEX_OF_SHEET).getRow(ROW_INDEX_OF_YEAR).getCell(COL_INDEX_OF_DATE).getNumericCellValue();
             wb.close();
             fis.close();
 
-            boolean isIncorrectInput = false;
-            if(year < MIN_INDEX_YEAR || year > MAX_INDEX_YEAR) isIncorrectInput = true;
-            if(month < Calendar.MIN_INDEX_MONTH || month > Calendar.MAX_INDEX_MONTH) isIncorrectInput = true;
-            if(isIncorrectInput) throw new Exception("Некорректно указан месяц или год!");
-
-            yearAndMonth = year << BITS_IN_MONTH | month;
+            if(year < MIN_INDEX_YEAR || year > MAX_INDEX_YEAR) {
+                throw new Exception("Некорректно указан месяц или год!");
+            }
         }catch(Exception exc){
             exc.printStackTrace();
             System.exit(0);
         }
-        return yearAndMonth;
+        return year;
+    }
+
+
+    public static int readMonth() {
+        int month = 0;
+        try {
+            FileInputStream fis = new FileInputStream("./lib/userInput.xls");
+            Workbook wb = new HSSFWorkbook(fis);
+            month = (int) wb.getSheetAt(INDEX_OF_SHEET).getRow(ROW_INDEX_OF_MONTH).getCell(COL_INDEX_OF_DATE).getNumericCellValue();
+            wb.close();
+            fis.close();
+
+            if (month < Calendar.MIN_INDEX_MONTH || month > Calendar.MAX_INDEX_MONTH) {
+                throw new Exception("Некорректно указан месяц!");
+            }
+        } catch (Exception exc) {
+            exc.printStackTrace();
+            System.exit(0);
+        }
+        return month;
     }
 
 
@@ -71,13 +85,13 @@ public class UserInteraction {
 
 
 
-    public static  void readShortDayAndHolidays(Map<Integer, Integer> shortDayAndHolidays, final int AMOUNT_OF_DAYS){
+    public static  void readShortDayAndHolidays(Map<Integer, Integer> shortDayAndHolidays){
         try{
             FileInputStream fis = new FileInputStream("./lib/userInput.xls");
             Workbook wb = new HSSFWorkbook(fis);
 
             for(int indexRow = ROW_INDEX_OF_SHORT_DAY; indexRow <= ROW_INDEX_OF_DAY_OFF; ++indexRow){
-                for(int indexCol = COL_INDEX_OF_DATE; indexCol <= AMOUNT_OF_DAYS; ++indexCol){
+                for(int indexCol = COL_INDEX_OF_DATE; indexCol <= CreatingGraphs.AMOUNT_OF_DAYS; ++indexCol){
                     try{
                         int indexDay = (int) wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(indexCol).getNumericCellValue();
                         if(indexDay == 0) throw new NullPointerException();
@@ -90,7 +104,7 @@ public class UserInteraction {
                         }
 
                         boolean isIncorrectInput = false;
-                        if(indexDay <= 0 || indexDay > AMOUNT_OF_DAYS) isIncorrectInput = true;
+                        if(indexDay <= 0 || indexDay > CreatingGraphs.AMOUNT_OF_DAYS) isIncorrectInput = true;
                         if(isIncorrectInput){
                             wb.close();
                             fis.close();

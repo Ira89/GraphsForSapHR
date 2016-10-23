@@ -10,11 +10,11 @@ public class GraphStandard extends Graph {
 
 
     @Override
-    public void setShortDayAndHolidays(final Map<Integer, Integer> shortDayAndHolidays, final int AMOUNT_OF_DAYS){
+    public void setShortDayAndHolidays(final Map<Integer, Integer> shortDayAndHolidays){
         int lengthRule = getLengthRule();
         int positionForRule = getCounter();
 
-        for(int indexDay = 0; indexDay < AMOUNT_OF_DAYS; ++indexDay){
+        for(int indexDay = 0; indexDay < CreatingGraphs.AMOUNT_OF_DAYS; ++indexDay){
             if(getRuleOfDay(positionForRule) != CHAR_DESIGNATION_WEEKEND){
                 for(Map.Entry<Integer, Integer> obj : shortDayAndHolidays.entrySet()){
                     if(obj.getKey() == indexDay + 1){
@@ -30,8 +30,8 @@ public class GraphStandard extends Graph {
 
 
     @Override
-    public void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays, final int AMOUNT_OF_DAYS){
-        for(int indexDay = 0; indexDay < AMOUNT_OF_DAYS; ++indexDay){
+    public void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays){
+        for(int indexDay = 0; indexDay < CreatingGraphs.AMOUNT_OF_DAYS; ++indexDay){
             if(getWorkTime(indexDay) == UNINITIALIZED_VALUE) setWorkTime(indexDay, getDaytime());
         }
     }

@@ -28,12 +28,12 @@ public class GraphFloat extends Graph {
 
 
 
-    private void setFloatDay(final double floatTime, final int counterFloatDay, final int amountUninitializedDays, final int AMOUNT_OF_DAYS){
+    private void setFloatDay(final double floatTime, final int counterFloatDay, final int amountUninitializedDays){
         double frequency = calculateFrequency(counterFloatDay, amountUninitializedDays);
         double currentFrequency = 0;
         int amountWorkDay = 0;
 
-        for(int indexDay = 0; indexDay < AMOUNT_OF_DAYS; ++indexDay){
+        for(int indexDay = 0; indexDay < CreatingGraphs.AMOUNT_OF_DAYS; ++indexDay){
             if(getWorkTime(indexDay) == UNINITIALIZED_VALUE){
                 if(currentFrequency + 1 < frequency  && amountWorkDay < amountUninitializedDays - counterFloatDay){
                     ++currentFrequency;
@@ -54,7 +54,7 @@ public class GraphFloat extends Graph {
 
 
     @Override
-    public void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays, final int AMOUNT_OF_DAYS){
+    public void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays){
         double averageWorkTime = sumTimesUninitializedDays;
         if(amountUninitializedDays != 0) averageWorkTime /= amountUninitializedDays;
 
@@ -69,7 +69,7 @@ public class GraphFloat extends Graph {
             ++counterFloatDay;
         }
 
-        if(counterFloatDay != 0) setFloatDay(floatTime, counterFloatDay, amountUninitializedDays, AMOUNT_OF_DAYS);
-        super.generateGraph(amountUninitializedDays - counterFloatDay, sumTimesUninitializedDays - sumFloatDay, AMOUNT_OF_DAYS);
+        if(counterFloatDay != 0) setFloatDay(floatTime, counterFloatDay, amountUninitializedDays);
+        super.generateGraph(amountUninitializedDays - counterFloatDay, sumTimesUninitializedDays - sumFloatDay);
     }
 }

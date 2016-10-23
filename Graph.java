@@ -62,9 +62,9 @@ public class Graph {
 
 
 
-    public void printWorkTime(final int AMOUNT_OF_DAYS){
+    public void printWorkTime(){
         System.out.print(name + ": \t");
-        for(int indexDay = 0; indexDay < AMOUNT_OF_DAYS; ++indexDay){
+        for(int indexDay = 0; indexDay < CreatingGraphs.AMOUNT_OF_DAYS; ++indexDay){
             System.out.print(workTime[indexDay] + " ");
         }
         System.out.println();
@@ -208,12 +208,12 @@ public class Graph {
 
 
     private void fillUninitializedWorkDays(final int spreadValue, final int amountSpreadValue, final int rareValue,
-                                           final int amountRareValue, final double frequency, final int AMOUNT_OF_DAYS){
+                                           final int amountRareValue, final double frequency){
         double currentFrequency = 0;
         int counterSpreadTime = 0;
         int counterRareTime = 0;
 
-        for(int indexDay = 0; indexDay < AMOUNT_OF_DAYS; ++indexDay){
+        for(int indexDay = 0; indexDay < CreatingGraphs.AMOUNT_OF_DAYS; ++indexDay){
             if(getWorkTime(indexDay) == UNINITIALIZED_VALUE){
                 if(currentFrequency < frequency && counterSpreadTime < amountSpreadValue || counterRareTime == amountRareValue){
                     setWorkTime(indexDay, spreadValue);
@@ -265,20 +265,20 @@ public class Graph {
 
 
 
-    public void createUninitializedWorkTimeArray(final int AMOUNT_OF_DAYS){
-        workTime = new double[AMOUNT_OF_DAYS];
-        for(int i = 0; i < AMOUNT_OF_DAYS; ++i){
+    public void createUninitializedWorkTimeArray(){
+        workTime = new double[CreatingGraphs.AMOUNT_OF_DAYS];
+        for(int i = 0; i < CreatingGraphs.AMOUNT_OF_DAYS; ++i){
             setWorkTime(i, UNINITIALIZED_VALUE);
         }
     }
 
 
 
-    public void setWeekend(final int AMOUNT_OF_DAYS){
+    public void setWeekend(){
         int lengthRule = getLengthRule();
         int positionForRule = getCounter();
 
-        for(int indexDay = 0; indexDay < AMOUNT_OF_DAYS; ++indexDay){
+        for(int indexDay = 0; indexDay < CreatingGraphs.AMOUNT_OF_DAYS; ++indexDay){
             if(getRuleOfDay(positionForRule) == CHAR_DESIGNATION_WEEKEND){
                 setWorkTime(indexDay, 0);
             }
@@ -288,11 +288,11 @@ public class Graph {
 
 
 
-    public void setShortDayAndHolidays(final Map<Integer, Integer> shortDayAndHolidays, final int AMOUNT_OF_DAYS){
+    public void setShortDayAndHolidays(final Map<Integer, Integer> shortDayAndHolidays){
         int lengthRule = getLengthRule();
         int positionForRule = getCounter();
 
-        for(int indexDay = 0; indexDay < AMOUNT_OF_DAYS; ++indexDay){
+        for(int indexDay = 0; indexDay < CreatingGraphs.AMOUNT_OF_DAYS; ++indexDay){
             if(getRuleOfDay(positionForRule) != CHAR_DESIGNATION_WEEKEND){
                 for(Map.Entry<Integer, Integer> obj : shortDayAndHolidays.entrySet()){
                     if(obj.getKey() == indexDay + 1){
@@ -307,9 +307,9 @@ public class Graph {
 
 
 
-    public int getAmountUninitializedDays(final int AMOUNT_OF_DAYS){
+    public int getAmountUninitializedDays(){
         int amountUninitializedDays = 0;
-        for(int indexDay = 0; indexDay < AMOUNT_OF_DAYS; ++indexDay){
+        for(int indexDay = 0; indexDay < CreatingGraphs.AMOUNT_OF_DAYS; ++indexDay){
             if(getWorkTime(indexDay) == UNINITIALIZED_VALUE) ++amountUninitializedDays;
         }
         return amountUninitializedDays;
@@ -317,9 +317,9 @@ public class Graph {
 
 
 
-    public double getSumTimeInitializedDays(final int AMOUNT_OF_DAYS){
+    public double getSumTimeInitializedDays(){
         double sumTime = 0;
-        for(int indexDay = 0; indexDay < AMOUNT_OF_DAYS; ++indexDay){
+        for(int indexDay = 0; indexDay < CreatingGraphs.AMOUNT_OF_DAYS; ++indexDay){
             if(getWorkTime(indexDay) != UNINITIALIZED_VALUE) sumTime += getWorkTime(indexDay);
         }
         return sumTime;
@@ -327,7 +327,7 @@ public class Graph {
 
 
 
-    public void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays, final int AMOUNT_OF_DAYS){
+    public void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays){
         double averageWorkTime = sumTimesUninitializedDays;
         if(amountUninitializedDays != 0) averageWorkTime /= amountUninitializedDays;
 
@@ -342,7 +342,7 @@ public class Graph {
         int amountSpreadValue = amountDaysWithMinTime >= amountDaysWithMaxTime ? amountDaysWithMinTime : amountDaysWithMaxTime;
         int rareValue = amountDaysWithMinTime < amountDaysWithMaxTime ? minWorkTime : maxWorkTime;
         int amountRareValue = amountDaysWithMinTime < amountDaysWithMaxTime ? amountDaysWithMinTime : amountDaysWithMaxTime;
-        fillUninitializedWorkDays(spreadValue, amountSpreadValue, rareValue, amountRareValue, frequency, AMOUNT_OF_DAYS);
+        fillUninitializedWorkDays(spreadValue, amountSpreadValue, rareValue, amountRareValue, frequency);
     }
 
 

@@ -52,12 +52,12 @@ public class GraphMix extends Graph {
      ******************************************************************************************************************************************/
 
 
-    private void fillWorkTimeByType(final char dayType, final double setValue, final int maxAmountSetting, final int AMOUNT_OF_DAYS){
+    private void fillWorkTimeByType(final char dayType, final double setValue, final int maxAmountSetting){
         int amountSetting = 0;
         int lengthRule = getLengthRule();
         int positionForRule = getCounter();
 
-        for(int indexDay = 0; indexDay < AMOUNT_OF_DAYS && amountSetting <= maxAmountSetting; ++indexDay){
+        for(int indexDay = 0; indexDay < CreatingGraphs.AMOUNT_OF_DAYS && amountSetting <= maxAmountSetting; ++indexDay){
             if(getRuleOfDay(positionForRule) == dayType && getWorkTime(indexDay) == UNINITIALIZED_VALUE){
                 setWorkTime(indexDay, setValue);
                 ++amountSetting;
@@ -73,7 +73,7 @@ public class GraphMix extends Graph {
 
 
     @Override
-    public void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays, final int AMOUNT_OF_DAYS){
+    public void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays){
         double averageWorkTime = sumTimesUninitializedDays;
         if(amountUninitializedDays != 0) averageWorkTime /= amountUninitializedDays;
 
@@ -89,11 +89,11 @@ public class GraphMix extends Graph {
         char mostFrequentTypeOfDay;
         if(spreadValue > rareValue) mostFrequentTypeOfDay = Graph.CHAR_DESIGNATION_NIGHT;
         else mostFrequentTypeOfDay = Graph.CHAR_DESIGNATION_DAY;
-        fillWorkTimeByType(mostFrequentTypeOfDay, spreadValue, amountSpreadValue, AMOUNT_OF_DAYS);
+        fillWorkTimeByType(mostFrequentTypeOfDay, spreadValue, amountSpreadValue);
 
-        int newAmountUninitializedDays = getAmountUninitializedDays(AMOUNT_OF_DAYS);
-        double sumTimeInitializedDays = getSumTimeInitializedDays(AMOUNT_OF_DAYS);
+        int newAmountUninitializedDays = getAmountUninitializedDays();
+        double sumTimeInitializedDays = getSumTimeInitializedDays();
         double newSumTimesUninitializedDays = getWorkTimeInMonth() - sumTimeInitializedDays;
-        super.generateGraph(newAmountUninitializedDays, newSumTimesUninitializedDays, AMOUNT_OF_DAYS);
+        super.generateGraph(newAmountUninitializedDays, newSumTimesUninitializedDays);
     }
 }
