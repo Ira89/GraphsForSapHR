@@ -1,20 +1,22 @@
 package ru.polynkina.irina.graphs;
 
+import ru.polynkina.irina.main.Main;
+
 import java.util.Map;
 
 public class GraphStandard extends Graph {
 
-    GraphStandard(int id, String name, String rule, double daytime, String daytimeSign, double workTimeInMonth){
+    public GraphStandard(int id, String name, String rule, double daytime, String daytimeSign, double workTimeInMonth){
         super(id, name, rule, daytime, daytimeSign, workTimeInMonth);
     }
 
 
     @Override
-    public void setShortDayAndHolidays(final Map<Integer, Integer> shortDayAndHolidays){
+    protected void setShortDayAndHolidays(final Map<Integer, Integer> shortDayAndHolidays){
         int lengthRule = getLengthRule();
         int positionForRule = getCounter();
 
-        for(int indexDay = 0; indexDay < CreatingGraphs.AMOUNT_OF_DAYS; ++indexDay){
+        for(int indexDay = 0; indexDay < Main.DAY_OF_MONTH; ++indexDay){
             if(getRuleOfDay(positionForRule) != CHAR_DESIGNATION_WEEKEND){
                 for(Map.Entry<Integer, Integer> obj : shortDayAndHolidays.entrySet()){
                     if(obj.getKey() == indexDay + 1){
@@ -30,8 +32,8 @@ public class GraphStandard extends Graph {
 
 
     @Override
-    public void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays){
-        for(int indexDay = 0; indexDay < CreatingGraphs.AMOUNT_OF_DAYS; ++indexDay){
+    protected void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays){
+        for(int indexDay = 0; indexDay < Main.DAY_OF_MONTH; ++indexDay){
             if(getWorkTime(indexDay) == UNINITIALIZED_VALUE) setWorkTime(indexDay, getDaytime());
         }
     }

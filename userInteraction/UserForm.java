@@ -1,18 +1,15 @@
-package ru.polynkina.irina.graphs;
+package ru.polynkina.irina.userInteraction;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
+import ru.polynkina.irina.main.Main;
+
 import java.io.FileInputStream;
 import java.util.Map;
 
-public class UserInteraction {
+public class UserForm {
 
-    final static int MAX_INDEX_YEAR = 2116;
-    final static int MIN_INDEX_YEAR = 2016;
-    final static int MAX_NORM_TIME = 200;
-    final static int MIN_NORM_TIME = 100;
-
-    // constants in the file graphs.xls
+    // constants in the file main.xls
     final static int DELTA_INDEX_AND_VALUE = 3;
     final static int INDEX_OF_SHEET = 0;
     final static int ROW_INDEX_OF_YEAR = 0;
@@ -24,9 +21,11 @@ public class UserInteraction {
 
 
     public static int readYear(){
+        final int MAX_INDEX_YEAR = 2116;
+        final int MIN_INDEX_YEAR = 2016;
         int year = 0;
         try{
-            FileInputStream fis = new FileInputStream("./lib/userInput.xls");
+            FileInputStream fis = new FileInputStream("./userForm/userForm.xls");
             Workbook wb = new HSSFWorkbook(fis);
             year = (int) wb.getSheetAt(INDEX_OF_SHEET).getRow(ROW_INDEX_OF_YEAR).getCell(COL_INDEX_OF_DATE).getNumericCellValue();
             wb.close();
@@ -44,15 +43,17 @@ public class UserInteraction {
 
 
     public static int readMonth() {
+        final int MAX_INDEX_MONTH = 12;
+        final int MIN_INDEX_MONTH = 1;
         int month = 0;
         try {
-            FileInputStream fis = new FileInputStream("./lib/userInput.xls");
+            FileInputStream fis = new FileInputStream("./userForm/userForm.xls");
             Workbook wb = new HSSFWorkbook(fis);
             month = (int) wb.getSheetAt(INDEX_OF_SHEET).getRow(ROW_INDEX_OF_MONTH).getCell(COL_INDEX_OF_DATE).getNumericCellValue();
             wb.close();
             fis.close();
 
-            if (month < Calendar.MIN_INDEX_MONTH || month > Calendar.MAX_INDEX_MONTH) {
+            if (month < MIN_INDEX_MONTH || month > MAX_INDEX_MONTH) {
                 throw new Exception("Некорректно указан месяц!");
             }
         } catch (Exception exc) {
@@ -65,9 +66,11 @@ public class UserInteraction {
 
 
     public static double readNormTime(){
+        final int MAX_NORM_TIME = 200;
+        final int MIN_NORM_TIME = 100;
         double normTime = 0;
         try{
-            FileInputStream fis = new FileInputStream("./lib/userInput.xls");
+            FileInputStream fis = new FileInputStream("./userForm/userForm.xls");
             Workbook wb = new HSSFWorkbook(fis);
             normTime = wb.getSheetAt(INDEX_OF_SHEET).getRow(ROW_INDEX_OF_NORM_TIME).getCell(COL_INDEX_OF_DATE).getNumericCellValue();
             wb.close();
@@ -85,13 +88,13 @@ public class UserInteraction {
 
 
 
-    public static  void readShortDayAndHolidays(Map<Integer, Integer> shortDayAndHolidays){
+    public static void readShortDayAndHolidays(Map<Integer, Integer> shortDayAndHolidays){
         try{
-            FileInputStream fis = new FileInputStream("./lib/userInput.xls");
+            FileInputStream fis = new FileInputStream("./userForm/userForm.xls");
             Workbook wb = new HSSFWorkbook(fis);
 
             for(int indexRow = ROW_INDEX_OF_SHORT_DAY; indexRow <= ROW_INDEX_OF_DAY_OFF; ++indexRow){
-                for(int indexCol = COL_INDEX_OF_DATE; indexCol <= CreatingGraphs.AMOUNT_OF_DAYS; ++indexCol){
+                for(int indexCol = COL_INDEX_OF_DATE; indexCol <= Main.DAY_OF_MONTH; ++indexCol){
                     try{
                         int indexDay = (int) wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(indexCol).getNumericCellValue();
                         if(indexDay == 0) throw new NullPointerException();
@@ -104,7 +107,7 @@ public class UserInteraction {
                         }
 
                         boolean isIncorrectInput = false;
-                        if(indexDay <= 0 || indexDay > CreatingGraphs.AMOUNT_OF_DAYS) isIncorrectInput = true;
+                        if(indexDay <= 0 || indexDay > Main.DAY_OF_MONTH) isIncorrectInput = true;
                         if(isIncorrectInput){
                             wb.close();
                             fis.close();

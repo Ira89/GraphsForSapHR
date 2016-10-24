@@ -1,10 +1,10 @@
 package ru.polynkina.irina.graphs;
 
+import ru.polynkina.irina.main.Main;
+
 public class GraphFloat extends Graph {
 
-    public static double MINUTE_FOR_FLOAT_TIME = 0.2;
-
-    GraphFloat(int id, String name, String rule, double daytime, String daytimeSign, double workTimeInMonth){
+    public GraphFloat(int id, String name, String rule, double daytime, String daytimeSign, double workTimeInMonth){
         super(id, name, rule, daytime, daytimeSign, workTimeInMonth);
         setNormTimeForStandardGraphs(workTimeInMonth);
     }
@@ -33,7 +33,7 @@ public class GraphFloat extends Graph {
         double currentFrequency = 0;
         int amountWorkDay = 0;
 
-        for(int indexDay = 0; indexDay < CreatingGraphs.AMOUNT_OF_DAYS; ++indexDay){
+        for(int indexDay = 0; indexDay < Main.DAY_OF_MONTH; ++indexDay){
             if(getWorkTime(indexDay) == UNINITIALIZED_VALUE){
                 if(currentFrequency + 1 < frequency  && amountWorkDay < amountUninitializedDays - counterFloatDay){
                     ++currentFrequency;
@@ -54,7 +54,8 @@ public class GraphFloat extends Graph {
 
 
     @Override
-    public void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays){
+    protected void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays){
+        final double MINUTE_FOR_FLOAT_TIME = 0.2;
         double averageWorkTime = sumTimesUninitializedDays;
         if(amountUninitializedDays != 0) averageWorkTime /= amountUninitializedDays;
 

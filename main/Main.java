@@ -1,42 +1,39 @@
-package ru.polynkina.irina.graphs;
+package ru.polynkina.irina.main;
+
+import ru.polynkina.irina.fileInteraction.FileInteraction;
+import ru.polynkina.irina.userInteraction.UserForm;
+import ru.polynkina.irina.calendar.Calendar;
+import ru.polynkina.irina.graphs.Graph;
+import ru.polynkina.irina.debug.Debug;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CreatingGraphs {
+public class Main {
 
-    static final int YEAR = UserInteraction.readYear();
-    static final int MONTH = UserInteraction.readMonth();
-    static final int AMOUNT_OF_DAYS = Calendar.getAmountDay(MONTH, YEAR);
-    static final double NORM_TIME = UserInteraction.readNormTime();
+    public static final int YEAR = UserForm.readYear();
+    public static final int MONTH = UserForm.readMonth();
+    public static final int DAY_OF_MONTH = Calendar.getAmountDay(MONTH, YEAR);
+    public static final double NORM_TIME = UserForm.readNormTime();
 
     public static void main(String[] debugLevel) {
         System.out.println("Version of the program: 1.0.1");
 
         Map<Integer, Integer> shortDayAndHolidays = new HashMap<Integer, Integer>();
-        UserInteraction.readShortDayAndHolidays(shortDayAndHolidays);
+        UserForm.readShortDayAndHolidays(shortDayAndHolidays);
 
         List<Graph> graphs = new ArrayList<Graph>();
         FileInteraction.fabricateGraphs(graphs);
         FileInteraction.readCountersForGraphs(graphs);
 
-        for(Graph obj : graphs){
-            obj.createUninitializedWorkTimeArray();
-            obj.setWeekend();
-            obj.setShortDayAndHolidays(shortDayAndHolidays);
-
-            int amountUninitializedDays = obj.getAmountUninitializedDays();
-            double sumTimeInitializedDays = obj.getSumTimeInitializedDays();
-            double sumTimesUninitializedDays = obj.getWorkTimeInMonth() - sumTimeInitializedDays;
-            obj.generateGraph(amountUninitializedDays, sumTimesUninitializedDays);
-        }
-
         Map<Double, String> dayHours = new HashMap<Double, String>();
         FileInteraction.readDayHours(dayHours);
         Map<Double, String> nightHours = new HashMap<Double, String>();
         FileInteraction.readNightHours(nightHours);
+
+        for(Graph obj : graphs) obj.startGenerating(shortDayAndHolidays, dayHours, nightHours);
 
         FileInteraction.writeGraphsIntoTemplate(graphs, dayHours, nightHours, shortDayAndHolidays);
         FileInteraction.writeNextCounter(graphs);

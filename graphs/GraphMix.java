@@ -1,32 +1,17 @@
 package ru.polynkina.irina.graphs;
 
+import ru.polynkina.irina.main.Main;
+
 public class GraphMix extends Graph {
 
     private double nightTime;
     private String nightTimeSign;
 
-    GraphMix(int id, String name, String rule, double daytime, String daytimeSign,
+    public GraphMix(int id, String name, String rule, double daytime, String daytimeSign,
              double nightTime, String nightTimeSign, double workTimeInMonth){
         super(id, name, rule, daytime, daytimeSign, workTimeInMonth);
-
-        try{
-            boolean isCorrectTime = checkTimeInput(nightTime);
-            if(!isCorrectTime) throw new Exception("Время не может принимать значение: " + nightTime);
-        }catch (Exception exc){
-            exc.printStackTrace();
-            System.exit(0);
-        }
-
         this.nightTime = nightTime;
         this.nightTimeSign = nightTimeSign;
-    }
-
-
-    @Override
-    public void printInfo(){
-        System.out.print("id: " + getId() + "\tname: " + getName() + "\trule: " + getRule() + "\tdaytime: " + getDaytime());
-        System.out.print("\tdaytimeSign: " + getDaytimeSign() + "\tnightTime: " + nightTime + "\tnightTimeSign: " + nightTimeSign);
-        System.out.println("\tworkTimeInMonth: " + getWorkTimeInMonth() + "\tcounter: " + getCounter());
     }
 
 
@@ -36,15 +21,11 @@ public class GraphMix extends Graph {
 
 
     @Override
-    public double getNightTime(){
-        return nightTime;
-    }
+    public double getNightTime() { return nightTime; }
 
 
     @Override
-    public String getNightTimeSign(){
-        return nightTimeSign;
-    }
+    public String getNightTimeSign(){ return nightTimeSign; }
 
 
     /*******************************************************************************************************************************************
@@ -57,7 +38,7 @@ public class GraphMix extends Graph {
         int lengthRule = getLengthRule();
         int positionForRule = getCounter();
 
-        for(int indexDay = 0; indexDay < CreatingGraphs.AMOUNT_OF_DAYS && amountSetting <= maxAmountSetting; ++indexDay){
+        for(int indexDay = 0; indexDay < Main.DAY_OF_MONTH && amountSetting <= maxAmountSetting; ++indexDay){
             if(getRuleOfDay(positionForRule) == dayType && getWorkTime(indexDay) == UNINITIALIZED_VALUE){
                 setWorkTime(indexDay, setValue);
                 ++amountSetting;
@@ -73,12 +54,12 @@ public class GraphMix extends Graph {
 
 
     @Override
-    public void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays){
+    protected void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays){
         double averageWorkTime = sumTimesUninitializedDays;
         if(amountUninitializedDays != 0) averageWorkTime /= amountUninitializedDays;
 
         int minWorkTime = (int) averageWorkTime;
-        int maxWorkTime = minWorkTime > averageWorkTime ? minWorkTime - 1 : minWorkTime + 1;
+        int maxWorkTime = minWorkTime + 1;
         int amountDaysWithMinTime = getAmountDaysWithMinTime(minWorkTime, maxWorkTime, sumTimesUninitializedDays, amountUninitializedDays);
         int amountDaysWithMaxTime = amountUninitializedDays - amountDaysWithMinTime;
 
