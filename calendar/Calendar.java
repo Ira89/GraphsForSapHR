@@ -2,7 +2,7 @@ package ru.polynkina.irina.calendar;
 
 public class Calendar {
 
-    public static int getAmountDay(final int MONTH, final int YEAR){
+    public static int getAmountDay(final int MONTH, final int YEAR) {
         final int[] DAY_IN_MONTH = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
         final int INDEX_MONTH_EXCLUSION = 2;
 

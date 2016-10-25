@@ -1,6 +1,7 @@
 package ru.polynkina.irina.main;
 
 import ru.polynkina.irina.fileInteraction.FileInteraction;
+import ru.polynkina.irina.unitTests.UnitTest;
 import ru.polynkina.irina.userInteraction.UserForm;
 import ru.polynkina.irina.calendar.Calendar;
 import ru.polynkina.irina.graphs.Graph;
@@ -33,13 +34,16 @@ public class Main {
         Map<Double, String> nightHours = new HashMap<Double, String>();
         FileInteraction.readNightHours(nightHours);
 
-        for(Graph obj : graphs) obj.startGenerating(shortDayAndHolidays, dayHours, nightHours);
+        for(Graph obj : graphs) obj.startGenerating(DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
 
         FileInteraction.writeGraphsIntoTemplate(graphs, dayHours, nightHours, shortDayAndHolidays);
         FileInteraction.writeNextCounter(graphs);
         FileInteraction.deleteOldCounter();
 
-        if (debugLevel.length == 1) Debug.start(debugLevel[0], shortDayAndHolidays, graphs, dayHours, nightHours);
+        UnitTest test = new UnitTest();
+        test.start();
+
+        if (debugLevel.length == 1) Debug.start(debugLevel[0], shortDayAndHolidays, graphs, dayHours, nightHours); // ?!
         System.out.println("Генерация графиков завершена успешно!");
     }
 }

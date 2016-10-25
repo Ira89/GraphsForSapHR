@@ -87,6 +87,16 @@ public class Graph {
         return workTime[indexDay];
     }
 
+    public String getWorkTimeSign(final int indexDay) {
+        try {
+            if(indexDay >= Main.DAY_OF_MONTH) throw new Exception("Попытка выхода за пределы массива");
+        } catch (Exception exc) {
+            exc.printStackTrace();
+            System.exit(0);
+        }
+        return workTimeSign[indexDay];
+    }
+
     public char getRuleOfDay(final int positionForRule){
         try{
             if(positionForRule >= getLengthRule()) throw new Exception("Попытка выхода за пределы правила");
@@ -143,7 +153,8 @@ public class Graph {
                 }else{
                     setWorkTime(indexDay, rareValue);
                     ++counterRareTime;
-                    currentFrequency = 0;
+                    //currentFrequency = 0;
+                    currentFrequency -= frequency;
                 }
             }
         }
@@ -185,6 +196,7 @@ public class Graph {
         workTimeSign = new String[Main.DAY_OF_MONTH];
         for(int i = 0; i < Main.DAY_OF_MONTH; ++i){
             setWorkTime(i, UNINITIALIZED_VALUE);
+            workTimeSign[i] = "FREE";
         }
     }
 
@@ -280,6 +292,11 @@ public class Graph {
             if(codeDay != null && codeDay == Graph.CODE_SHORT_DAY){
                 if(getWorkTime(indexDay) != 0) ++hour;
             }
+            boolean isStandardOrUniqueGraph = this instanceof GraphStandard || this instanceof GraphUnique;
+            if(isStandardOrUniqueGraph && getRuleOfDay(positionForRule) != Graph.CHAR_DESIGNATION_WEEKEND) {
+                if (getRuleOfDay(positionForRule) == 'd') hour = getDaytime();
+                else hour = getUniqueTime();
+            }
             String hourName;
             if(getRuleOfDay(positionForRule) == Graph.CHAR_DESIGNATION_DAY){
                 if(hour == getDaytime()) hourName = getDaytimeSign();
@@ -316,7 +333,7 @@ public class Graph {
         return hourName;
     }
 
-    public void startGenerating(Map<Integer, Integer> shortDayAndHolidays, Map<Double, String> dayHours, Map<Double, String> nightHours) {
+    public void startGenerating(final int DAY_OF_MONTH, Map<Integer, Integer> shortDayAndHolidays, Map<Double, String> dayHours, Map<Double, String> nightHours) {
         createUninitializedWorkTimeArray();
         setWeekend();
         setShortDayAndHolidays(shortDayAndHolidays);
