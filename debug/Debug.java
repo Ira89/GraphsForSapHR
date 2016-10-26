@@ -38,7 +38,7 @@ public class Debug {
             System.out.print("id: " + obj.getId() + "\tname: " + obj.getName() + "\trule: " + obj.getRule());
             System.out.print("\tdaytime: " + obj.getDaytime() + "\tdaytimeSign: " + obj.getDaytimeSign());
             System.out.print("\tnightTime: " + obj.getNightTime() + "\tnightTimeSign: " + obj.getNightTimeSign());
-            System.out.println("\tworkTimeInMonth: " + obj.getWorkTimeInMonth() + "\tcounter: " + obj.getCounter());
+            System.out.println("\tworkTimeInMonth: " + obj.getNormTime() + "\tcounter: " + obj.getCounter());
         }
     }
 

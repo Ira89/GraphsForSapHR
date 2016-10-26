@@ -59,9 +59,9 @@ public class UnitTest {
                 "FREE", "FREE", "4C10"
         };
 
-        Graph actualGraph = new Graph(1, "graph", "dddfff", 11, "FL11", 169);
+        Graph actualGraph = new Graph(1, "graph", "dddfff", 11, "FL11", 169, DAY_OF_MONTH);
         actualGraph.setCounter(0);
-        actualGraph.startGenerating(DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
+        actualGraph.startGenerating(shortDayAndHolidays, dayHours, nightHours);
 
         if(!isEquals(actualGraph, correctGraph)) {
             System.out.println("GRAPHS: ERROR");
@@ -81,9 +81,9 @@ public class UnitTest {
                 "FREE", "FREE", "FREE"
         };
 
-        Graph actualGraph = new GraphDiurnal(1, "diurnal", "nfff", 22, "SUTK", 170);
+        Graph actualGraph = new GraphDiurnal(1, "diurnal", "nfff", 22, "SUTK", 170, DAY_OF_MONTH);
         actualGraph.setCounter(1);
-        actualGraph.startGenerating(DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
+        actualGraph.startGenerating(shortDayAndHolidays, dayHours, nightHours);
 
         if(!isEquals(actualGraph, correctGraph)) {
             System.out.println("DIURNAL GRAPHS: ERROR");
@@ -103,9 +103,9 @@ public class UnitTest {
                 "4AC6", "4AC7", "4AC6"
         };
 
-        Graph actualGraph = new GraphFloat(1, "float", "dddddff", 7.2, "NO72", 169);
+        Graph actualGraph = new GraphFloat(1, "float", "dddddff", 7.2, "NO72", 169, DAY_OF_MONTH);
         actualGraph.setCounter(0);
-        actualGraph.startGenerating(DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
+        actualGraph.startGenerating(shortDayAndHolidays, dayHours, nightHours);
 
         if(!isEquals(actualGraph, correctGraph)) {
             System.out.println("FLOAT GRAPHS: ERROR");
@@ -125,9 +125,9 @@ public class UnitTest {
                 "FREE", "FREE", "CDEN"
         };
 
-        Graph actualGraph = new GraphMix(1, "mix", "ddnnffff", 11, "CDEN", 11, "CNO4", 169);
+        Graph actualGraph = new GraphMix(1, "mix", "ddnnffff", 11, "CDEN", 11, "CNO4", 169, DAY_OF_MONTH);
         actualGraph.setCounter(2);
-        actualGraph.startGenerating(DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
+        actualGraph.startGenerating(shortDayAndHolidays, dayHours, nightHours);
 
         if(!isEquals(actualGraph, correctGraph)) {
             System.out.println("MIX GRAPHS: ERROR");
@@ -147,9 +147,9 @@ public class UnitTest {
                 "SO20", "SO20", "4AC3"
         };
 
-        Graph actualGraph = new GraphShort(1, "short", "dddddff", 4, "SO20", 169);
+        Graph actualGraph = new GraphShort(1, "short", "dddddff", 4, "SO20", 169, DAY_OF_MONTH);
         actualGraph.setCounter(2);
-        actualGraph.startGenerating(DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
+        actualGraph.startGenerating(shortDayAndHolidays, dayHours, nightHours);
 
         if(!isEquals(actualGraph, correctGraph)) {
             System.out.println("SHORT GRAPHS: ERROR");
@@ -169,9 +169,9 @@ public class UnitTest {
                 "NORM", "NORM", "NORM"
         };
 
-        Graph actualGraph = new GraphStandard(1, "standard", "dddddff", 8, "NORM", 169);
+        Graph actualGraph = new GraphStandard(1, "standard", "dddddff", 8, "NORM", 169, DAY_OF_MONTH);
         actualGraph.setCounter(1);
-        actualGraph.startGenerating(DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
+        actualGraph.startGenerating(shortDayAndHolidays, dayHours, nightHours);
 
         if(!isEquals(actualGraph, correctGraph)) {
             System.out.println("STANDARD GRAPHS: ERROR");
@@ -191,9 +191,9 @@ public class UnitTest {
                 "NEP5", "NEP3", "NEP5"
         };
 
-        Graph actualGraph = new GraphUnique(1, "unique", "dududff", 6, "NEP3", 5, "NEP5", 169);
+        Graph actualGraph = new GraphUnique(1, "unique", "dududff", 6, "NEP3", 5, "NEP5", 169, DAY_OF_MONTH);
         actualGraph.setCounter(1);
-        actualGraph.startGenerating(DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
+        actualGraph.startGenerating(shortDayAndHolidays, dayHours, nightHours);
 
         if(!isEquals(actualGraph, correctGraph)) {
             System.out.println("UNIQUE GRAPHS: ERROR");

@@ -6,18 +6,14 @@ import java.util.Map;
 
 public class GraphStandard extends Graph {
 
-    public GraphStandard(int id, String name, String rule, double daytime, String daytimeSign, double workTimeInMonth){
-        super(id, name, rule, daytime, daytimeSign, workTimeInMonth);
+    public GraphStandard(int id, String name, String rule, double daytime, String daytimeSign, final double NORM_TIME, final int DAY_OF_MONTH){
+        super(id, name, rule, daytime, daytimeSign, NORM_TIME, DAY_OF_MONTH);
     }
 
-
     @Override
-    protected void setShortDayAndHolidays(final Map<Integer, Integer> shortDayAndHolidays){
-        int lengthRule = getLengthRule();
-        int positionForRule = getCounter();
-
+    protected void setShortDaysAndHolidays(final Map<Integer, Integer> shortDayAndHolidays){
         for(int indexDay = 0; indexDay < Main.DAY_OF_MONTH; ++indexDay){
-            if(getRuleOfDay(positionForRule) != CHAR_DESIGNATION_WEEKEND){
+            if(getRuleOfDay(indexDay) != CHAR_DESIGNATION_WEEKEND){
                 for(Map.Entry<Integer, Integer> obj : shortDayAndHolidays.entrySet()){
                     if(obj.getKey() == indexDay + 1){
                         if(obj.getValue() == CODE_SHORT_DAY) setWorkTime(indexDay, getDaytime() - 1);
@@ -26,15 +22,6 @@ public class GraphStandard extends Graph {
                     }
                 }
             }
-            if(++positionForRule == lengthRule) positionForRule = 0;
-        }
-    }
-
-
-    @Override
-    protected void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays){
-        for(int indexDay = 0; indexDay < Main.DAY_OF_MONTH; ++indexDay){
-            if(getWorkTime(indexDay) == UNINITIALIZED_VALUE) setWorkTime(indexDay, getDaytime());
         }
     }
 }

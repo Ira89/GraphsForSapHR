@@ -16,7 +16,7 @@ public class Main {
 
     public static final int YEAR = UserForm.readYear();
     public static final int MONTH = UserForm.readMonth();
-    public static final int DAY_OF_MONTH = Calendar.getAmountDay(MONTH, YEAR);
+    public static final int DAY_OF_MONTH = Calendar.getDayOfMonth(MONTH, YEAR);
     public static final double NORM_TIME = UserForm.readNormTime();
 
     public static void main(String[] debugLevel) {
@@ -26,7 +26,7 @@ public class Main {
         UserForm.readShortDayAndHolidays(shortDayAndHolidays);
 
         List<Graph> graphs = new ArrayList<Graph>();
-        FileInteraction.fabricateGraphs(graphs);
+        FileInteraction.fabricateGraphs(graphs, NORM_TIME, DAY_OF_MONTH);
         FileInteraction.readCountersForGraphs(graphs);
 
         Map<Double, String> dayHours = new HashMap<Double, String>();
@@ -34,7 +34,7 @@ public class Main {
         Map<Double, String> nightHours = new HashMap<Double, String>();
         FileInteraction.readNightHours(nightHours);
 
-        for(Graph obj : graphs) obj.startGenerating(DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
+        for(Graph obj : graphs) obj.startGenerating(shortDayAndHolidays, dayHours, nightHours);
 
         FileInteraction.writeGraphsIntoTemplate(graphs, dayHours, nightHours, shortDayAndHolidays);
         FileInteraction.writeNextCounter(graphs);

@@ -8,8 +8,8 @@ public class GraphMix extends Graph {
     private String nightTimeSign;
 
     public GraphMix(int id, String name, String rule, double daytime, String daytimeSign,
-             double nightTime, String nightTimeSign, double workTimeInMonth){
-        super(id, name, rule, daytime, daytimeSign, workTimeInMonth);
+             double nightTime, String nightTimeSign, final double NORM_TIME, final int DAY_OF_MONTH){
+        super(id, name, rule, daytime, daytimeSign, NORM_TIME, DAY_OF_MONTH);
         this.nightTime = nightTime;
         this.nightTimeSign = nightTimeSign;
     }
@@ -35,15 +35,11 @@ public class GraphMix extends Graph {
 
     private void fillWorkTimeByType(final char dayType, final double setValue, final int maxAmountSetting){
         int amountSetting = 0;
-        int lengthRule = getLengthRule();
-        int positionForRule = getCounter();
-
         for(int indexDay = 0; indexDay < Main.DAY_OF_MONTH && amountSetting <= maxAmountSetting; ++indexDay){
-            if(getRuleOfDay(positionForRule) == dayType && getWorkTime(indexDay) == UNINITIALIZED_VALUE){
+            if(getRuleOfDay(indexDay) == dayType && getWorkTime(indexDay) == UNINITIALIZED_VALUE){
                 setWorkTime(indexDay, setValue);
                 ++amountSetting;
             }
-            if(++positionForRule == lengthRule) positionForRule = 0;
         }
     }
 
@@ -54,14 +50,15 @@ public class GraphMix extends Graph {
 
 
     @Override
-    protected void generateGraph(final int amountUninitializedDays, final double sumTimesUninitializedDays){
-        double averageWorkTime = sumTimesUninitializedDays;
-        if(amountUninitializedDays != 0) averageWorkTime /= amountUninitializedDays;
+    protected void generateGraph(){
+        int amountMissingDays = calcMissingDays();
+        double missingTime = calcMissingTime();
 
-        int minWorkTime = (int) averageWorkTime;
+        int minWorkTime = amountMissingDays == 0 ? (int) missingTime : (int) missingTime / amountMissingDays;
         int maxWorkTime = minWorkTime + 1;
-        int amountDaysWithMinTime = getAmountDaysWithMinTime(minWorkTime, maxWorkTime, sumTimesUninitializedDays, amountUninitializedDays);
-        int amountDaysWithMaxTime = amountUninitializedDays - amountDaysWithMinTime;
+
+        int amountDaysWithMinTime = calcDaysWithMinTime(minWorkTime, maxWorkTime, missingTime, amountMissingDays);
+        int amountDaysWithMaxTime = amountMissingDays - amountDaysWithMinTime;
 
         int spreadValue = amountDaysWithMinTime >= amountDaysWithMaxTime ? minWorkTime : maxWorkTime;
         int rareValue = amountDaysWithMinTime < amountDaysWithMaxTime ? minWorkTime : maxWorkTime;
@@ -71,10 +68,6 @@ public class GraphMix extends Graph {
         if(spreadValue > rareValue) mostFrequentTypeOfDay = Graph.CHAR_DESIGNATION_NIGHT;
         else mostFrequentTypeOfDay = Graph.CHAR_DESIGNATION_DAY;
         fillWorkTimeByType(mostFrequentTypeOfDay, spreadValue, amountSpreadValue);
-
-        int newAmountUninitializedDays = getAmountUninitializedDays();
-        double sumTimeInitializedDays = getSumTimeInitializedDays();
-        double newSumTimesUninitializedDays = getWorkTimeInMonth() - sumTimeInitializedDays;
-        super.generateGraph(newAmountUninitializedDays, newSumTimesUninitializedDays);
+        super.generateGraph();
     }
 }

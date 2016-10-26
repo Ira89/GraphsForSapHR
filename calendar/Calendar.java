@@ -2,7 +2,17 @@ package ru.polynkina.irina.calendar;
 
 public class Calendar {
 
-    public static int getAmountDay(final int MONTH, final int YEAR) {
+    public static int getDayOfMonth(final int MONTH, final int YEAR) {
+        final int MIN_INDEX_MONTH = 1;
+        final int MAX_INDEX_MONTH = 12;
+
+        try {
+            if(MONTH < MIN_INDEX_MONTH || MONTH > MAX_INDEX_MONTH) throw new Exception("Некорректно указан месяц!");
+        } catch (Exception exc) {
+            exc.printStackTrace();
+            System.exit(0);
+        }
+
         final int[] DAY_IN_MONTH = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
         final int INDEX_MONTH_EXCLUSION = 2;
 
