@@ -33,7 +33,6 @@ public class FileInteraction {
     final static String STRING_DESIGNATION_OF_FLOAT_GRAPHS = "FLOAT";
     final static String STRING_DESIGNATION_OF_DAY_GRAPHS = "DAY";
     final static String STRING_DESIGNATION_OF_MIX_GRAPHS = "MIX";
-    final static String SECOND_NIGHT_SHIFT_FOR_HOLIDAYS = "C_33";
 
     // constants in the file counter_...xls
     final static int COL_INDEX_COUNTER_ID = 0;
@@ -60,26 +59,11 @@ public class FileInteraction {
 
 
     /*******************************************************************************************************************************************
-                                                        private methods
-     ******************************************************************************************************************************************/
-
-
-    private static String findHourName(Map<Double, String> hours, double desiredValue){
-        String hourName = hours.get(desiredValue);
-        if(hourName == null){
-            System.out.println("Не могу найти график на: " + desiredValue + " час");
-            hourName = "FREE";
-        }
-        return hourName;
-    }
-
-
-    /*******************************************************************************************************************************************
                                                         public methods
      ******************************************************************************************************************************************/
 
 
-    public static void fabricateGraphs(List<Graph> graphs, final double NORM_TIME, final int DAY_OF_MONTH){
+    public static void fabricateGraphs(List<Graph> graphs){
         try{
             String filename = "rules.xls";
             FileInputStream fis = new FileInputStream("./rules/" + filename);
@@ -98,29 +82,29 @@ public class FileInteraction {
                     String daytimeSign = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_OF_DAYTIME_SIGN).getStringCellValue();
 
                     if(type.equals(STRING_DESIGNATION_OF_DAY_GRAPHS)){
-                        graphs.add(new Graph(id, name, rule, daytime, daytimeSign, NORM_TIME, DAY_OF_MONTH));
+                        graphs.add(new Graph(id, name, rule, daytime, daytimeSign));
                     }
                     else if(type.equals(STRING_DESIGNATION_OF_SHORT_DAY_GRAPHS)){
-                        graphs.add(new GraphShort(id, name, rule, daytime, daytimeSign, NORM_TIME, DAY_OF_MONTH));
+                        graphs.add(new GraphShort(id, name, rule, daytime, daytimeSign));
                     }
                     else if(type.equals(STRING_DESIGNATION_OF_STANDARD_GRAPHS)){
-                        graphs.add(new GraphStandard(id, name, rule, daytime, daytimeSign, NORM_TIME, DAY_OF_MONTH));
+                        graphs.add(new GraphStandard(id, name, rule, daytime, daytimeSign));
                     }
                     else if(type.equals(STRING_DESIGNATION_OF_UNIQUE_GRAPHS)){
                         double uniqueTime = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_OF_NIGHTTIME).getNumericCellValue();
                         String uTimeSign = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_OF_NIGHTTIME_SIGN).getStringCellValue();
-                        graphs.add(new GraphUnique(id, name, rule, daytime, daytimeSign, uniqueTime, uTimeSign, NORM_TIME, DAY_OF_MONTH));
+                        graphs.add(new GraphUnique(id, name, rule, daytime, daytimeSign, uniqueTime, uTimeSign));
                     }
                     else if(type.equals(STRING_DESIGNATION_OF_FLOAT_GRAPHS)){
-                        graphs.add(new GraphFloat(id, name, rule, daytime, daytimeSign, NORM_TIME, DAY_OF_MONTH));
+                        graphs.add(new GraphFloat(id, name, rule, daytime, daytimeSign));
                     }
                     else if(type.equals(STRING_DESIGNATION_OF_DIURNAL_GRAPHS)){
-                        graphs.add(new GraphDiurnal(id, name, rule, daytime, daytimeSign, NORM_TIME, DAY_OF_MONTH));
+                        graphs.add(new GraphDiurnal(id, name, rule, daytime, daytimeSign));
                     }
                     else if(type.equals(STRING_DESIGNATION_OF_MIX_GRAPHS)){
                         double nightTime = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_OF_NIGHTTIME).getNumericCellValue();
                         String nTimeSign = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_OF_NIGHTTIME_SIGN).getStringCellValue();
-                        graphs.add(new GraphMix(id, name, rule, daytime, daytimeSign, nightTime, nTimeSign, NORM_TIME, DAY_OF_MONTH));
+                        graphs.add(new GraphMix(id, name, rule, daytime, daytimeSign, nightTime, nTimeSign));
                     }
                     else{
                         throw new Exception("Тип графика: " + type + " неизвестен!");
@@ -195,7 +179,7 @@ public class FileInteraction {
                 Cell cell = row.createCell(COL_INDEX_NAME_GRAPH_IN_TEMPLATE);
                 cell.setCellValue(obj.getName());
                 cell = row.createCell(COL_INDEX_WORK_TIME_IN_TEMPLATE);
-                cell.setCellValue(obj.getWorkHoursPerMonth(Main.DAY_OF_MONTH));
+                cell.setCellValue(obj.getNormTime());
 
                 for(int indexDay = 0; indexDay < AMOUNT_OF_DAYS; ++indexDay){
                     if(obj.getWorkTime(indexDay) != 0){
@@ -282,8 +266,10 @@ public class FileInteraction {
      /*******************************************************************************************************************************************/
 
 
-    public static void writeGraphsIntoTemplate(final List<Graph> graphs, final Map<Double, String> dayHours, final Map<Double, String> nightHours,
-                                               final Map<Integer, Integer> shortDayAndHoliday){
+    public static void writeGraphsIntoTemplate(final List<Graph> graphs, final Map<Integer, Integer> shortDayAndHoliday){
+        final int CODE_SHORT_DAY = 0;
+        final int CODE_HOLIDAY = 1;
+        final int CODE_DAY_OFF = 2;
         try{
             FileInputStream fis = new FileInputStream("./templates/templateForSapHR.xls");
             Workbook wb = new HSSFWorkbook(fis);
@@ -296,79 +282,41 @@ public class FileInteraction {
             styleForNighttime.setFillPattern(CellStyle.SOLID_FOREGROUND);
             styleForNighttime.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
 
-            for(Graph obj : graphs){
+            for(Graph obj : graphs) {
                 Row row = wb.getSheetAt(INDEX_OF_SHEET).createRow(obj.getId() + DELTA_ROW_IN_TEMPLATE);
                 Cell cell = row.createCell(COL_INDEX_NAME_GRAPH_IN_TEMPLATE);
                 cell.setCellValue(obj.getName());
                 cell = row.createCell(COL_INDEX_WORK_TIME_IN_TEMPLATE);
-                cell.setCellValue(obj.getWorkHoursPerMonth(Main.DAY_OF_MONTH));
+                cell.setCellValue(obj.getNormTime());
 
-                for(int indexDay = 0; indexDay < Main.DAY_OF_MONTH; ++indexDay){
-                    double hour = obj.getWorkTime(indexDay);
-                    Integer codeDay = shortDayAndHoliday.get(indexDay + 1);
-                    if(codeDay != null && codeDay == Graph.CODE_SHORT_DAY){
-                        if(obj.getWorkTime(indexDay) != 0) ++hour;
+                for (int indexDay = 0; indexDay < obj.getAmountDay(); ++indexDay) {
+                    cell = row.createCell(DELTA_COL_IN_TEMPLATE + indexDay * SIZE_STEP);
+                    String hourName = obj.getWorkTimeSign(indexDay);
+                    cell.setCellValue(hourName);
+                    if (!hourName.equals("FREE")) {
+                        if (obj.getRuleOfDay(indexDay) == 'n') cell.setCellStyle(styleForNighttime);
+                        else cell.setCellStyle(styleForDaytime);
                     }
+                }
 
-                    String hourName;
-                    if(obj.getRuleOfDay(indexDay) == Graph.CHAR_DESIGNATION_DAY){
-                        if(hour == obj.getDaytime()) hourName = obj.getDaytimeSign();
-                        else hourName = findHourName(dayHours, hour);
-                    }
-                    else if(obj.getRuleOfDay(indexDay) == Graph.CHAR_DESIGNATION_NIGHT){
-                        if(hour == obj.getNightTime()){
-                            hourName = obj.getNightTimeSign();
-                            if(codeDay != null && codeDay == Graph.CODE_HOLIDAY){
-                                int positionForRulePreviousDay = indexDay - 1;
-                                if(positionForRulePreviousDay < 0) positionForRulePreviousDay = indexDay - 1;
-                                if(obj.getRuleOfDay(positionForRulePreviousDay) == Graph.CHAR_DESIGNATION_NIGHT){
-                                    hourName = SECOND_NIGHT_SHIFT_FOR_HOLIDAYS;
-                                }
+                for (Map.Entry<Integer, Integer> days : shortDayAndHoliday.entrySet()) {
+                    switch (days.getValue()) {
+                        case CODE_SHORT_DAY: {
+                            if (obj.getRuleOfDay(days.getKey() - 1) != 'f') {
+                                cell = row.createCell(DELTA_COL_IN_TEMPLATE + days.getKey() * SIZE_STEP - CELL_OFFSET_FOR_TEXT);
+                                cell.setCellValue(SIGN_SHORT_DAY);
                             }
                         }
-                        else hourName = findHourName(nightHours, hour);
-                    }
-                    else{
-                        if(hour == obj.getUniqueTime()) hourName = obj.getUniqueTimeSign();
-                        else hourName = findHourName(dayHours, hour);
-                    }
-
-                    cell = row.createCell(DELTA_COL_IN_TEMPLATE + indexDay * SIZE_STEP);
-                    cell.setCellValue(hourName);
-
-                    if(obj.getRuleOfDay(indexDay) == Graph.CHAR_DESIGNATION_WEEKEND && obj.getWorkTime(indexDay) == 0){
-                        // without instruction!
-                    }
-                    else if(obj.getRuleOfDay(indexDay) == Graph.CHAR_DESIGNATION_NIGHT) cell.setCellStyle(styleForNighttime);
-                    else cell.setCellStyle(styleForDaytime);
-
-                    /*************************************** set sign short day and holiday **************************************/
-                    if(codeDay != null){
-                        switch(codeDay){
-                            case Graph.CODE_SHORT_DAY:{
-                                if(obj.getRuleOfDay(indexDay) != Graph.CHAR_DESIGNATION_WEEKEND){
-                                    cell = row.createCell(DELTA_COL_IN_TEMPLATE + (indexDay + 1) * SIZE_STEP - CELL_OFFSET_FOR_TEXT);
-                                    cell.setCellValue(SIGN_SHORT_DAY);
-                                }
-                            } break;
-                            case Graph.CODE_HOLIDAY:{
-                                cell = row.createCell(DELTA_COL_IN_TEMPLATE + (indexDay + 1) * SIZE_STEP - CELL_OFFSET_FOR_NUMBER);
-                                cell.setCellValue(SIGN_HOLIDAY);
-                            } // without break!
-                            case Graph.CODE_DAY_OFF:{
-                                boolean isStandardOrUniqueGraph = (obj instanceof GraphStandard) || (obj instanceof GraphUnique);
-                                if(isStandardOrUniqueGraph && obj.getRuleOfDay(indexDay) != Graph.CHAR_DESIGNATION_WEEKEND){
-                                    cell = row.createCell(DELTA_COL_IN_TEMPLATE + indexDay * SIZE_STEP);
-                                    cell.setCellStyle(styleForDaytime);
-                                    if(obj.getRuleOfDay(indexDay) != Graph.CHAR_DESIGNATION_UNIVERSAL_DAY){
-                                        cell.setCellValue(obj.getDaytimeSign());
-                                    }
-                                    else{
-                                        cell.setCellValue(obj.getUniqueTimeSign());
-                                    }
-                                    cell = row.createCell(DELTA_COL_IN_TEMPLATE + (indexDay + 1) * SIZE_STEP - CELL_OFFSET_FOR_TEXT);
-                                    cell.setCellValue(SIGN_DAY_OFF);
-                                }
+                        break;
+                        case CODE_HOLIDAY: {
+                            cell = row.createCell(DELTA_COL_IN_TEMPLATE + days.getKey() * SIZE_STEP - CELL_OFFSET_FOR_NUMBER);
+                            cell.setCellValue(SIGN_HOLIDAY);
+                        } // without break!
+                        case CODE_DAY_OFF: {
+                            boolean isStandardOrUniqueGraph = (obj instanceof GraphStandard) || (obj instanceof GraphUnique);
+                            if (isStandardOrUniqueGraph && obj.getRuleOfDay(days.getKey() - 1) != 'f') {
+                                cell = row.createCell(DELTA_COL_IN_TEMPLATE + days.getKey() * SIZE_STEP - CELL_OFFSET_FOR_TEXT);
+                                cell.setCellValue(SIGN_DAY_OFF);
                             }
                         }
                     }

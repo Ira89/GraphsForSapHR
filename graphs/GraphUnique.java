@@ -1,7 +1,5 @@
 package ru.polynkina.irina.graphs;
 
-import ru.polynkina.irina.main.Main;
-
 import java.util.Map;
 
 public class GraphUnique extends Graph {
@@ -9,9 +7,8 @@ public class GraphUnique extends Graph {
     private double uniqueTime;
     private String uniqueTimeSign;
 
-    public GraphUnique(int id, String name, String rule, double daytime, String daytimeSign,
-                double uniqueTime, String uniqueTimeSign, final double NORM_TIME, final int DAY_OF_MONTH){
-        super(id, name, rule, daytime, daytimeSign, NORM_TIME, DAY_OF_MONTH);
+    public GraphUnique(int id, String name, String rule, double daytime, String daytimeSign, double uniqueTime, String uniqueTimeSign){
+        super(id, name, rule, daytime, daytimeSign);
         this.uniqueTime = uniqueTime;
         this.uniqueTimeSign = uniqueTimeSign;
     }
@@ -34,10 +31,17 @@ public class GraphUnique extends Graph {
                                                         public methods
      ******************************************************************************************************************************************/
 
+    private void overwriteNormTime() {
+        double sumTime = 0;
+        for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay){
+            sumTime += getWorkTime(indexDay);
+        }
+        super.setNormTime(sumTime);
+    }
 
     @Override
     protected void setShortDaysAndHolidays(final Map<Integer, Integer> shortDayAndHolidays){
-        for(int indexDay = 0; indexDay < Main.DAY_OF_MONTH; ++indexDay){
+        for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay){
             if(getRuleOfDay(indexDay) != CHAR_DESIGNATION_WEEKEND){
                 for(Map.Entry<Integer, Integer> obj : shortDayAndHolidays.entrySet()){
                     if(obj.getKey() == indexDay + 1){
@@ -53,14 +57,14 @@ public class GraphUnique extends Graph {
         }
     }
 
-
     @Override
     protected void generateGraph(){
-        for(int indexDay = 0; indexDay < Main.DAY_OF_MONTH; ++indexDay){
+        for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay){
             if(getWorkTime(indexDay) == UNINITIALIZED_VALUE){
                 if(getRuleOfDay(indexDay) == CHAR_DESIGNATION_DAY) setWorkTime(indexDay, getDaytime());
                 else if(getRuleOfDay(indexDay) == CHAR_DESIGNATION_UNIVERSAL_DAY) setWorkTime(indexDay, getUniqueTime());
             }
         }
+        overwriteNormTime();
     }
 }

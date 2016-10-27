@@ -1,11 +1,9 @@
 package ru.polynkina.irina.graphs;
 
-import ru.polynkina.irina.main.Main;
-
 public class GraphDiurnal extends Graph {
 
-    public GraphDiurnal(int id, String name, String rule, double daytime, String daytimeSign, final double NORM_TIME, final int DAY_OF_MONTH){
-        super(id, name, rule, daytime, daytimeSign, NORM_TIME, DAY_OF_MONTH);
+    public GraphDiurnal(int id, String name, String rule, double daytime, String daytimeSign){
+        super(id, name, rule, daytime, daytimeSign);
     }
 
 
@@ -16,8 +14,8 @@ public class GraphDiurnal extends Graph {
 
     private void setAdditionalWorkDay(double additionalTime){
         final int INDEX_MIDDLE_DAY_OFF = 2;
-        for(int indexDay = 0; indexDay < Main.DAY_OF_MONTH && additionalTime != 0; ++indexDay){
-            if(getRuleOfDay(indexDay) == CHAR_DESIGNATION_NIGHT && indexDay + INDEX_MIDDLE_DAY_OFF < Main.DAY_OF_MONTH){
+        for(int indexDay = 0; indexDay < getAmountDay() && additionalTime != 0; ++indexDay){
+            if(getRuleOfDay(indexDay) == CHAR_DESIGNATION_NIGHT && indexDay + INDEX_MIDDLE_DAY_OFF < getAmountDay()){
                 double additionalHours = additionalTime < MAX_WORK_TIME_IN_DAY ? additionalTime : MAX_WORK_TIME_IN_DAY;
                 setWorkTime(indexDay + INDEX_MIDDLE_DAY_OFF, additionalHours);
                 additionalTime -= additionalHours;

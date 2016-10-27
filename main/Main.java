@@ -1,16 +1,12 @@
 package ru.polynkina.irina.main;
 
 import ru.polynkina.irina.fileInteraction.FileInteraction;
-import ru.polynkina.irina.unitTests.UnitTest;
 import ru.polynkina.irina.userInteraction.UserForm;
+import ru.polynkina.irina.unitTests.UnitTest;
 import ru.polynkina.irina.calendar.Calendar;
 import ru.polynkina.irina.graphs.Graph;
-import ru.polynkina.irina.debug.Debug;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Main {
 
@@ -22,11 +18,11 @@ public class Main {
     public static void main(String[] debugLevel) {
         System.out.println("Version of the program: 1.0.1");
 
-        Map<Integer, Integer> shortDayAndHolidays = new HashMap<Integer, Integer>();
+        Map<Integer, Integer> shortDayAndHolidays = new LinkedHashMap<Integer, Integer>();
         UserForm.readShortDayAndHolidays(shortDayAndHolidays);
 
         List<Graph> graphs = new ArrayList<Graph>();
-        FileInteraction.fabricateGraphs(graphs, NORM_TIME, DAY_OF_MONTH);
+        FileInteraction.fabricateGraphs(graphs);
         FileInteraction.readCountersForGraphs(graphs);
 
         Map<Double, String> dayHours = new HashMap<Double, String>();
@@ -34,16 +30,18 @@ public class Main {
         Map<Double, String> nightHours = new HashMap<Double, String>();
         FileInteraction.readNightHours(nightHours);
 
-        for(Graph obj : graphs) obj.startGenerating(shortDayAndHolidays, dayHours, nightHours);
+        for(Graph obj : graphs) {
+            obj.startGenerating(NORM_TIME, DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
+        }
 
-        FileInteraction.writeGraphsIntoTemplate(graphs, dayHours, nightHours, shortDayAndHolidays);
+        FileInteraction.writeWorkTimeInFile(graphs, DAY_OF_MONTH);
+        FileInteraction.writeGraphsIntoTemplate(graphs, shortDayAndHolidays);
         FileInteraction.writeNextCounter(graphs);
         FileInteraction.deleteOldCounter();
 
         UnitTest test = new UnitTest();
         test.start();
 
-        if (debugLevel.length == 1) Debug.start(debugLevel[0], shortDayAndHolidays, graphs, dayHours, nightHours); // ?!
         System.out.println("Генерация графиков завершена успешно!");
     }
 }

@@ -1,15 +1,12 @@
 package ru.polynkina.irina.graphs;
 
-import ru.polynkina.irina.main.Main;
-
 public class GraphMix extends Graph {
 
     private double nightTime;
     private String nightTimeSign;
 
-    public GraphMix(int id, String name, String rule, double daytime, String daytimeSign,
-             double nightTime, String nightTimeSign, final double NORM_TIME, final int DAY_OF_MONTH){
-        super(id, name, rule, daytime, daytimeSign, NORM_TIME, DAY_OF_MONTH);
+    public GraphMix(int id, String name, String rule, double daytime, String daytimeSign, double nightTime, String nightTimeSign){
+        super(id, name, rule, daytime, daytimeSign);
         this.nightTime = nightTime;
         this.nightTimeSign = nightTimeSign;
     }
@@ -35,7 +32,7 @@ public class GraphMix extends Graph {
 
     private void fillWorkTimeByType(final char dayType, final double setValue, final int maxAmountSetting){
         int amountSetting = 0;
-        for(int indexDay = 0; indexDay < Main.DAY_OF_MONTH && amountSetting <= maxAmountSetting; ++indexDay){
+        for(int indexDay = 0; indexDay < getAmountDay() && amountSetting <= maxAmountSetting; ++indexDay){
             if(getRuleOfDay(indexDay) == dayType && getWorkTime(indexDay) == UNINITIALIZED_VALUE){
                 setWorkTime(indexDay, setValue);
                 ++amountSetting;
@@ -65,8 +62,8 @@ public class GraphMix extends Graph {
         int amountSpreadValue = amountDaysWithMinTime >= amountDaysWithMaxTime ? amountDaysWithMinTime : amountDaysWithMaxTime;
 
         char mostFrequentTypeOfDay;
-        if(spreadValue > rareValue) mostFrequentTypeOfDay = Graph.CHAR_DESIGNATION_NIGHT;
-        else mostFrequentTypeOfDay = Graph.CHAR_DESIGNATION_DAY;
+        if(spreadValue > rareValue) mostFrequentTypeOfDay = CHAR_DESIGNATION_NIGHT;
+        else mostFrequentTypeOfDay = CHAR_DESIGNATION_DAY;
         fillWorkTimeByType(mostFrequentTypeOfDay, spreadValue, amountSpreadValue);
         super.generateGraph();
     }

@@ -5,8 +5,6 @@ import java.util.Map;
 public class Graph {
 
     final static double UNINITIALIZED_VALUE = -1;
-    final static double STANDARD_TIME_IN_DAY = 8;
-    final static double FLOAT_TIME_IN_DAY = 7.2;
     final static double MAX_WORK_TIME_IN_DAY = 15;
     final static double MAX_WORK_TIME_IN_DIURNAL = 22;
 
@@ -34,19 +32,12 @@ public class Graph {
     private String workTimeSign[];
 
 
-    public Graph(int id, String name, String rule, double daytime, String daytimeSign, final double NORM_TIME, final int DAY_OF_MONTH) {
+    public Graph(int id, String name, String rule, double daytime, String daytimeSign) {
         this.id = id;
         this.name = name;
         this.rule = rule;
         this.daytime = daytime;
         this.daytimeSign = daytimeSign;
-        this.normTime = NORM_TIME;
-
-        workTime = new double[DAY_OF_MONTH];
-        for(int i = 0; i < DAY_OF_MONTH; ++i) workTime[i] = UNINITIALIZED_VALUE;
-
-        workTimeSign = new String[DAY_OF_MONTH];
-        for(int i = 0; i < DAY_OF_MONTH; ++i) workTimeSign[i] = "-";
     }
 
 
@@ -67,10 +58,9 @@ public class Graph {
     }
 
 
-    public void setNormTime(final double normTime){ this.normTime = normTime; }
+
     public int getId(){ return id; }
     public String getName(){ return name; }
-    public String getRule(){ return rule; }
     public int getLengthRule(){ return rule.length(); }
     public double getDaytime(){ return daytime; }
     public double getUniqueTime(){ return getDaytime(); }
@@ -80,6 +70,7 @@ public class Graph {
     public String getNightTimeSign(){ return getDaytimeSign(); }
     public int getCounter(){ return counter; }
     public double getNormTime(){ return normTime; }
+    public int getAmountDay() { return workTime.length; }
 
 
     public double getWorkTime(final int indexDay){
@@ -135,16 +126,8 @@ public class Graph {
     }*/
 
     /*******************************************************************************************************************************************
-                                                        public methods
-     ******************************************************************************************************************************************/
 
-    public double getWorkHoursPerMonth(final int AMOUNT_OF_DAYS){
-        double sumWorkTime = 0;
-        for(int indexDay = 0; indexDay < AMOUNT_OF_DAYS; ++indexDay) {
-            sumWorkTime += getWorkTime(indexDay);
-        }
-        return sumWorkTime;
-    }
+     ******************************************************************************************************************************************/
 
     private void setWorkTimeSign(Map<Integer, Integer> shortDayAndHolidays, Map<Double, String> dayHours, Map<Double, String> nightHours) {
         final String SECOND_NIGHT_SHIFT_FOR_HOLIDAYS = "C_33";
@@ -193,13 +176,34 @@ public class Graph {
         }
         return hourName;
     }
-// *********************************************************************************************************************
-    public void startGenerating(Map<Integer, Integer> shortDayAndHolidays, Map<Double, String> dayHours, Map<Double, String> nightHours) {
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+    public void startGenerating(final double NORM_TIME, final int DAY_OF_MONTH, Map<Integer, Integer> shortDayAndHolidays,
+                                Map<Double, String> dayHours, Map<Double, String> nightHours) {
+        createEmptyArray(DAY_OF_MONTH);                                // step 1
+        setNormTime(NORM_TIME);                                        // step 2
         setWeekend();
         setShortDaysAndHolidays(shortDayAndHolidays);
         generateGraph();
         setWorkTimeSign(shortDayAndHolidays, dayHours, nightHours);
     }
+
+    // ----------------------------------------------- step 1 ----------------------------------------------------------
+
+    private void createEmptyArray(final int DAY_OF_MONTH) {
+        workTime = new double[DAY_OF_MONTH];
+        for(int i = 0; i < DAY_OF_MONTH; ++i) workTime[i] = UNINITIALIZED_VALUE;
+
+        workTimeSign = new String[DAY_OF_MONTH];
+        for(int i = 0; i < DAY_OF_MONTH; ++i) workTimeSign[i] = "-";
+    }
+
+    // ----------------------------------------------- step 2 ----------------------------------------------------------
+
+    protected void setNormTime(final double normTime){ this.normTime = normTime; }
+
+
 
     private void setWeekend(){
         for(int indexDay = 0; indexDay < workTime.length; ++indexDay){

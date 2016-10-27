@@ -1,12 +1,9 @@
 package ru.polynkina.irina.graphs;
 
-import ru.polynkina.irina.main.Main;
-
 public class GraphFloat extends Graph {
 
-    public GraphFloat(int id, String name, String rule, double daytime, String daytimeSign, final double NORM_TIME, final int DAY_OF_MONTH){
-        super(id, name, rule, daytime, daytimeSign, NORM_TIME, DAY_OF_MONTH);
-        setNormTimeForStandardGraphs(NORM_TIME);
+    public GraphFloat(int id, String name, String rule, double daytime, String daytimeSign){
+        super(id, name, rule, daytime, daytimeSign);
     }
 
 
@@ -14,16 +11,18 @@ public class GraphFloat extends Graph {
                                                         private methods
      ******************************************************************************************************************************************/
 
-
-    private void setNormTimeForStandardGraphs(double standardNormTimeInMonth){
+    @Override
+    protected void setNormTime(double normTime){
+        final double FLOAT_TIME_IN_DAY = 7.2;
+        final double STANDARD_TIME_IN_DAY = 8.0;
         int hoursInShortDays = 0;
-        while(standardNormTimeInMonth % STANDARD_TIME_IN_DAY != 0){
-            ++standardNormTimeInMonth;
+        while(normTime % STANDARD_TIME_IN_DAY != 0){
+            ++normTime;
             ++hoursInShortDays;
         }
-        double amountDay = standardNormTimeInMonth / STANDARD_TIME_IN_DAY;
+        double amountDay = normTime / STANDARD_TIME_IN_DAY;
         double newWorkTimeInMonth =  FLOAT_TIME_IN_DAY * amountDay - hoursInShortDays;
-        setNormTime(newWorkTimeInMonth);
+        super.setNormTime(newWorkTimeInMonth);
     }
 
 
@@ -33,7 +32,7 @@ public class GraphFloat extends Graph {
         double currentFrequency = 0;
         int amountWorkDay = 0;
 
-        for(int indexDay = 0; indexDay < Main.DAY_OF_MONTH; ++indexDay){
+        for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay){
             if(getWorkTime(indexDay) == UNINITIALIZED_VALUE){
                 if(currentFrequency + 1 < frequency  && amountWorkDay < amountUninitializedDays - counterFloatDay){
                     ++currentFrequency;
