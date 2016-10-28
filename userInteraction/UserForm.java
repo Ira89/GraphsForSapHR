@@ -2,39 +2,39 @@ package ru.polynkina.irina.userInteraction;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
-import ru.polynkina.irina.main.Main;
-
 import java.io.FileInputStream;
 import java.util.Map;
 
 public class UserForm {
 
-    // constants in the file main.xls
-    final static int DELTA_INDEX_AND_VALUE = 3;
-    final static int INDEX_OF_SHEET = 0;
-    final static int ROW_INDEX_OF_YEAR = 0;
-    final static int ROW_INDEX_OF_MONTH = 1;
-    final static int ROW_INDEX_OF_NORM_TIME = 2;
-    final static int ROW_INDEX_OF_SHORT_DAY = 3;
-    final static int ROW_INDEX_OF_DAY_OFF = 5;
-    final static int COL_INDEX_OF_DATE = 1;
+    private final static int ROW_INDICATES_YEAR = 0;
+    private final static int COL_INDICATES_YEAR = 1;
+
+    private final static int MIN_INDEX_MONTH = 1;
+    private final static int MAX_INDEX_MONTH = 12;
+    private final static int ROW_INDICATES_MONTH = 1;
+    private final static int COL_INDICATES_MONTH = 1;
+
+    private final static int MIN_NORM_TIME = 100;
+    private final static int MAX_NORM_TIME = 200;
+    private final static int ROW_INDICATES_NORM_TIME = 2;
+    private final static int COL_INDICATES_NORM_TIME = 1;
+
+    private final static int ROW_INDICATES_SHORT_DAY = 3;
+    private final static int ROW_INDICATES_DAY_OFF = 5;
+    private final static int COL_INDICATES_DATE = 1;
+    private final static int AMOUNT_OF_HEADER = 3;
 
 
-    public static int readYear(){
-        final int MAX_INDEX_YEAR = 2116;
-        final int MIN_INDEX_YEAR = 2016;
+    public static int readYear() {
         int year = 0;
-        try{
+        try {
             FileInputStream fis = new FileInputStream("./userForm/userForm.xls");
             Workbook wb = new HSSFWorkbook(fis);
-            year = (int) wb.getSheetAt(INDEX_OF_SHEET).getRow(ROW_INDEX_OF_YEAR).getCell(COL_INDEX_OF_DATE).getNumericCellValue();
+            year = (int) wb.getSheetAt(0).getRow(ROW_INDICATES_YEAR).getCell(COL_INDICATES_YEAR).getNumericCellValue();
             wb.close();
             fis.close();
-
-            if(year < MIN_INDEX_YEAR || year > MAX_INDEX_YEAR) {
-                throw new Exception("Некорректно указан месяц или год!");
-            }
-        }catch(Exception exc){
+        } catch(Exception exc){
             exc.printStackTrace();
             System.exit(0);
         }
@@ -43,18 +43,16 @@ public class UserForm {
 
 
     public static int readMonth() {
-        final int MAX_INDEX_MONTH = 12;
-        final int MIN_INDEX_MONTH = 1;
         int month = 0;
         try {
             FileInputStream fis = new FileInputStream("./userForm/userForm.xls");
             Workbook wb = new HSSFWorkbook(fis);
-            month = (int) wb.getSheetAt(INDEX_OF_SHEET).getRow(ROW_INDEX_OF_MONTH).getCell(COL_INDEX_OF_DATE).getNumericCellValue();
+            month = (int) wb.getSheetAt(0).getRow(ROW_INDICATES_MONTH).getCell(COL_INDICATES_MONTH).getNumericCellValue();
             wb.close();
             fis.close();
 
             if (month < MIN_INDEX_MONTH || month > MAX_INDEX_MONTH) {
-                throw new Exception("Некорректно указан месяц!");
+                throw new Exception("Месяц должен быть в диапазоне от " + MIN_INDEX_MONTH + " до " + MAX_INDEX_MONTH);
             }
         } catch (Exception exc) {
             exc.printStackTrace();
@@ -64,22 +62,19 @@ public class UserForm {
     }
 
 
-
-    public static double readNormTime(){
-        final int MAX_NORM_TIME = 200;
-        final int MIN_NORM_TIME = 100;
+    public static double readNormTime() {
         double normTime = 0;
         try{
             FileInputStream fis = new FileInputStream("./userForm/userForm.xls");
             Workbook wb = new HSSFWorkbook(fis);
-            normTime = wb.getSheetAt(INDEX_OF_SHEET).getRow(ROW_INDEX_OF_NORM_TIME).getCell(COL_INDEX_OF_DATE).getNumericCellValue();
+            normTime = wb.getSheetAt(0).getRow(ROW_INDICATES_NORM_TIME).getCell(COL_INDICATES_NORM_TIME).getNumericCellValue();
             wb.close();
             fis.close();
 
-            boolean isIncorrectInput = false;
-            if(normTime < MIN_NORM_TIME || normTime > MAX_NORM_TIME) isIncorrectInput = true;
-            if(isIncorrectInput) throw new Exception("Некорректно указана норма времени!");
-        }catch(Exception exc){
+            if(normTime < MIN_NORM_TIME || normTime > MAX_NORM_TIME) {
+                throw new Exception("Время может быть в диапазоне от " + MIN_NORM_TIME + " до " + MAX_NORM_TIME);
+            }
+        } catch(Exception exc){
             exc.printStackTrace();
             System.exit(0);
         }
@@ -87,45 +82,35 @@ public class UserForm {
     }
 
 
-
-    public static void readShortDayAndHolidays(Map<Integer, Integer> shortDayAndHolidays){
-        try{
+    public static void readShortDaysAndHolidays(Map<Integer, Integer> shortDaysAndHolidays, int dayOfMonth) {
+        try {
             FileInputStream fis = new FileInputStream("./userForm/userForm.xls");
             Workbook wb = new HSSFWorkbook(fis);
-
-            for(int indexRow = ROW_INDEX_OF_SHORT_DAY; indexRow <= ROW_INDEX_OF_DAY_OFF; ++indexRow){
-                for(int indexCol = COL_INDEX_OF_DATE; indexCol <= Main.DAY_OF_MONTH; ++indexCol){
-                    try{
-                        int indexDay = (int) wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(indexCol).getNumericCellValue();
-                        if(indexDay == 0) throw new NullPointerException();
-
-                        boolean isNewDate = shortDayAndHolidays.get(indexDay) == null;
-                        if(!isNewDate){
-                            wb.close();
-                            fis.close();
-                            throw new Exception("Значение " + indexDay + " не может быть указано дважды");
-                        }
-
-                        boolean isIncorrectInput = false;
-                        if(indexDay <= 0 || indexDay > Main.DAY_OF_MONTH) isIncorrectInput = true;
-                        if(isIncorrectInput){
-                            wb.close();
-                            fis.close();
-                            throw new Exception(indexDay + "-й день не существует");
-                        }
-
-                        shortDayAndHolidays.put(indexDay, indexRow - DELTA_INDEX_AND_VALUE);
-                    }catch(NullPointerException nullExc){
-                        break;
+            for(int indexRow = ROW_INDICATES_SHORT_DAY; indexRow <= ROW_INDICATES_DAY_OFF; ++indexRow) {
+                for(int indexCol = COL_INDICATES_DATE; indexCol <= dayOfMonth; ++indexCol) {
+                    int indexDay = (int) wb.getSheetAt(0).getRow(indexRow).getCell(indexCol).getNumericCellValue();
+                    if(indexDay == 0) break;
+                    if(dateIsCorrect(indexDay, dayOfMonth, shortDaysAndHolidays)) {
+                        shortDaysAndHolidays.put(indexDay, indexRow - AMOUNT_OF_HEADER);
                     }
                 }
             }
-
             wb.close();
             fis.close();
-        }catch(Exception exc){
+        } catch(Exception exc) {
             exc.printStackTrace();
             System.exit(0);
         }
+    }
+
+
+    private static boolean dateIsCorrect(int indexDay, int dayOfMonth, final Map<Integer, Integer> shortDaysAndHolidays) throws Exception {
+        if(indexDay < 0 || indexDay > dayOfMonth) {
+            throw new Exception("Дата может быть в диапазоне от 1 до " + dayOfMonth);
+        }
+        if(shortDaysAndHolidays.get(indexDay) != null) {
+            throw new Exception(indexDay + "-е число не может быть указано дважды");
+        }
+        return true;
     }
 }

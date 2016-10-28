@@ -3,8 +3,6 @@ package ru.polynkina.irina.fileInteraction;
 import ru.polynkina.irina.graphs.*;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
-import ru.polynkina.irina.main.Main;
-
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
@@ -129,9 +127,9 @@ public class FileInteraction {
 
 
 
-    public static void readCountersForGraphs(List<Graph> graphs){
+    public static void readCountersForGraphs(List<Graph> graphs, int month, int year){
         try {
-            String filename = "counter_" + Main.MONTH + "_" + Main.YEAR + ".xls";
+            String filename = "counter_" + month + "_" + year + ".xls";
             FileInputStream fis = new FileInputStream("./counters/" + filename);
             Workbook wb = new HSSFWorkbook(fis);
 
@@ -336,9 +334,9 @@ public class FileInteraction {
 
 
 
-    public static void writeNextCounter(final List<Graph> graphs){
+    public static void writeNextCounter(final List<Graph> graphs, int dayOfMonth, int month, int year){
         final int MAX_INDEX_MONTH = 12;
-        String filename = "counter_" + Main.MONTH + "_" + Main.YEAR + ".xls";
+        String filename = "counter_" + month + "_" + year + ".xls";
         try{
             FileInputStream fis = new FileInputStream("./counters/" + filename);
             Workbook wb = new HSSFWorkbook(fis);
@@ -348,15 +346,15 @@ public class FileInteraction {
                 Cell cell = row.createCell(COL_INDEX_COUNTER_ID);
                 cell.setCellValue(obj.getId());
 
-                int nextCounter = Main.DAY_OF_MONTH % obj.getLengthRule();
+                int nextCounter = dayOfMonth % obj.getLengthRule();
                 nextCounter += obj.getCounter();
                 nextCounter %= obj.getLengthRule();
                 cell = row.createCell(COL_INDEX_COUNTER_VALUE);
                 cell.setCellValue(nextCounter);
             }
 
-            int nextMonth = Main.MONTH + 1 > MAX_INDEX_MONTH ? 1 : Main.MONTH + 1;
-            int nextYear = Main.MONTH + 1 > MAX_INDEX_MONTH ? Main.YEAR + 1 : Main.YEAR;
+            int nextMonth = month + 1 > MAX_INDEX_MONTH ? 1 : month + 1;
+            int nextYear = month + 1 > MAX_INDEX_MONTH ? year + 1 : year;
             String nextFilename = "counter_" + nextMonth + "_" + nextYear + ".xls";
             FileOutputStream fos = new FileOutputStream("./counters/" + nextFilename);
             wb.write(fos);
@@ -372,12 +370,12 @@ public class FileInteraction {
 
 
 
-    public static void deleteOldCounter(){
+    public static void deleteOldCounter(int month, int year){
         try{
-            String filenameOldCounter = "counter_" + Main.MONTH + "_" + (Main.YEAR - DATA_HOLD_TIME) + ".xls";
+            String filenameOldCounter = "counter_" + month + "_" + (year - DATA_HOLD_TIME) + ".xls";
             File oldFile = new File("./counters/" + filenameOldCounter);
             if(oldFile.delete()){
-                System.out.println("Программа удалила файл за " + Main.MONTH + "." + (Main.YEAR - DATA_HOLD_TIME));
+                System.out.println("Программа удалила файл за " + month + "." + (year - DATA_HOLD_TIME));
             }
         }catch (Exception exc){
             exc.printStackTrace();

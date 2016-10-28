@@ -2,10 +2,10 @@ package ru.polynkina.irina.calendar;
 
 public class Calendar {
 
-    public static int getDayOfMonth(final int MONTH, final int YEAR) {
-        final int MIN_INDEX_MONTH = 1;
-        final int MAX_INDEX_MONTH = 12;
+    private final static int MIN_INDEX_MONTH = 1;
+    private final static int MAX_INDEX_MONTH = 12;
 
+    public static int getDayOfMonth(final int MONTH, final int YEAR) {
         try {
             if(MONTH < MIN_INDEX_MONTH || MONTH > MAX_INDEX_MONTH) throw new Exception("Некорректно указан месяц!");
         } catch (Exception exc) {

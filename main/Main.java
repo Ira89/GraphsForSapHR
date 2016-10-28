@@ -19,11 +19,11 @@ public class Main {
         System.out.println("Version of the program: 1.0.1");
 
         Map<Integer, Integer> shortDayAndHolidays = new LinkedHashMap<Integer, Integer>();
-        UserForm.readShortDayAndHolidays(shortDayAndHolidays);
+        UserForm.readShortDaysAndHolidays(shortDayAndHolidays, DAY_OF_MONTH);
 
         List<Graph> graphs = new ArrayList<Graph>();
         FileInteraction.fabricateGraphs(graphs);
-        FileInteraction.readCountersForGraphs(graphs);
+        FileInteraction.readCountersForGraphs(graphs, MONTH, YEAR);
 
         Map<Double, String> dayHours = new HashMap<Double, String>();
         FileInteraction.readDayHours(dayHours);
@@ -36,8 +36,8 @@ public class Main {
 
         FileInteraction.writeWorkTimeInFile(graphs, DAY_OF_MONTH);
         FileInteraction.writeGraphsIntoTemplate(graphs, shortDayAndHolidays);
-        FileInteraction.writeNextCounter(graphs);
-        FileInteraction.deleteOldCounter();
+        FileInteraction.writeNextCounter(graphs, DAY_OF_MONTH, MONTH, YEAR);
+        FileInteraction.deleteOldCounter(MONTH, YEAR);
 
         UnitTest test = new UnitTest();
         test.start();
