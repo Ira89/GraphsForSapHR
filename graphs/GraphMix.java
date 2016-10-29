@@ -1,5 +1,7 @@
 package ru.polynkina.irina.graphs;
 
+import java.util.Map;
+
 public class GraphMix extends Graph {
 
     private double nightTime;
@@ -11,23 +13,8 @@ public class GraphMix extends Graph {
         this.nightTimeSign = nightTimeSign;
     }
 
-
-    /*******************************************************************************************************************************************
-                                                        getters and setters
-     ******************************************************************************************************************************************/
-
-
-    @Override
-    public double getNightTime() { return nightTime; }
-
-
-    @Override
-    public String getNightTimeSign(){ return nightTimeSign; }
-
-
-    /*******************************************************************************************************************************************
-                                                        private methods
-     ******************************************************************************************************************************************/
+    private double getNightTime() { return nightTime; }
+    private String getNightTimeSign(){ return nightTimeSign; }
 
 
     private void fillWorkTimeByType(final char dayType, final double setValue, final int maxAmountSetting){
@@ -39,12 +26,6 @@ public class GraphMix extends Graph {
             }
         }
     }
-
-
-    /*******************************************************************************************************************************************
-                                                        public methods
-     ******************************************************************************************************************************************/
-
 
     @Override
     protected void generateGraph(){
@@ -62,9 +43,31 @@ public class GraphMix extends Graph {
         int amountSpreadValue = amountDaysWithMinTime >= amountDaysWithMaxTime ? amountDaysWithMinTime : amountDaysWithMaxTime;
 
         char mostFrequentTypeOfDay;
-        if(spreadValue > rareValue) mostFrequentTypeOfDay = CHAR_DESIGNATION_NIGHT;
-        else mostFrequentTypeOfDay = CHAR_DESIGNATION_DAY;
+        if(spreadValue > rareValue) mostFrequentTypeOfDay = SIGN_NIGHT;
+        else mostFrequentTypeOfDay = SIGN_DAY;
         fillWorkTimeByType(mostFrequentTypeOfDay, spreadValue, amountSpreadValue);
         super.generateGraph();
+    }
+
+    @Override
+    protected void setWorkTimeSign(Map<Integer, Integer> shortDayAndHolidays, Map<Double, String> dayHours, Map<Double, String> nightHours) {
+        final String SECOND_NIGHT_SHIFT_FOR_HOLIDAYS = "C_33";
+        for (int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
+            double hour = getWorkTime(indexDay);
+            Integer codeDay = shortDayAndHolidays.get(indexDay + 1);
+            if(getWorkTime(indexDay) != 0) {
+                if(codeDay != null && codeDay == CODE_SHORT_DAY) ++hour;
+            }
+            if(getRuleOfDay(indexDay) == SIGN_NIGHT) {
+                if(codeDay != null && codeDay == CODE_HOLIDAY && getRuleOfDay(indexDay - 1) == SIGN_NIGHT) {
+                    setWorkTimeSign(indexDay, SECOND_NIGHT_SHIFT_FOR_HOLIDAYS);
+                }
+                else if(getNightTime() == hour) setWorkTimeSign(indexDay, getNightTimeSign());
+                else setWorkTimeSign(indexDay, findHourName(nightHours, hour));
+            } else {
+                if(getDaytime() == hour) setWorkTimeSign(indexDay, getDaytimeSign());
+                else setWorkTimeSign(indexDay, findHourName(dayHours, hour));
+            }
+        }
     }
 }

@@ -7,26 +7,6 @@ public class GraphFloat extends Graph {
     }
 
 
-    /*******************************************************************************************************************************************
-                                                        private methods
-     ******************************************************************************************************************************************/
-
-    @Override
-    protected void setNormTime(double normTime){
-        final double FLOAT_TIME_IN_DAY = 7.2;
-        final double STANDARD_TIME_IN_DAY = 8.0;
-        int hoursInShortDays = 0;
-        while(normTime % STANDARD_TIME_IN_DAY != 0){
-            ++normTime;
-            ++hoursInShortDays;
-        }
-        double amountDay = normTime / STANDARD_TIME_IN_DAY;
-        double newWorkTimeInMonth =  FLOAT_TIME_IN_DAY * amountDay - hoursInShortDays;
-        super.setNormTime(newWorkTimeInMonth);
-    }
-
-
-
     private void setFloatDay(final double floatTime, final int counterFloatDay, final int amountUninitializedDays){
         double frequency = calcFrequency(counterFloatDay, amountUninitializedDays);
         double currentFrequency = 0;
@@ -46,11 +26,19 @@ public class GraphFloat extends Graph {
         }
     }
 
-
-    /*******************************************************************************************************************************************
-                                                        public methods
-     ******************************************************************************************************************************************/
-
+    @Override
+    protected void setNormTime(double normTime){
+        final double FLOAT_TIME_IN_DAY = 7.2;
+        final double STANDARD_TIME_IN_DAY = 8.0;
+        int hoursInShortDays = 0;
+        while(normTime % STANDARD_TIME_IN_DAY != 0){
+            ++normTime;
+            ++hoursInShortDays;
+        }
+        double amountDay = normTime / STANDARD_TIME_IN_DAY;
+        double newWorkTimeInMonth =  FLOAT_TIME_IN_DAY * amountDay - hoursInShortDays;
+        super.setNormTime(newWorkTimeInMonth);
+    }
 
     @Override
     protected void generateGraph(){
@@ -66,7 +54,7 @@ public class GraphFloat extends Graph {
 
         int counterFloatDay = 0;
         double sumFloatDay = 0;
-        while((missingTime - sumFloatDay + ACCEPTABLE_ACCURACY) % 1 > NEGLIGIBLE_TIME_INTERVAL){
+        while((missingTime - sumFloatDay) % 1 > 0.001) {
             sumFloatDay += floatTime;
             ++counterFloatDay;
         }

@@ -46,8 +46,11 @@ public class UnitTest {
     private void printInfo(Graph actualGraph, String correctGraph[], double correctNormTime) {
         System.out.print("actual graphs: " + actualGraph.getNormTime() + " -> ");
         for(int i = 0; i < DAY_OF_MONTH; ++i) System.out.print(actualGraph.getWorkTimeSign(i) + " ");
-        System.out.print("\ncorrect graph: " + correctNormTime + " -> ");
+        System.out.println();
+
+        System.out.print("correct graph: " + correctNormTime + " -> ");
         for(int i = 0; i < DAY_OF_MONTH; ++i) System.out.print(correctGraph[i] + " ");
+        System.out.println();
     }
 
     private boolean isEquals(Graph actualGraph, String correctGraph[], double correctNormTime) {

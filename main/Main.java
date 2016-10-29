@@ -10,13 +10,16 @@ import java.util.*;
 
 public class Main {
 
-    public static final int YEAR = UserForm.readYear();
-    public static final int MONTH = UserForm.readMonth();
-    public static final int DAY_OF_MONTH = Calendar.getDayOfMonth(MONTH, YEAR);
-    public static final double NORM_TIME = UserForm.readNormTime();
+    public static void main(String[] needRunningTests) {
+        if(needRunningTests[0].equals("1")) {
+            UnitTest test = new UnitTest();
+            test.start();
+        }
 
-    public static void main(String[] debugLevel) {
-        System.out.println("Version of the program: 1.0.1");
+        final int YEAR = UserForm.readYear();
+        final int MONTH = UserForm.readMonth();
+        final int DAY_OF_MONTH = Calendar.getDayOfMonth(MONTH, YEAR);
+        final double NORM_TIME = UserForm.readNormTime();
 
         Map<Integer, Integer> shortDayAndHolidays = new LinkedHashMap<Integer, Integer>();
         UserForm.readShortDaysAndHolidays(shortDayAndHolidays, DAY_OF_MONTH);
@@ -39,9 +42,7 @@ public class Main {
         FileInteraction.writeNextCounter(graphs, DAY_OF_MONTH, MONTH, YEAR);
         FileInteraction.deleteOldCounter(MONTH, YEAR);
 
-        UnitTest test = new UnitTest();
-        test.start();
-
         System.out.println("Генерация графиков завершена успешно!");
+        System.out.println("Версия программы: 1.0.1");
     }
 }

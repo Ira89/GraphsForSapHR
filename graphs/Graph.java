@@ -4,22 +4,14 @@ import java.util.Map;
 
 public class Graph {
 
-    final static double UNINITIALIZED_VALUE = -1;
-    final static double MAX_WORK_TIME_IN_DAY = 15;
-    final static double MAX_WORK_TIME_IN_DIURNAL = 22;
-
-    final static double NEGLIGIBLE_TIME_INTERVAL = 0.001;
-    final static double ACCEPTABLE_ACCURACY = 1.0e-10;
-
-    public final static char CHAR_DESIGNATION_UNIVERSAL_DAY = 'u';
-    public final static char CHAR_DESIGNATION_WEEKEND = 'f';
-    public final static char CHAR_DESIGNATION_NIGHT = 'n';
-    public final static char CHAR_DESIGNATION_DAY = 'd';
-
-    public final static int CODE_SHORT_DAY = 0;
-    public final static int CODE_HOLIDAY = 1;
-    public final static int CODE_DAY_OFF = 2;
-
+    final static double UNINITIALIZED_VALUE = -1.0;
+    final static int CODE_SHORT_DAY = 0;
+    final static int CODE_HOLIDAY = 1;
+    final static int CODE_DAY_OFF = 2;
+    final static char SIGN_UNIVERSAL_DAY = 'u';
+    final static char SIGN_WEEKEND = 'f';
+    final static char SIGN_NIGHT = 'n';
+    final static char SIGN_DAY = 'd';
 
     private int id;
     private String name;
@@ -40,11 +32,53 @@ public class Graph {
         this.daytimeSign = daytimeSign;
     }
 
+    // ----------------------------------------------- getters and setters ---------------------------------------------
 
-    /*******************************************************************************************************************************************
-                                                        getters and setters
-     ******************************************************************************************************************************************/
+    public int getId(){ return id; }
+    public String getName(){ return name; }
+    public int getLengthRule(){ return rule.length(); }
+    public double getDaytime(){ return daytime; }
+    public String getDaytimeSign(){ return daytimeSign; }
+    public int getCounter(){ return counter; }
+    public double getNormTime(){ return normTime; }
+    public int getAmountDay() { return workTime.length; }
 
+
+    public double getWorkTime(final int indexDay){
+        if(indexDayIsCorrect(indexDay)) return workTime[indexDay];
+        else return -1.0;
+    }
+
+   public String getWorkTimeSign(final int indexDay) {
+       if(indexDayIsCorrect(indexDay)) return workTimeSign[indexDay];
+       else return "";
+    }
+
+    public void setWorkTime(final int indexDay, final double time){
+        if(indexDayIsCorrect(indexDay)) workTime[indexDay] = time;
+    }
+
+    public void setWorkTimeSign(final int indexDay, final String sign){
+        if(indexDayIsCorrect(indexDay)) workTimeSign[indexDay] = sign;
+    }
+
+    private boolean indexDayIsCorrect(int indexDay) {
+        try {
+            if(indexDay < 0 || indexDay >= getAmountDay())
+                throw new Exception("Дата должна быть в диапазаоне от 1 до " + getAmountDay());
+        } catch (Exception exc) {
+            exc.printStackTrace();
+            System.exit(0);
+        }
+        return true;
+    }
+
+    public char getRuleOfDay(final int indexDay) {
+        int rulesPosition = counter + indexDay;
+        rulesPosition %= rule.length();
+        if(indexDay < 0) rulesPosition = rule.length() + rulesPosition;
+        return rule.charAt(rulesPosition);
+    }
 
     public void setCounter(final int counter){
         try{
@@ -57,226 +91,72 @@ public class Graph {
         this.counter = counter;
     }
 
-
-
-    public int getId(){ return id; }
-    public String getName(){ return name; }
-    public int getLengthRule(){ return rule.length(); }
-    public double getDaytime(){ return daytime; }
-    public double getUniqueTime(){ return getDaytime(); }
-    public double getNightTime(){ return getDaytime(); }
-    public String getDaytimeSign(){ return daytimeSign; }
-    public String getUniqueTimeSign(){ return getDaytimeSign(); }
-    public String getNightTimeSign(){ return getDaytimeSign(); }
-    public int getCounter(){ return counter; }
-    public double getNormTime(){ return normTime; }
-    public int getAmountDay() { return workTime.length; }
-
-
-    public double getWorkTime(final int indexDay){
-        try{
-            if(indexDay >= workTime.length) throw new Exception("Попытка выхода за пределы массива");
-        }catch (Exception exc){
-            exc.printStackTrace();
-            System.exit(0);
-        }
-        return workTime[indexDay];
-    }
-
-   public String getWorkTimeSign(final int indexDay) {
-        try {
-            if(indexDay >= workTime.length) throw new Exception("Попытка выхода за пределы массива");
-        } catch (Exception exc) {
-            exc.printStackTrace();
-            System.exit(0);
-        }
-        return workTimeSign[indexDay];
-    }
-
-    public char getRuleOfDay(final int indexDay) {
-        int rulesPosition = counter + indexDay;
-        rulesPosition %= rule.length();
-        if(indexDay < 0) rulesPosition = rule.length() - rulesPosition;
-        return rule.charAt(rulesPosition);
-    }
-
-
-    public void setWorkTime(final int indexDay, final double time){
-        try{
-            if(indexDay >= workTime.length) throw new Exception("Попытка выхода за пределы массива");
-        }catch (Exception exc){
-            exc.printStackTrace();
-            System.exit(0);
-        }
-        workTime[indexDay] = time;
-    }
-
     /*private boolean checkRuleInput(final String rule){
         int sizeRule = rule.length();
         for(int positionForRule = 0; positionForRule < sizeRule; ++positionForRule){
             switch(rule.charAt(positionForRule)){
-                case CHAR_DESIGNATION_UNIVERSAL_DAY: break;
-                case CHAR_DESIGNATION_WEEKEND: break;
-                case CHAR_DESIGNATION_NIGHT: break;
-                case CHAR_DESIGNATION_DAY: break;
+                case SIGN_UNIVERSAL_DAY: break;
+                case SIGN_WEEKEND: break;
+                case SIGN_NIGHT: break;
+                case SIGN_DAY: break;
                 default: return false;
             }
         }
         return true;
     }*/
 
-    /*******************************************************************************************************************************************
 
-     ******************************************************************************************************************************************/
+    // ----------------------------------------------- generation ------------------------------------------------------
 
-    private void setWorkTimeSign(Map<Integer, Integer> shortDayAndHolidays, Map<Double, String> dayHours, Map<Double, String> nightHours) {
-        final String SECOND_NIGHT_SHIFT_FOR_HOLIDAYS = "C_33";
-        for(int indexDay = 0; indexDay < workTime.length; ++indexDay){
-            double hour = getWorkTime(indexDay);
-            Integer codeDay = shortDayAndHolidays.get(indexDay + 1);
-            if(codeDay != null && codeDay == Graph.CODE_SHORT_DAY){
-                if(getWorkTime(indexDay) != 0) ++hour;
-            }
-            boolean isStandardOrUniqueGraph = this instanceof GraphStandard || this instanceof GraphUnique;
-            if(isStandardOrUniqueGraph && getRuleOfDay(indexDay) != Graph.CHAR_DESIGNATION_WEEKEND) {
-                if (getRuleOfDay(indexDay) == 'd') hour = getDaytime();
-                else hour = getUniqueTime();
-            }
-            String hourName;
-            if(getRuleOfDay(indexDay) == Graph.CHAR_DESIGNATION_DAY){
-                if(hour == getDaytime()) hourName = getDaytimeSign();
-                else hourName = findHourName(dayHours, hour);
-            }
-            else if(getRuleOfDay(indexDay) == Graph.CHAR_DESIGNATION_NIGHT){
-                if(hour == getNightTime()){
-                    hourName = getNightTimeSign();
-                    if(codeDay != null && codeDay == Graph.CODE_HOLIDAY){
-                        int positionForRulePreviousDay = indexDay - 1;
-                        if(positionForRulePreviousDay < 0) positionForRulePreviousDay = indexDay - 1;
-                        if(getRuleOfDay(positionForRulePreviousDay) == Graph.CHAR_DESIGNATION_NIGHT){
-                            hourName = SECOND_NIGHT_SHIFT_FOR_HOLIDAYS;
-                        }
-                    }
-                }
-                else hourName = findHourName(nightHours, hour);
-            }
-            else{
-                if(hour == getUniqueTime()) hourName = getUniqueTimeSign();
-                else hourName = findHourName(dayHours, hour);
-            }
-            workTimeSign[indexDay] = hourName;
-        }
+    public void startGenerating(double normTime, int dayOfMonth, final Map<Integer, Integer> shortDayAndHolidays,
+                                final Map<Double, String> dayHours, final Map<Double, String> nightHours) {
+        createEmptyArray(dayOfMonth);                                  // step 0
+        setNormTime(normTime);                                         // step 1
+        setWeekend();                                                  // step 2
+        setShortDaysAndHolidays(shortDayAndHolidays);                  // step 3
+        generateGraph();                                               // step 4
+        setWorkTimeSign(shortDayAndHolidays, dayHours, nightHours);    // step 5
     }
 
-    private static String findHourName(Map<Double, String> hours, double desiredValue){
-        String hourName = hours.get(desiredValue);
-        if(hourName == null){
-            System.out.println("Нет графика на: " + desiredValue + " час");
-            hourName = "???";
+    // ----------------------------------------------- step 0 ----------------------------------------------------------
+
+    private void createEmptyArray(int dayOfMonth) {
+        workTime = new double[dayOfMonth];
+        workTimeSign = new String[dayOfMonth];
+        for(int indexDay = 0; indexDay < dayOfMonth; ++indexDay) {
+            setWorkTime(indexDay, UNINITIALIZED_VALUE);
+            setWorkTimeSign(indexDay, "-");
         }
-        return hourName;
-    }
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-    public void startGenerating(final double NORM_TIME, final int DAY_OF_MONTH, Map<Integer, Integer> shortDayAndHolidays,
-                                Map<Double, String> dayHours, Map<Double, String> nightHours) {
-        createEmptyArray(DAY_OF_MONTH);                                // step 1
-        setNormTime(NORM_TIME);                                        // step 2
-        setWeekend();
-        setShortDaysAndHolidays(shortDayAndHolidays);
-        generateGraph();
-        setWorkTimeSign(shortDayAndHolidays, dayHours, nightHours);
     }
 
     // ----------------------------------------------- step 1 ----------------------------------------------------------
 
-    private void createEmptyArray(final int DAY_OF_MONTH) {
-        workTime = new double[DAY_OF_MONTH];
-        for(int i = 0; i < DAY_OF_MONTH; ++i) workTime[i] = UNINITIALIZED_VALUE;
-
-        workTimeSign = new String[DAY_OF_MONTH];
-        for(int i = 0; i < DAY_OF_MONTH; ++i) workTimeSign[i] = "-";
-    }
+    protected void setNormTime(double normTime){ this.normTime = normTime; }
 
     // ----------------------------------------------- step 2 ----------------------------------------------------------
 
-    protected void setNormTime(final double normTime){ this.normTime = normTime; }
-
-
-
     private void setWeekend(){
-        for(int indexDay = 0; indexDay < workTime.length; ++indexDay){
-            if(getRuleOfDay(indexDay) == CHAR_DESIGNATION_WEEKEND){
-                workTime[indexDay] = 0;
-            }
+        for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
+            if(getRuleOfDay(indexDay) == SIGN_WEEKEND) setWorkTime(indexDay, 0);
         }
     }
 
-    protected void setShortDaysAndHolidays(final Map<Integer, Integer> shortDayAndHolidays){
+    // ----------------------------------------------- step 3 ----------------------------------------------------------
+
+    protected void setShortDaysAndHolidays(final Map<Integer, Integer> shortDayAndHolidays) {
         for(Map.Entry<Integer, Integer> obj : shortDayAndHolidays.entrySet()) {
-            if(getRuleOfDay(obj.getKey() - 1) != CHAR_DESIGNATION_WEEKEND) {
-                if(obj.getValue() == CODE_SHORT_DAY) workTime[obj.getKey() - 1] = getDaytime() - 1;
-                else if(obj.getValue() == CODE_HOLIDAY) workTime[obj.getKey() - 1] = getDaytime();
+            if(getRuleOfDay(obj.getKey() - 1) != SIGN_WEEKEND) {
+                if(obj.getValue() == CODE_SHORT_DAY) setWorkTime(obj.getKey() - 1, getDaytime() - 1);
+                else if(obj.getValue() == CODE_HOLIDAY) setWorkTime(obj.getKey() - 1, getDaytime());
             }
         }
     }
 
-    protected int calcMissingDays(){
-        int amountMissingDays = 0;
-        for(int indexDay = 0; indexDay < workTime.length; ++indexDay){
-            if(getWorkTime(indexDay) == UNINITIALIZED_VALUE) ++amountMissingDays;
-        }
-        return amountMissingDays;
-    }
+    // ----------------------------------------------- step 4 ----------------------------------------------------------
 
-    protected double calcMissingTime(){
-        double missingTime = 0;
-        for(int indexDay = 0; indexDay < workTime.length; ++indexDay){
-            if(getWorkTime(indexDay) != UNINITIALIZED_VALUE) missingTime += getWorkTime(indexDay);
-        }
-        return getNormTime() - missingTime;
-    }
-
-    protected int calcDaysWithMinTime(final int minWorkTime, final int maxWorkTime, final double sumWorkTime, final int amountWorkDays){
-        int daysWithMinTime;
-        for(daysWithMinTime = 0; daysWithMinTime <= amountWorkDays; ++daysWithMinTime){
-            int daysWithMaxTime = amountWorkDays - daysWithMinTime;
-            if(daysWithMinTime * minWorkTime + daysWithMaxTime * maxWorkTime - sumWorkTime < ACCEPTABLE_ACCURACY) break;
-        }
-        return daysWithMinTime;
-    }
-
-    protected double calcFrequency(final int amountDaysWithMinTime, final int amountDaysWithMaxTime){
-        if(amountDaysWithMinTime > amountDaysWithMaxTime)
-            return amountDaysWithMaxTime == 0 ? amountDaysWithMinTime : (double) amountDaysWithMinTime / amountDaysWithMaxTime;
-        return amountDaysWithMinTime == 0 ? amountDaysWithMaxTime : (double) amountDaysWithMaxTime / amountDaysWithMinTime;
-    }
-
-    private void fillMissingWorkDays(final int spreadValue, final int amountSpreadValue, final int rareValue,
-                                      final int amountRareValue, final double frequency){
-        double currentFrequency = 0;
-        int counterSpreadTime = 0, counterRareTime = 0;
-
-        for(int indexDay = 0; indexDay < workTime.length; ++indexDay){
-            if(getWorkTime(indexDay) == UNINITIALIZED_VALUE){
-                if(currentFrequency < frequency && counterSpreadTime < amountSpreadValue || counterRareTime == amountRareValue){
-                    workTime[indexDay] = spreadValue;
-                    ++counterSpreadTime;
-                    ++currentFrequency;
-                }else{
-                    workTime[indexDay] = rareValue;
-                    ++counterRareTime;
-                    currentFrequency -= frequency;
-                }
-            }
-        }
-    }
-
-    protected void generateGraph(){
+    protected void generateGraph() {
         int amountMissingDays = calcMissingDays();
         double missingTime = calcMissingTime();
-
         int minWorkTime = amountMissingDays == 0 ? (int) missingTime : (int) missingTime / amountMissingDays;
         int maxWorkTime = minWorkTime + 1;
 
@@ -284,10 +164,83 @@ public class Graph {
         int amountDaysWithMaxTime = amountMissingDays - amountDaysWithMinTime;
         double frequency = calcFrequency(amountDaysWithMinTime, amountDaysWithMaxTime);
 
-        int spreadValue = amountDaysWithMinTime >= amountDaysWithMaxTime ? minWorkTime : maxWorkTime;
-        int amountSpreadValue = amountDaysWithMinTime >= amountDaysWithMaxTime ? amountDaysWithMinTime : amountDaysWithMaxTime;
-        int rareValue = amountDaysWithMinTime < amountDaysWithMaxTime ? minWorkTime : maxWorkTime;
-        int amountRareValue = amountDaysWithMinTime < amountDaysWithMaxTime ? amountDaysWithMinTime : amountDaysWithMaxTime;
-        fillMissingWorkDays(spreadValue, amountSpreadValue, rareValue, amountRareValue, frequency);
+        if(amountDaysWithMinTime >= amountDaysWithMaxTime) {
+            fillMissingWorkDays(minWorkTime, amountDaysWithMinTime, maxWorkTime, amountDaysWithMaxTime, frequency);
+        } else fillMissingWorkDays(maxWorkTime, amountDaysWithMaxTime, minWorkTime, amountDaysWithMinTime, frequency);
+    }
+
+    protected int calcMissingDays(){
+        int amountMissingDays = 0;
+        for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
+            if(getWorkTime(indexDay) == UNINITIALIZED_VALUE) ++amountMissingDays;
+        }
+        return amountMissingDays;
+    }
+
+    protected double calcMissingTime(){
+        double missingTime = 0;
+        for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
+            if(getWorkTime(indexDay) != UNINITIALIZED_VALUE) missingTime += getWorkTime(indexDay);
+        }
+        return getNormTime() - missingTime;
+    }
+
+    protected int calcDaysWithMinTime(int minWorkTime, int maxWorkTime, double sumWorkTime, int amountWorkDays) {
+        int daysWithMinTime;
+        for(daysWithMinTime = 0; daysWithMinTime <= amountWorkDays; ++daysWithMinTime) {
+            int daysWithMaxTime = amountWorkDays - daysWithMinTime;
+            if((daysWithMinTime * minWorkTime + daysWithMaxTime * maxWorkTime - sumWorkTime) < 0.001) break;
+        }
+        return daysWithMinTime;
+    }
+
+    protected double calcFrequency(int amountDaysWithMinTime, int amountDaysWithMaxTime) {
+        if(amountDaysWithMinTime > amountDaysWithMaxTime)
+            return amountDaysWithMaxTime == 0 ? amountDaysWithMinTime : (double) amountDaysWithMinTime / amountDaysWithMaxTime;
+        return amountDaysWithMinTime == 0 ? amountDaysWithMaxTime : (double) amountDaysWithMaxTime / amountDaysWithMinTime;
+    }
+
+    private void fillMissingWorkDays(int spreadValue, int amountSpreadValue, int rareValue, int amountRareValue, double frequency) {
+        double currentFrequency = 0;
+        int counterSpreadTime = 0;
+        int counterRareTime = 0;
+
+        for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay){
+            if(getWorkTime(indexDay) == UNINITIALIZED_VALUE){
+                if(currentFrequency < frequency && counterSpreadTime < amountSpreadValue || counterRareTime == amountRareValue) {
+                    setWorkTime(indexDay, spreadValue);
+                    ++counterSpreadTime;
+                    ++currentFrequency;
+                }else{
+                    setWorkTime(indexDay, rareValue);
+                    ++counterRareTime;
+                    currentFrequency -= frequency;
+                }
+            }
+        }
+    }
+
+    // ----------------------------------------------- step 5 ----------------------------------------------------------
+
+    protected void setWorkTimeSign(final Map<Integer, Integer> shortDayAndHolidays, final Map<Double, String> dayHours,
+                                   final Map<Double, String> nightHours) {
+        for (int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
+            double hour = getWorkTime(indexDay);
+            if(getWorkTime(indexDay) != 0) {
+                Integer codeDay = shortDayAndHolidays.get(indexDay + 1);
+                if(codeDay != null && codeDay == CODE_SHORT_DAY) ++hour;
+            }
+            if (getDaytime() == hour) setWorkTimeSign(indexDay, getDaytimeSign());
+            else setWorkTimeSign(indexDay, findHourName(dayHours, hour));
+        }
+    }
+
+    protected static String findHourName(final Map<Double, String> hours, double desiredValue) {
+        String hourName = hours.get(desiredValue);
+        if(hourName == null){
+            System.out.println("Нет графика на: " + desiredValue + " час");
+            hourName = "???";
+        }
+        return hourName;
     }
 }

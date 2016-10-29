@@ -7,7 +7,8 @@ public class Calendar {
 
     public static int getDayOfMonth(final int MONTH, final int YEAR) {
         try {
-            if(MONTH < MIN_INDEX_MONTH || MONTH > MAX_INDEX_MONTH) throw new Exception("Некорректно указан месяц!");
+            if(MONTH < MIN_INDEX_MONTH || MONTH > MAX_INDEX_MONTH)
+                throw new Exception("Месяц может быть в диапазоне от " + MIN_INDEX_MONTH + " до " + MAX_INDEX_MONTH);
         } catch (Exception exc) {
             exc.printStackTrace();
             System.exit(0);

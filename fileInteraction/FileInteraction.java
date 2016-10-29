@@ -183,9 +183,7 @@ public class FileInteraction {
                     if(obj.getWorkTime(indexDay) != 0){
                         cell = row.createCell(indexDay + DELTA_COL_IN_TEMPLATE);
                         cell.setCellValue(obj.getWorkTime(indexDay));
-
-                        boolean isNightGraph = obj.getRuleOfDay(indexDay) == Graph.CHAR_DESIGNATION_NIGHT;
-                        if(isNightGraph) cell.setCellStyle(styleForNighttime);
+                        if(obj.getRuleOfDay(indexDay) == 'n') cell.setCellStyle(styleForNighttime);
                         else cell.setCellStyle(styleForDaytime);
                     }
                 }

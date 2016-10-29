@@ -13,23 +13,8 @@ public class GraphUnique extends Graph {
         this.uniqueTimeSign = uniqueTimeSign;
     }
 
-
-    /*******************************************************************************************************************************************
-                                                        getters and setters
-     ******************************************************************************************************************************************/
-
-
-    @Override
-    public double getUniqueTime(){ return uniqueTime; }
-
-
-    @Override
-    public String getUniqueTimeSign(){ return uniqueTimeSign; }
-
-
-    /*******************************************************************************************************************************************
-                                                        public methods
-     ******************************************************************************************************************************************/
+    private double getUniqueTime() { return uniqueTime; }
+    private String getUniqueTimeSign(){ return uniqueTimeSign; }
 
     private void overwriteNormTime() {
         double sumTime = 0;
@@ -42,12 +27,12 @@ public class GraphUnique extends Graph {
     @Override
     protected void setShortDaysAndHolidays(final Map<Integer, Integer> shortDayAndHolidays){
         for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay){
-            if(getRuleOfDay(indexDay) != CHAR_DESIGNATION_WEEKEND){
+            if(getRuleOfDay(indexDay) != SIGN_WEEKEND){
                 for(Map.Entry<Integer, Integer> obj : shortDayAndHolidays.entrySet()){
                     if(obj.getKey() == indexDay + 1){
                         if(obj.getValue() == CODE_SHORT_DAY){
-                            if(getRuleOfDay(indexDay) == CHAR_DESIGNATION_DAY) setWorkTime(indexDay, getDaytime() - 1);
-                            else if(getRuleOfDay(indexDay) == CHAR_DESIGNATION_UNIVERSAL_DAY) setWorkTime(indexDay, getUniqueTime() - 1);
+                            if(getRuleOfDay(indexDay) == SIGN_DAY) setWorkTime(indexDay, getDaytime() - 1);
+                            else if(getRuleOfDay(indexDay) == SIGN_UNIVERSAL_DAY) setWorkTime(indexDay, getUniqueTime() - 1);
                         }
                         else if(obj.getValue() == CODE_HOLIDAY) setWorkTime(indexDay, 0);
                         else if(obj.getValue() == CODE_DAY_OFF) setWorkTime(indexDay, 0);
@@ -61,10 +46,20 @@ public class GraphUnique extends Graph {
     protected void generateGraph(){
         for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay){
             if(getWorkTime(indexDay) == UNINITIALIZED_VALUE){
-                if(getRuleOfDay(indexDay) == CHAR_DESIGNATION_DAY) setWorkTime(indexDay, getDaytime());
-                else if(getRuleOfDay(indexDay) == CHAR_DESIGNATION_UNIVERSAL_DAY) setWorkTime(indexDay, getUniqueTime());
+                if(getRuleOfDay(indexDay) == SIGN_DAY) setWorkTime(indexDay, getDaytime());
+                else if(getRuleOfDay(indexDay) == SIGN_UNIVERSAL_DAY) setWorkTime(indexDay, getUniqueTime());
             }
         }
         overwriteNormTime();
+    }
+
+    @Override
+    protected void setWorkTimeSign(Map<Integer, Integer> shortDayAndHolidays, Map<Double, String> dayHours, Map<Double, String> nightHours) {
+        for (int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
+            if (getRuleOfDay(indexDay) != SIGN_WEEKEND) {
+                if(getRuleOfDay(indexDay) == 'd') setWorkTimeSign(indexDay, getDaytimeSign());
+                else setWorkTimeSign(indexDay, getUniqueTimeSign());
+            } else setWorkTimeSign(indexDay, findHourName(dayHours, 0));
+        }
     }
 }
