@@ -62,4 +62,18 @@ public class GraphUnique extends Graph {
             } else setWorkTimeSign(indexDay, findHourName(dayHours, 0));
         }
     }
+
+    @Override
+    protected void setHolidaysAndShortDaysSign(final Map<Integer, Integer> shortDayAndHolidays) {
+        for(Map.Entry<Integer, Integer> obj : shortDayAndHolidays.entrySet()) {
+            if(obj.getValue() == CODE_HOLIDAY) {
+                setHolidaysSign((obj.getKey() - 1), "1");
+                setShortDaysSign((obj.getKey() - 1), "F");
+            } else if(obj.getValue() == CODE_SHORT_DAY && getRuleOfDay(obj.getKey() - 1) != SIGN_WEEKEND) {
+                setShortDaysSign((obj.getKey() - 1), "A");
+            } else if(obj.getValue() == CODE_DAY_OFF && getRuleOfDay(obj.getKey() - 1) != SIGN_WEEKEND) {
+                setShortDaysSign((obj.getKey() - 1), "F");
+            }
+        }
+    }
 }

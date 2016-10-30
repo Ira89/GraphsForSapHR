@@ -55,7 +55,7 @@ public class GraphMix extends Graph {
         for (int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
             double hour = getWorkTime(indexDay);
             Integer codeDay = shortDayAndHolidays.get(indexDay + 1);
-            if(getWorkTime(indexDay) != 0) {
+            if(getRuleOfDay(indexDay) != SIGN_WEEKEND) {
                 if(codeDay != null && codeDay == CODE_SHORT_DAY) ++hour;
             }
             if(getRuleOfDay(indexDay) == SIGN_NIGHT) {

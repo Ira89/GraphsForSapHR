@@ -37,14 +37,18 @@ public class GraphDiurnal extends Graph {
 
     @Override
     protected void setWorkTimeSign(Map<Integer, Integer> shortDayAndHolidays, Map<Double, String> dayHours, Map<Double, String> nightHours) {
+        final String SECOND_NIGHT_SHIFT_FOR_HOLIDAYS = "C_33";
         for (int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
             double hour = getWorkTime(indexDay);
-            if(getWorkTime(indexDay) != 0) {
-                Integer codeDay = shortDayAndHolidays.get(indexDay + 1);
+            Integer codeDay = shortDayAndHolidays.get(indexDay + 1);
+            if(getRuleOfDay(indexDay) != SIGN_WEEKEND) {
                 if(codeDay != null && codeDay == CODE_SHORT_DAY) ++hour;
             }
             if(getRuleOfDay(indexDay) == SIGN_NIGHT) {
-                if (hour == getDaytime()) setWorkTimeSign(indexDay, getDaytimeSign());
+                if(codeDay != null && codeDay == CODE_HOLIDAY && getRuleOfDay(indexDay - 1) == SIGN_NIGHT) {
+                    setWorkTimeSign(indexDay, SECOND_NIGHT_SHIFT_FOR_HOLIDAYS);
+                }
+                else if (hour == getDaytime()) setWorkTimeSign(indexDay, getDaytimeSign());
                 else setWorkTimeSign(indexDay, findHourName(nightHours, hour));
             } else setWorkTimeSign(indexDay, findHourName(dayHours, hour));
         }

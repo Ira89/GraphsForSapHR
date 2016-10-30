@@ -20,8 +20,11 @@ public class Graph {
     private String daytimeSign;
     private int counter;
     private double normTime;
+
     private double workTime[];
     private String workTimeSign[];
+    private String holidaysSign[];
+    private String shortDaysSign[];
 
 
     public Graph(int id, String name, String rule, double daytime, String daytimeSign) {
@@ -54,12 +57,30 @@ public class Graph {
        else return "";
     }
 
-    public void setWorkTime(final int indexDay, final double time){
+    public String getHolidaysSign(int indexDay) {
+        if(indexDayIsCorrect(indexDay)) return holidaysSign[indexDay];
+        else return "";
+    }
+
+    public String getShortDaysSign(int indexDay) {
+        if(indexDayIsCorrect(indexDay)) return shortDaysSign[indexDay];
+        else return "";
+    }
+
+    public void setWorkTime(int indexDay, double time){
         if(indexDayIsCorrect(indexDay)) workTime[indexDay] = time;
     }
 
-    public void setWorkTimeSign(final int indexDay, final String sign){
+    public void setWorkTimeSign(int indexDay, String sign){
         if(indexDayIsCorrect(indexDay)) workTimeSign[indexDay] = sign;
+    }
+
+    public void setHolidaysSign(int indexDay, String sign) {
+        if(indexDayIsCorrect(indexDay)) holidaysSign[indexDay] = sign;
+    }
+
+    public void setShortDaysSign(int indexDay, String sign) {
+        if(indexDayIsCorrect(indexDay)) shortDaysSign[indexDay] = sign;
     }
 
     private boolean indexDayIsCorrect(int indexDay) {
@@ -76,7 +97,7 @@ public class Graph {
     public char getRuleOfDay(final int indexDay) {
         int rulesPosition = counter + indexDay;
         rulesPosition %= rule.length();
-        if(indexDay < 0) rulesPosition = rule.length() + rulesPosition;
+        if(rulesPosition < 0) rulesPosition = rule.length() + rulesPosition;
         return rule.charAt(rulesPosition);
     }
 
@@ -116,6 +137,7 @@ public class Graph {
         setShortDaysAndHolidays(shortDayAndHolidays);                  // step 3
         generateGraph();                                               // step 4
         setWorkTimeSign(shortDayAndHolidays, dayHours, nightHours);    // step 5
+        setHolidaysAndShortDaysSign(shortDayAndHolidays);              // step 6
     }
 
     // ----------------------------------------------- step 0 ----------------------------------------------------------
@@ -123,9 +145,13 @@ public class Graph {
     private void createEmptyArray(int dayOfMonth) {
         workTime = new double[dayOfMonth];
         workTimeSign = new String[dayOfMonth];
+        holidaysSign = new String[dayOfMonth];
+        shortDaysSign = new String[dayOfMonth];
         for(int indexDay = 0; indexDay < dayOfMonth; ++indexDay) {
             setWorkTime(indexDay, UNINITIALIZED_VALUE);
-            setWorkTimeSign(indexDay, "-");
+            setWorkTimeSign(indexDay, "");
+            setHolidaysSign(indexDay, "");
+            setShortDaysSign(indexDay, "");
         }
     }
 
@@ -226,7 +252,7 @@ public class Graph {
                                    final Map<Double, String> nightHours) {
         for (int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
             double hour = getWorkTime(indexDay);
-            if(getWorkTime(indexDay) != 0) {
+            if(getRuleOfDay(indexDay) != SIGN_WEEKEND) {
                 Integer codeDay = shortDayAndHolidays.get(indexDay + 1);
                 if(codeDay != null && codeDay == CODE_SHORT_DAY) ++hour;
             }
@@ -242,5 +268,17 @@ public class Graph {
             hourName = "???";
         }
         return hourName;
+    }
+
+    // ----------------------------------------------- step 6 ----------------------------------------------------------
+
+    protected void setHolidaysAndShortDaysSign(final Map<Integer, Integer> shortDayAndHolidays) {
+        for(Map.Entry<Integer, Integer> obj : shortDayAndHolidays.entrySet()) {
+            if(obj.getValue() == CODE_HOLIDAY) {
+                setHolidaysSign((obj.getKey() - 1), "1");
+            } else if(obj.getValue() == CODE_SHORT_DAY && getRuleOfDay(obj.getKey() - 1) != SIGN_WEEKEND) {
+                setShortDaysSign((obj.getKey() - 1), "A");
+            }
+        }
     }
 }

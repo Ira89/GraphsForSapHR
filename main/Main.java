@@ -38,7 +38,7 @@ public class Main {
         }
 
         FileInteraction.writeWorkTimeInFile(graphs, DAY_OF_MONTH);
-        FileInteraction.writeGraphsIntoTemplate(graphs, shortDayAndHolidays);
+        FileInteraction.writeGraphsIntoTemplate(graphs);
         FileInteraction.writeNextCounter(graphs, DAY_OF_MONTH, MONTH, YEAR);
         FileInteraction.deleteOldCounter(MONTH, YEAR);
 
