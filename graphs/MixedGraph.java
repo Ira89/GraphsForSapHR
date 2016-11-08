@@ -2,12 +2,12 @@ package ru.polynkina.irina.graphs;
 
 import java.util.Map;
 
-public class GraphMix extends Graph {
+public class MixedGraph extends DayGraph {
 
     private double nightTime;
     private String nightTimeSign;
 
-    public GraphMix(int id, String name, String rule, double daytime, String daytimeSign, double nightTime, String nightTimeSign){
+    public MixedGraph(int id, String name, String rule, double daytime, String daytimeSign, double nightTime, String nightTimeSign){
         super(id, name, rule, daytime, daytimeSign);
         this.nightTime = nightTime;
         this.nightTimeSign = nightTimeSign;

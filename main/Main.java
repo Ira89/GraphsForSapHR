@@ -1,10 +1,10 @@
 package ru.polynkina.irina.main;
 
 import ru.polynkina.irina.fileInteraction.FileInteraction;
+import ru.polynkina.irina.graphs.DayGraph;
 import ru.polynkina.irina.userInteraction.UserForm;
 import ru.polynkina.irina.unitTests.UnitTest;
 import ru.polynkina.irina.calendar.Calendar;
-import ru.polynkina.irina.graphs.Graph;
 
 import java.util.*;
 
@@ -24,16 +24,16 @@ public class Main {
         Map<Integer, Integer> shortDayAndHolidays = new LinkedHashMap<Integer, Integer>();
         UserForm.readShortDaysAndHolidays(shortDayAndHolidays, DAY_OF_MONTH);
 
-        List<Graph> graphs = new ArrayList<Graph>();
-        FileInteraction.fabricateGraphs(graphs);
-        FileInteraction.readCountersForGraphs(graphs, MONTH, YEAR);
-
         Map<Double, String> dayHours = new HashMap<Double, String>();
         FileInteraction.readDayHours(dayHours);
         Map<Double, String> nightHours = new HashMap<Double, String>();
         FileInteraction.readNightHours(nightHours);
 
-        for(Graph obj : graphs) {
+        List<DayGraph> graphs = new ArrayList<DayGraph>();
+        FileInteraction.fabricateGraphs(graphs);
+        FileInteraction.readCountersForGraphs(graphs, MONTH, YEAR);
+
+        for(DayGraph obj : graphs) {
             obj.startGenerating(NORM_TIME, DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
         }
 

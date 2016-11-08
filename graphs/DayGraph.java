@@ -2,7 +2,7 @@ package ru.polynkina.irina.graphs;
 
 import java.util.Map;
 
-public class Graph {
+public class DayGraph {
 
     final static double UNINITIALIZED_VALUE = -1.0;
     final static int CODE_SHORT_DAY = 0;
@@ -26,8 +26,7 @@ public class Graph {
     private String holidaysSign[];
     private String shortDaysSign[];
 
-
-    public Graph(int id, String name, String rule, double daytime, String daytimeSign) {
+    public DayGraph(int id, String name, String rule, double daytime, String daytimeSign) {
         this.id = id;
         this.name = name;
         this.rule = rule;
@@ -40,8 +39,8 @@ public class Graph {
     public int getId(){ return id; }
     public String getName(){ return name; }
     public int getLengthRule(){ return rule.length(); }
-    public double getDaytime(){ return daytime; }
-    public String getDaytimeSign(){ return daytimeSign; }
+    protected double getDaytime(){ return daytime; }
+    protected String getDaytimeSign(){ return daytimeSign; }
     public int getCounter(){ return counter; }
     public double getNormTime(){ return normTime; }
     public int getAmountDay() { return workTime.length; }
@@ -52,9 +51,9 @@ public class Graph {
         else return -1.0;
     }
 
-   public String getWorkTimeSign(final int indexDay) {
-       if(indexDayIsCorrect(indexDay)) return workTimeSign[indexDay];
-       else return "";
+    public String getWorkTimeSign(final int indexDay) {
+        if(indexDayIsCorrect(indexDay)) return workTimeSign[indexDay];
+        else return "";
     }
 
     public String getHolidaysSign(int indexDay) {
@@ -67,19 +66,19 @@ public class Graph {
         else return "";
     }
 
-    public void setWorkTime(int indexDay, double time){
+    protected void setWorkTime(int indexDay, double time){
         if(indexDayIsCorrect(indexDay)) workTime[indexDay] = time;
     }
 
-    public void setWorkTimeSign(int indexDay, String sign){
+    protected void setWorkTimeSign(int indexDay, String sign){
         if(indexDayIsCorrect(indexDay)) workTimeSign[indexDay] = sign;
     }
 
-    public void setHolidaysSign(int indexDay, String sign) {
+    protected void setHolidaysSign(int indexDay, String sign) {
         if(indexDayIsCorrect(indexDay)) holidaysSign[indexDay] = sign;
     }
 
-    public void setShortDaysSign(int indexDay, String sign) {
+    protected void setShortDaysSign(int indexDay, String sign) {
         if(indexDayIsCorrect(indexDay)) shortDaysSign[indexDay] = sign;
     }
 
@@ -125,7 +124,6 @@ public class Graph {
         }
         return true;
     }*/
-
 
     // ----------------------------------------------- generation ------------------------------------------------------
 

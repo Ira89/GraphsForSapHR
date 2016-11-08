@@ -1,8 +1,8 @@
 package ru.polynkina.irina.graphs;
 
-public class GraphShort extends Graph {
+public class ShortGraph extends DayGraph {
 
-    public GraphShort(int id, String name, String rule, double daytime, String daytimeSign){
+    public ShortGraph(int id, String name, String rule, double daytime, String daytimeSign){
         super(id, name, rule, daytime, daytimeSign);
     }
 

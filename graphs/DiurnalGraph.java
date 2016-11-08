@@ -2,12 +2,12 @@ package ru.polynkina.irina.graphs;
 
 import java.util.Map;
 
-public class GraphDiurnal extends Graph {
+public class DiurnalGraph extends DayGraph {
 
     private final static double MAX_WORK_TIME_IN_DAY = 15;
     private final static double MAX_WORK_TIME_IN_DIURNAL = 22;
 
-    public GraphDiurnal(int id, String name, String rule, double daytime, String daytimeSign){
+    public DiurnalGraph(int id, String name, String rule, double daytime, String daytimeSign){
         super(id, name, rule, daytime, daytimeSign);
     }
 

@@ -1,11 +1,10 @@
 package ru.polynkina.irina.graphs;
 
-public class GraphFloat extends Graph {
+public class FractionalGraph extends DayGraph {
 
-    public GraphFloat(int id, String name, String rule, double daytime, String daytimeSign){
+    public FractionalGraph(int id, String name, String rule, double daytime, String daytimeSign){
         super(id, name, rule, daytime, daytimeSign);
     }
-
 
     private void setFloatDay(final double floatTime, final int counterFloatDay, final int amountUninitializedDays){
         double frequency = calcFrequency(counterFloatDay, amountUninitializedDays);
