@@ -57,7 +57,7 @@ public class FileInteraction {
      ******************************************************************************************************************************************/
 
 
-    public static void fabricateGraphs(List<Graph> graphs){
+    public static void fabricateGraphs(List<DayGraph> graphs){
         try{
             String filename = "rules.xls";
             FileInputStream fis = new FileInputStream("./rules/" + filename);
@@ -75,21 +75,21 @@ public class FileInteraction {
                     String daytimeSign = wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDEX_OF_DAYTIME_SIGN).getStringCellValue();
 
                     if(type.equals(STRING_DESIGNATION_OF_DAY_GRAPHS)) {
-                        graphs.add(new Graph(id, name, rule, daytime, daytimeSign));
+                        graphs.add(new DayGraph(id, name, rule, daytime, daytimeSign));
                     } else if(type.equals(STRING_DESIGNATION_OF_SHORT_DAY_GRAPHS)) {
-                        graphs.add(new GraphShort(id, name, rule, daytime, daytimeSign));
+                        graphs.add(new ShortGraph(id, name, rule, daytime, daytimeSign));
                     } else if(type.equals(STRING_DESIGNATION_OF_STANDARD_GRAPHS)) {
-                        graphs.add(new GraphStandard(id, name, rule, daytime, daytimeSign));
+                        graphs.add(new FiveDayGraph(id, name, rule, daytime, daytimeSign));
                     } else if(type.equals(STRING_DESIGNATION_OF_FLOAT_GRAPHS)) {
-                        graphs.add(new GraphFloat(id, name, rule, daytime, daytimeSign));
+                        graphs.add(new FractionalGraph(id, name, rule, daytime, daytimeSign));
                     } else if(type.equals(STRING_DESIGNATION_OF_DIURNAL_GRAPHS)) {
-                        graphs.add(new GraphDiurnal(id, name, rule, daytime, daytimeSign));
+                        graphs.add(new DiurnalGraph(id, name, rule, daytime, daytimeSign));
                     } else if(type.equals(STRING_DESIGNATION_OF_UNIQUE_GRAPHS) || (type.equals(STRING_DESIGNATION_OF_MIX_GRAPHS))){
                         double uniqueTime = wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDEX_OF_NIGHTTIME).getNumericCellValue();
                         String uTimeSign = wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDEX_OF_NIGHTTIME_SIGN).getStringCellValue();
                         if(type.equals(STRING_DESIGNATION_OF_UNIQUE_GRAPHS)) {
-                            graphs.add(new GraphUnique(id, name, rule, daytime, daytimeSign, uniqueTime, uTimeSign));
-                        } else graphs.add(new GraphMix(id, name, rule, daytime, daytimeSign, uniqueTime, uTimeSign));
+                            graphs.add(new UniqueGraph(id, name, rule, daytime, daytimeSign, uniqueTime, uTimeSign));
+                        } else graphs.add(new MixedGraph(id, name, rule, daytime, daytimeSign, uniqueTime, uTimeSign));
                     }
                     else throw new Exception("Тип графика: " + type + " неизвестен!");
 
@@ -110,13 +110,13 @@ public class FileInteraction {
 
 
 
-    public static void readCountersForGraphs(List<Graph> graphs, int month, int year){
+    public static void readCountersForGraphs(List<DayGraph> graphs, int month, int year){
         try {
             String filename = "counter_" + month + "_" + year + ".xls";
             FileInputStream fis = new FileInputStream("./counters/" + filename);
             Workbook wb = new HSSFWorkbook(fis);
 
-            for (Graph obj : graphs) {
+            for (DayGraph obj : graphs) {
                 int idGraph = obj.getId();
                 int idCounter = (int) wb.getSheetAt(0).getRow(idGraph).getCell(COL_INDEX_COUNTER_ID).getNumericCellValue();
                 if (idGraph != idCounter){
@@ -142,7 +142,7 @@ public class FileInteraction {
 
 
 
-    public static void writeWorkTimeInFile(final List<Graph> graphs, final int AMOUNT_OF_DAYS){
+    public static void writeWorkTimeInFile(final List<DayGraph> graphs, final int AMOUNT_OF_DAYS){
         try{
             FileInputStream fis = new FileInputStream("./templates/templateWorkingTime.xls");
             Workbook wb = new HSSFWorkbook(fis);
@@ -155,7 +155,7 @@ public class FileInteraction {
             styleForNighttime.setFillPattern(CellStyle.SOLID_FOREGROUND);
             styleForNighttime.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
 
-            for(Graph obj : graphs){
+            for(DayGraph obj : graphs){
                 Row row = wb.getSheetAt(INDEX_OF_SHEET).createRow(obj.getId() + DELTA_ROW_IN_TEMPLATE);
                 Cell cell = row.createCell(COL_INDEX_NAME_GRAPH_IN_TEMPLATE);
                 cell.setCellValue(obj.getName());
@@ -211,7 +211,7 @@ public class FileInteraction {
     }
 
 
-    public static void writeGraphsIntoTemplate(final List<Graph> graphs){
+    public static void writeGraphsIntoTemplate(final List<DayGraph> graphs){
         try{
             FileInputStream fis = new FileInputStream("./templates/templateForSapHR.xls");
             Workbook wb = new HSSFWorkbook(fis);
@@ -224,7 +224,7 @@ public class FileInteraction {
             styleForNighttime.setFillPattern(CellStyle.SOLID_FOREGROUND);
             styleForNighttime.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
 
-            for(Graph obj : graphs) {
+            for(DayGraph obj : graphs) {
                 Row row = wb.getSheetAt(INDEX_OF_SHEET).createRow(obj.getId() + DELTA_ROW_IN_TEMPLATE);
                 Cell cell = row.createCell(COL_INDEX_NAME_GRAPH_IN_TEMPLATE);
                 cell.setCellValue(obj.getName());
@@ -270,14 +270,14 @@ public class FileInteraction {
 
 
 
-    public static void writeNextCounter(final List<Graph> graphs, int dayOfMonth, int month, int year){
+    public static void writeNextCounter(final List<DayGraph> graphs, int dayOfMonth, int month, int year){
         final int MAX_INDEX_MONTH = 12;
         String filename = "counter_" + month + "_" + year + ".xls";
         try{
             FileInputStream fis = new FileInputStream("./counters/" + filename);
             Workbook wb = new HSSFWorkbook(fis);
 
-            for(Graph obj : graphs){
+            for(DayGraph obj : graphs){
                 Row row = wb.getSheetAt(0).getRow(obj.getId());
                 Cell cell = row.createCell(COL_INDEX_COUNTER_ID);
                 cell.setCellValue(obj.getId());
