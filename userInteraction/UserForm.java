@@ -25,11 +25,14 @@ public class UserForm {
     private final static int COL_INDICATES_DATE = 1;
     private final static int AMOUNT_OF_HEADER = 3;
 
+    private final static int ROW_INDICATE_CALENDAR = 7;
+    private final static int ROW_INDICATE_STATUS_CALENDAR = 8;
+
 
     public static int readYear() {
         int year = 0;
         try {
-            FileInputStream fis = new FileInputStream("./userForm/userForm.xls");
+            FileInputStream fis = new FileInputStream("./_files/userForm/userForm.xls");
             Workbook wb = new HSSFWorkbook(fis);
             year = (int) wb.getSheetAt(0).getRow(ROW_INDICATES_YEAR).getCell(COL_INDICATES_YEAR).getNumericCellValue();
             wb.close();
@@ -45,7 +48,7 @@ public class UserForm {
     public static int readMonth() {
         int month = 0;
         try {
-            FileInputStream fis = new FileInputStream("./userForm/userForm.xls");
+            FileInputStream fis = new FileInputStream("./_files/userForm/userForm.xls");
             Workbook wb = new HSSFWorkbook(fis);
             month = (int) wb.getSheetAt(0).getRow(ROW_INDICATES_MONTH).getCell(COL_INDICATES_MONTH).getNumericCellValue();
             wb.close();
@@ -65,7 +68,7 @@ public class UserForm {
     public static double readNormTime() {
         double normTime = 0;
         try{
-            FileInputStream fis = new FileInputStream("./userForm/userForm.xls");
+            FileInputStream fis = new FileInputStream("./_files/userForm/userForm.xls");
             Workbook wb = new HSSFWorkbook(fis);
             normTime = wb.getSheetAt(0).getRow(ROW_INDICATES_NORM_TIME).getCell(COL_INDICATES_NORM_TIME).getNumericCellValue();
             wb.close();
@@ -84,7 +87,7 @@ public class UserForm {
 
     public static void readShortDaysAndHolidays(Map<Integer, Integer> shortDaysAndHolidays, int dayOfMonth) {
         try {
-            FileInputStream fis = new FileInputStream("./userForm/userForm.xls");
+            FileInputStream fis = new FileInputStream("./_files/userForm/userForm.xls");
             Workbook wb = new HSSFWorkbook(fis);
             for(int indexRow = ROW_INDICATES_SHORT_DAY; indexRow <= ROW_INDICATES_DAY_OFF; ++indexRow) {
                 for(int indexCol = COL_INDICATES_DATE; indexCol <= dayOfMonth; ++indexCol) {
@@ -98,6 +101,31 @@ public class UserForm {
             wb.close();
             fis.close();
         } catch(Exception exc) {
+            exc.printStackTrace();
+            System.exit(0);
+        }
+    }
+
+
+    public static void readRegions(Map<String, Integer> regions) {
+        try {
+            FileInputStream fis = new FileInputStream("./_files/userForm/userForm.xls");
+            Workbook wb = new HSSFWorkbook(fis);
+            int indexCol = 1;
+            while(true) {
+                try {
+                    String nameCalendar = wb.getSheetAt(0).getRow(ROW_INDICATE_CALENDAR).getCell(indexCol).getStringCellValue();
+                    Integer statusCalendar = (int) wb.getSheetAt(0).getRow(ROW_INDICATE_STATUS_CALENDAR).getCell(indexCol).getNumericCellValue();
+                    ++indexCol;
+                    if(nameCalendar.equals("")) break;
+                    regions.put(nameCalendar, statusCalendar);
+                } catch (NullPointerException nullExc) {
+                    break;
+                }
+            }
+            wb.close();
+            fis.close();
+        } catch (Exception exc) {
             exc.printStackTrace();
             System.exit(0);
         }

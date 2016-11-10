@@ -40,8 +40,11 @@ public class FileInteraction {
     // constants in the file template...xls
     final static int DELTA_ROW_IN_TEMPLATE = 1;
     final static int DELTA_COL_IN_TEMPLATE = 2;
+    final static int DELTA_COL_IN_TEMPLATE_SAP = 3;
     final static int COL_INDEX_NAME_GRAPH_IN_TEMPLATE = 0;
+    final static int COL_INDEX_NAME_GRAPH_IN_TEMPLATE_SAP = 1;
     final static int COL_INDEX_WORK_TIME_IN_TEMPLATE = 1;
+    final static int COL_INDEX_WORK_TIME_IN_TEMPLATE_SAP = 2;
     final static int SIZE_STEP = 5;
 
     final static int CELL_OFFSET_FOR_TEXT = 2;
@@ -60,7 +63,7 @@ public class FileInteraction {
     public static void fabricateGraphs(List<DayGraph> graphs){
         try{
             String filename = "rules.xls";
-            FileInputStream fis = new FileInputStream("./rules/" + filename);
+            FileInputStream fis = new FileInputStream("./_files/rules/" + filename);
             Workbook wb = new HSSFWorkbook(fis);
 
             int indexRow = 0;
@@ -113,7 +116,7 @@ public class FileInteraction {
     public static void readCountersForGraphs(List<DayGraph> graphs, int month, int year){
         try {
             String filename = "counter_" + month + "_" + year + ".xls";
-            FileInputStream fis = new FileInputStream("./counters/" + filename);
+            FileInputStream fis = new FileInputStream("./_files/counters/" + filename);
             Workbook wb = new HSSFWorkbook(fis);
 
             for (DayGraph obj : graphs) {
@@ -144,7 +147,7 @@ public class FileInteraction {
 
     public static void writeWorkTimeInFile(final List<DayGraph> graphs, final int AMOUNT_OF_DAYS){
         try{
-            FileInputStream fis = new FileInputStream("./templates/templateWorkingTime.xls");
+            FileInputStream fis = new FileInputStream("./_files/templates/templateWorkingTime.xls");
             Workbook wb = new HSSFWorkbook(fis);
 
             CellStyle styleForDaytime = wb.createCellStyle();
@@ -185,9 +188,9 @@ public class FileInteraction {
     }
 
 
-    public static void readDayHours(Map<Double, String> dayHours){ readHours("./library/dayHours.xls", dayHours); }
+    public static void readDayHours(Map<Double, String> dayHours){ readHours("./_files/library/dayHours.xls", dayHours); }
 
-    public static void readNightHours(Map<Double, String> nightHours){ readHours("./library/nightHours.xls", nightHours); }
+    public static void readNightHours(Map<Double, String> nightHours){ readHours("./_files/library/nightHours.xls", nightHours); }
 
     private static void readHours(String directory, Map<Double, String> hours) {
         try {
@@ -204,6 +207,8 @@ public class FileInteraction {
                     break;
                 }
             }
+            wb.close();
+            fis.close();
         } catch (Exception exc) {
             exc.printStackTrace();
             System.exit(0);
@@ -211,9 +216,10 @@ public class FileInteraction {
     }
 
 
-    public static void writeGraphsIntoTemplate(final List<DayGraph> graphs){
+    public static void writeGraphsIntoTemplate(final List<DayGraph> graphs, final List<String> regions, String nameRegion,
+                                                int month, int year){
         try{
-            FileInputStream fis = new FileInputStream("./templates/templateForSapHR.xls");
+            FileInputStream fis = new FileInputStream("./_files/templates/templateForSapHR.xls");
             Workbook wb = new HSSFWorkbook(fis);
 
             CellStyle styleForDaytime = wb.createCellStyle();
@@ -225,15 +231,16 @@ public class FileInteraction {
             styleForNighttime.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
 
             for(DayGraph obj : graphs) {
+                if(!regions.contains(obj.getName())) continue;
                 Row row = wb.getSheetAt(INDEX_OF_SHEET).createRow(obj.getId() + DELTA_ROW_IN_TEMPLATE);
-                Cell cell = row.createCell(COL_INDEX_NAME_GRAPH_IN_TEMPLATE);
+                Cell cell = row.createCell(COL_INDEX_NAME_GRAPH_IN_TEMPLATE_SAP);
                 cell.setCellValue(obj.getName());
-                cell = row.createCell(COL_INDEX_WORK_TIME_IN_TEMPLATE);
+                cell = row.createCell(COL_INDEX_WORK_TIME_IN_TEMPLATE_SAP);
                 cell.setCellValue(obj.getNormTime());
 
                 for (int indexDay = 0; indexDay < obj.getAmountDay(); ++indexDay) {
                     // write hour sign
-                    cell = row.createCell(DELTA_COL_IN_TEMPLATE + indexDay * SIZE_STEP);
+                    cell = row.createCell(DELTA_COL_IN_TEMPLATE_SAP + indexDay * SIZE_STEP);
                     String hourName = obj.getWorkTimeSign(indexDay);
                     cell.setCellValue(hourName);
 
@@ -245,18 +252,18 @@ public class FileInteraction {
 
                     // write short days sign
                     if(!obj.getShortDaysSign(indexDay).equals("")) {
-                        cell = row.createCell(DELTA_COL_IN_TEMPLATE + indexDay * SIZE_STEP + CELL_OFFSET_FOR_TEXT + 1);
+                        cell = row.createCell(DELTA_COL_IN_TEMPLATE_SAP + indexDay * SIZE_STEP + CELL_OFFSET_FOR_TEXT + 1);
                         cell.setCellValue(obj.getShortDaysSign(indexDay));
                     }
 
                     // write holidays sign
                     if(!obj.getHolidaysSign(indexDay).equals("")) {
-                        cell = row.createCell(DELTA_COL_IN_TEMPLATE + indexDay * SIZE_STEP + CELL_OFFSET_FOR_TEXT );
+                        cell = row.createCell(DELTA_COL_IN_TEMPLATE_SAP + indexDay * SIZE_STEP + CELL_OFFSET_FOR_TEXT);
                         cell.setCellValue(Integer.parseInt(obj.getHolidaysSign(indexDay)));
                     }
                 }
             }
-            FileOutputStream fos = new FileOutputStream("./workTimeForSapHR.xls");
+            FileOutputStream fos = new FileOutputStream("./" + nameRegion + "_" + month + "." + year + ".xls");
             wb.write(fos);
 
             fos.close();
@@ -274,7 +281,7 @@ public class FileInteraction {
         final int MAX_INDEX_MONTH = 12;
         String filename = "counter_" + month + "_" + year + ".xls";
         try{
-            FileInputStream fis = new FileInputStream("./counters/" + filename);
+            FileInputStream fis = new FileInputStream("./_files/counters/" + filename);
             Workbook wb = new HSSFWorkbook(fis);
 
             for(DayGraph obj : graphs){
@@ -292,7 +299,7 @@ public class FileInteraction {
             int nextMonth = month + 1 > MAX_INDEX_MONTH ? 1 : month + 1;
             int nextYear = month + 1 > MAX_INDEX_MONTH ? year + 1 : year;
             String nextFilename = "counter_" + nextMonth + "_" + nextYear + ".xls";
-            FileOutputStream fos = new FileOutputStream("./counters/" + nextFilename);
+            FileOutputStream fos = new FileOutputStream("./_files/counters/" + nextFilename);
             wb.write(fos);
 
             fos.close();
@@ -309,9 +316,34 @@ public class FileInteraction {
     public static void deleteOldCounter(int month, int year){
         try{
             String filenameOldCounter = "counter_" + month + "_" + (year - DATA_HOLD_TIME) + ".xls";
-            File oldFile = new File("./counters/" + filenameOldCounter);
+            File oldFile = new File("./_files/counters/" + filenameOldCounter);
             if(oldFile.delete()) System.out.println("Удален счетчик за " + month + "." + (year - DATA_HOLD_TIME));
         }catch (Exception exc){
+            exc.printStackTrace();
+            System.exit(0);
+        }
+    }
+
+
+    public static void readGraphsForRegion(String nameRegion, List<String> graphsForRegion) {
+        try {
+            FileInputStream fis = new FileInputStream("./_files/regions/" + nameRegion + ".xls");
+            Workbook wb = new HSSFWorkbook(fis);
+            int indexRow = 0;
+            while (true) {
+                try {
+                    String nameGraph = wb.getSheetAt(0).getRow(indexRow).getCell(0).getStringCellValue();
+                    if (nameGraph.equals("")) break;
+                    graphsForRegion.add(nameGraph);
+                    ++indexRow;
+                } catch (NullPointerException nullExc) {
+                    break;
+                }
+            }
+
+            wb.close();
+            fis.close();
+        } catch (Exception exc) {
             exc.printStackTrace();
             System.exit(0);
         }

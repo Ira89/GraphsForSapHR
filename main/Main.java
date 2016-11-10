@@ -5,13 +5,12 @@ import ru.polynkina.irina.graphs.DayGraph;
 import ru.polynkina.irina.userInteraction.UserForm;
 import ru.polynkina.irina.unitTests.UnitTest;
 import ru.polynkina.irina.calendar.Calendar;
-
 import java.util.*;
 
 public class Main {
 
     public static void main(String[] needRunningTests) {
-        if(needRunningTests[0].equals("1")) {
+        if(needRunningTests != null && needRunningTests[0].equals("1")) {
             UnitTest test = new UnitTest();
             test.start();
         }
@@ -33,16 +32,25 @@ public class Main {
         FileInteraction.fabricateGraphs(graphs);
         FileInteraction.readCountersForGraphs(graphs, MONTH, YEAR);
 
-        for(DayGraph obj : graphs) {
+        for(DayGraph obj : graphs)
             obj.startGenerating(NORM_TIME, DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
+        FileInteraction.writeWorkTimeInFile(graphs, DAY_OF_MONTH);
+
+
+        Map<String, Integer> regions = new HashMap<String, Integer>();
+        UserForm.readRegions(regions);
+
+        for(Map.Entry<String, Integer> obj : regions.entrySet()) {
+            if(obj.getValue() == 0) continue;
+            List<String> graphsForRegion = new ArrayList<String>();
+            FileInteraction.readGraphsForRegion(obj.getKey(), graphsForRegion);
+            FileInteraction.writeGraphsIntoTemplate(graphs, graphsForRegion, obj.getKey(), MONTH, YEAR);
         }
 
-        FileInteraction.writeWorkTimeInFile(graphs, DAY_OF_MONTH);
-        FileInteraction.writeGraphsIntoTemplate(graphs);
         FileInteraction.writeNextCounter(graphs, DAY_OF_MONTH, MONTH, YEAR);
         FileInteraction.deleteOldCounter(MONTH, YEAR);
 
         System.out.println("Генерация графиков завершена успешно!");
-        System.out.println("Версия программы: 1.0.1");
+        System.out.println("Версия программы: 2.0.0");
     }
 }
