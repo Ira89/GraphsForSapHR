@@ -230,9 +230,10 @@ public class FileInteraction {
             styleForNighttime.setFillPattern(CellStyle.SOLID_FOREGROUND);
             styleForNighttime.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
 
+            int indexRow = 0;
             for(DayGraph obj : graphs) {
                 if(!regions.contains(obj.getName())) continue;
-                Row row = wb.getSheetAt(INDEX_OF_SHEET).createRow(obj.getId() + DELTA_ROW_IN_TEMPLATE);
+                Row row = wb.getSheetAt(INDEX_OF_SHEET).createRow(indexRow + DELTA_ROW_IN_TEMPLATE);
                 Cell cell = row.createCell(COL_INDEX_NAME_GRAPH_IN_TEMPLATE_SAP);
                 cell.setCellValue(obj.getName());
                 cell = row.createCell(COL_INDEX_WORK_TIME_IN_TEMPLATE_SAP);
@@ -262,6 +263,7 @@ public class FileInteraction {
                         cell.setCellValue(Integer.parseInt(obj.getHolidaysSign(indexDay)));
                     }
                 }
+                ++indexRow;
             }
             FileOutputStream fos = new FileOutputStream("./" + nameRegion + "_" + month + "." + year + ".xls");
             wb.write(fos);

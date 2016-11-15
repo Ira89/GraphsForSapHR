@@ -4,18 +4,22 @@ import ru.polynkina.irina.graphs.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UnitTest {
+import org.junit.Test;
+import org.junit.BeforeClass;
+import static org.junit.Assert.fail;
 
-    private Map<Integer, Integer> shortDayAndHolidays = new HashMap<Integer, Integer>();
-    private Map<Double, String> dayHours = new HashMap<Double, String>();
-    private Map<Double, String> nightHours = new HashMap<Double, String>();
+public class UnitTests {
+
+    private static Map<Integer, Integer> shortDayAndHolidays = new HashMap<Integer, Integer>();
+    private static Map<Double, String> dayHours = new HashMap<Double, String>();
+    private static Map<Double, String> nightHours = new HashMap<Double, String>();
     private static final int DAY_OF_MONTH = 31;
     private static final int INDEX_SHORT_DAY = 0;
     private static final int INDEX_HOLIDAY = 1;
     private static final int INDEX_DAY_OFF = 2;
 
-
-    public UnitTest() {
+    @BeforeClass
+    public static void init() {
         shortDayAndHolidays.put(1, INDEX_SHORT_DAY);
         shortDayAndHolidays.put(2, INDEX_HOLIDAY);
         shortDayAndHolidays.put(3, INDEX_DAY_OFF);
@@ -33,36 +37,26 @@ public class UnitTest {
         nightHours.put(12.0, "4O12");
     }
 
-    public void start() {
-        testDayGraphs();
-        testDiurnalGraphs();
-        testFloatGraphs();
-        testMixGraphs();
-        testStandardGraphs();
-        testShortGraphs();
-        testUniqueGraphs();
+    private String makeDebugInfo(DayGraph actualGraph, String correctGraph[], double correctNormTime) {
+        String textInfo = '\n' + " actual -> " + actualGraph.getNormTime() + " ";
+        for(int i = 0; i < DAY_OF_MONTH; ++i) textInfo += actualGraph.getWorkTimeSign(i) + " ";
+
+        textInfo += '\n' + "correct -> " + correctNormTime + " ";
+        for(int i = 0; i < DAY_OF_MONTH; ++i) textInfo += correctGraph[i] + " ";
+        return textInfo;
     }
 
-    private void printInfo(DayGraph actualGraph, String correctGraph[], double correctNormTime) {
-        System.out.print("actual graphs: " + actualGraph.getNormTime() + " -> ");
-        for(int i = 0; i < DAY_OF_MONTH; ++i) System.out.print(actualGraph.getWorkTimeSign(i) + " ");
-        System.out.println();
-
-        System.out.print("correct graph: " + correctNormTime + " -> ");
-        for(int i = 0; i < DAY_OF_MONTH; ++i) System.out.print(correctGraph[i] + " ");
-        System.out.println();
-    }
-
-    private boolean isEquals(DayGraph actualGraph, String correctGraph[], double correctNormTime) {
-        for(int i = 0; i < DAY_OF_MONTH; ++i)
+    private boolean graphsIsEquals(DayGraph actualGraph, String correctGraph[], double correctNormTime) {
+        for(int i = 0; i < DAY_OF_MONTH; ++i) {
             if (!correctGraph[i].equals(actualGraph.getWorkTimeSign(i))) return false;
+        }
         return correctNormTime - actualGraph.getNormTime() < 0.001;
     }
 
-    // FL12
-    private void testDayGraphs() {
-        double correctNormTime = 167;
-        String correctGraph[] = {
+    @Test
+    public void testDayGraph() {
+        final double correctNormTime = 167;
+        final String correctGraph[] = {
                 "FL11", "FL11", "4C10", "FREE", "FREE", "FREE", "4C10",
                 "FL11", "4C10", "FREE", "FREE", "FREE", "FL11", "4C10",
                 "FL11", "FREE", "FREE", "FREE", "4C10", "4C10", "FL11",
@@ -74,18 +68,14 @@ public class UnitTest {
         actualGraph.setCounter(0);
         actualGraph.startGenerating(167, DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
 
-        if(!isEquals(actualGraph, correctGraph, correctNormTime)) {
-            System.out.println("DAY GRAPHS: ERROR");
-            printInfo(actualGraph, correctGraph, correctNormTime);
-        } else {
-            System.out.println("DAY GRAPHS: OK");
-        }
+        if(!graphsIsEquals(actualGraph, correctGraph, correctNormTime))
+            fail("DAY (FL12)" + makeDebugInfo(actualGraph, correctGraph, correctNormTime));
     }
 
-    // SUT1
-    private void testDiurnalGraphs() {
-        double correctNormTime = 167;
-        String correctGraph[] = {
+    @Test
+    public void testDiurnalGraph() {
+        final double correctNormTime = 167;
+        final String correctGraph[] = {
                 "FREE", "FREE", "FREE", "SUTK", "FREE", "4C13", "FREE",
                 "SUTK", "FREE", "FREE", "FREE", "SUTK", "FREE", "FREE",
                 "FREE", "SUTK", "FREE", "FREE", "FREE", "SUTK", "FREE",
@@ -97,18 +87,14 @@ public class UnitTest {
         actualGraph.setCounter(1);
         actualGraph.startGenerating(167, DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
 
-        if(!isEquals(actualGraph, correctGraph, correctNormTime)) {
-            System.out.println("DIURNAL GRAPHS: ERROR");
-            printInfo(actualGraph, correctGraph, correctNormTime);
-        } else {
-            System.out.println("DIURNAL GRAPHS: OK");
-        }
+        if(!graphsIsEquals(actualGraph, correctGraph, correctNormTime))
+            fail("DIURNAL (SUT1)" + makeDebugInfo(actualGraph, correctGraph, correctNormTime));
     }
 
-    // G5-2
-    private void testFloatGraphs() {
-        double correctNormTime = 150.2;
-        String correctGraph[] = {
+    @Test
+    public void testFractionalGraph() {
+        final double correctNormTime = 150.2;
+        final String correctGraph[] = {
                 "NO72", "NO72", "4AC7", "4AC7", "4AC6", "FREE", "FREE",
                 "4AC7", "4AC6", "NO62", "4AC7", "4AC7", "FREE", "FREE",
                 "4AC6", "4AC7", "4AC6", "NO62", "4AC7", "FREE", "FREE",
@@ -120,18 +106,14 @@ public class UnitTest {
         actualGraph.setCounter(0);
         actualGraph.startGenerating(167, DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
 
-        if(!isEquals(actualGraph, correctGraph, correctNormTime)) {
-            System.out.println("FLOAT GRAPHS: ERROR");
-            printInfo(actualGraph, correctGraph, correctNormTime);
-        } else {
-            System.out.println("FLOAT GRAPHS: OK");
-        }
+        if(!graphsIsEquals(actualGraph, correctGraph, correctNormTime))
+            fail("FLOAT (G5-2)" + makeDebugInfo(actualGraph, correctGraph, correctNormTime));
     }
 
-    // LOG1
-    private void testMixGraphs() {
-        int correctNormTime = 167;
-        String correctGraph[] = {
+    @Test
+    public void testMixedGraph() {
+        final double correctNormTime = 167;
+        final String correctGraph[] = {
                 "CNO4", "C_33", "FREE", "FREE", "FREE", "FREE", "CDEN",
                 "CDEN", "CNO4", "4O12", "FREE", "FREE", "FREE", "FREE",
                 "CDEN", "CDEN", "CNO4", "4O12", "FREE", "FREE", "FREE",
@@ -143,18 +125,14 @@ public class UnitTest {
         actualGraph.setCounter(2);
         actualGraph.startGenerating(167, DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
 
-        if(!isEquals(actualGraph, correctGraph, correctNormTime)) {
-            System.out.println("MIX GRAPHS: ERROR");
-            printInfo(actualGraph, correctGraph, correctNormTime);
-        } else {
-            System.out.println("MIX GRAPHS: OK");
-        }
+        if(!graphsIsEquals(actualGraph, correctGraph, correctNormTime))
+            fail("MIX (LOG1)" + makeDebugInfo(actualGraph, correctGraph, correctNormTime));
     }
 
-    // PAR6
-    private void testShortGraphs() {
-        int correctNormTime = 83;
-        String correctGraph[] = {
+    @Test
+    public void testShortGraph() {
+        final double correctNormTime = 83;
+        final String correctGraph[] = {
                 "SO20", "SO20", "SO20", "FREE", "FREE", "SO20", "4AC3",
                 "SO20", "SO20", "4AC3", "FREE", "FREE", "SO20", "4AC3",
                 "SO20", "SO20", "4AC3", "FREE", "FREE", "SO20", "SO20",
@@ -166,18 +144,14 @@ public class UnitTest {
         actualGraph.setCounter(2);
         actualGraph.startGenerating(167, DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
 
-        if(!isEquals(actualGraph, correctGraph, correctNormTime)) {
-            System.out.println("SHORT GRAPHS: ERROR");
-            printInfo(actualGraph, correctGraph, correctNormTime);
-        } else {
-            System.out.println("SHORT GRAPHS: OK");
-        }
+        if(!graphsIsEquals(actualGraph, correctGraph, correctNormTime))
+            fail("SHORT (PAR6)" + makeDebugInfo(actualGraph, correctGraph, correctNormTime));
     }
 
-    // NEP4
-    private void testStandardGraphs() {
-        int correctNormTime = 146;
-        String correctGraph[] = {
+    @Test
+    public void testFiveDayGraph() {
+        final double correctNormTime = 146;
+        final String correctGraph[] = {
                 "NEP4", "NEP4", "NEP4", "NEP4", "FREE", "FREE", "NEP4",
                 "NEP4", "NEP4", "NEP4", "NEP4", "FREE", "FREE", "NEP4",
                 "NEP4", "NEP4", "NEP4", "NEP4", "FREE", "FREE", "NEP4",
@@ -189,18 +163,14 @@ public class UnitTest {
         actualGraph.setCounter(1);
         actualGraph.startGenerating(167, DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
 
-        if(!isEquals(actualGraph, correctGraph, correctNormTime)) {
-            System.out.println("STANDARD GRAPHS: ERROR");
-            printInfo(actualGraph, correctGraph, correctNormTime);
-        } else {
-            System.out.println("STANDARD GRAPHS: OK");
-        }
+        if(!graphsIsEquals(actualGraph, correctGraph, correctNormTime))
+            fail("STANDARD (NEP4)" + makeDebugInfo(actualGraph, correctGraph, correctNormTime));
     }
 
-    // NEP6
-    private void testUniqueGraphs() {
-        int correctNormTime = 116;
-        String correctGraph[] = {
+    @Test
+    public void testUniqueGraph() {
+        final double correctNormTime = 116;
+        final String correctGraph[] = {
                 "NEP5", "NEP3", "NEP5", "NEP3", "FREE", "FREE", "NEP3",
                 "NEP5", "NEP3", "NEP5", "NEP3", "FREE", "FREE", "NEP3",
                 "NEP5", "NEP3", "NEP5", "NEP3", "FREE", "FREE", "NEP3",
@@ -212,11 +182,7 @@ public class UnitTest {
         actualGraph.setCounter(1);
         actualGraph.startGenerating(167, DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
 
-        if(!isEquals(actualGraph, correctGraph, correctNormTime)) {
-            System.out.println("UNIQUE GRAPHS: ERROR");
-            printInfo(actualGraph, correctGraph, correctNormTime);
-        } else {
-            System.out.println("UNIQUE GRAPHS: OK");
-        }
+        if(!graphsIsEquals(actualGraph, correctGraph, correctNormTime))
+            fail("UNIQUE (NEP6)" + makeDebugInfo(actualGraph, correctGraph, correctNormTime));
     }
 }
