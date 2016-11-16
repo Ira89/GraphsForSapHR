@@ -10,19 +10,19 @@ import static org.junit.Assert.fail;
 
 public class UnitTests {
 
-    private static Map<Integer, Integer> shortDayAndHolidays = new HashMap<Integer, Integer>();
+    private static Map<Integer, Integer> shortAndHolidays = new HashMap<Integer, Integer>();
     private static Map<Double, String> dayHours = new HashMap<Double, String>();
     private static Map<Double, String> nightHours = new HashMap<Double, String>();
-    private static final int DAY_OF_MONTH = 31;
+    private static final int DAYS_IN_MONTH = 31;
     private static final int INDEX_SHORT_DAY = 0;
     private static final int INDEX_HOLIDAY = 1;
     private static final int INDEX_DAY_OFF = 2;
 
     @BeforeClass
     public static void init() {
-        shortDayAndHolidays.put(1, INDEX_SHORT_DAY);
-        shortDayAndHolidays.put(2, INDEX_HOLIDAY);
-        shortDayAndHolidays.put(3, INDEX_DAY_OFF);
+        shortAndHolidays.put(1, INDEX_SHORT_DAY);
+        shortAndHolidays.put(2, INDEX_HOLIDAY);
+        shortAndHolidays.put(3, INDEX_DAY_OFF);
 
         dayHours.put(0.0, "FREE");
         dayHours.put(1.0, "4AC1");
@@ -39,15 +39,15 @@ public class UnitTests {
 
     private String makeDebugInfo(DayGraph actualGraph, String correctGraph[], double correctNormTime) {
         String textInfo = '\n' + " actual -> " + actualGraph.getNormTime() + " ";
-        for(int i = 0; i < DAY_OF_MONTH; ++i) textInfo += actualGraph.getWorkTimeSign(i) + " ";
+        for(int i = 0; i < DAYS_IN_MONTH; ++i) textInfo += actualGraph.getWorkTimeSign(i) + " ";
 
         textInfo += '\n' + "correct -> " + correctNormTime + " ";
-        for(int i = 0; i < DAY_OF_MONTH; ++i) textInfo += correctGraph[i] + " ";
+        for(int i = 0; i < DAYS_IN_MONTH; ++i) textInfo += correctGraph[i] + " ";
         return textInfo;
     }
 
     private boolean graphsIsEquals(DayGraph actualGraph, String correctGraph[], double correctNormTime) {
-        for(int i = 0; i < DAY_OF_MONTH; ++i) {
+        for(int i = 0; i < DAYS_IN_MONTH; ++i) {
             if (!correctGraph[i].equals(actualGraph.getWorkTimeSign(i))) return false;
         }
         return correctNormTime - actualGraph.getNormTime() < 0.001;
@@ -66,7 +66,7 @@ public class UnitTests {
 
         DayGraph actualGraph = new DayGraph(1, "DAY", "dddfff", 11, "FL11");
         actualGraph.setCounter(0);
-        actualGraph.startGenerating(167, DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
+        actualGraph.startGenerating(167, DAYS_IN_MONTH, shortAndHolidays, dayHours, nightHours);
 
         if(!graphsIsEquals(actualGraph, correctGraph, correctNormTime))
             fail("DAY (FL12)" + makeDebugInfo(actualGraph, correctGraph, correctNormTime));
@@ -85,7 +85,7 @@ public class UnitTests {
 
         DayGraph actualGraph = new DiurnalGraph(1, "DIURNAL", "nfff", 22, "SUTK");
         actualGraph.setCounter(1);
-        actualGraph.startGenerating(167, DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
+        actualGraph.startGenerating(167, DAYS_IN_MONTH, shortAndHolidays, dayHours, nightHours);
 
         if(!graphsIsEquals(actualGraph, correctGraph, correctNormTime))
             fail("DIURNAL (SUT1)" + makeDebugInfo(actualGraph, correctGraph, correctNormTime));
@@ -104,7 +104,7 @@ public class UnitTests {
 
         DayGraph actualGraph = new FractionalGraph(1, "FLOAT", "dddddff", 7.2, "NO72");
         actualGraph.setCounter(0);
-        actualGraph.startGenerating(167, DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
+        actualGraph.startGenerating(167, DAYS_IN_MONTH, shortAndHolidays, dayHours, nightHours);
 
         if(!graphsIsEquals(actualGraph, correctGraph, correctNormTime))
             fail("FLOAT (G5-2)" + makeDebugInfo(actualGraph, correctGraph, correctNormTime));
@@ -123,7 +123,7 @@ public class UnitTests {
 
         DayGraph actualGraph = new MixedGraph(1, "MIX", "ddnnffff", 11, "CDEN", 11, "CNO4");
         actualGraph.setCounter(2);
-        actualGraph.startGenerating(167, DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
+        actualGraph.startGenerating(167, DAYS_IN_MONTH, shortAndHolidays, dayHours, nightHours);
 
         if(!graphsIsEquals(actualGraph, correctGraph, correctNormTime))
             fail("MIX (LOG1)" + makeDebugInfo(actualGraph, correctGraph, correctNormTime));
@@ -142,7 +142,7 @@ public class UnitTests {
 
         DayGraph actualGraph = new ShortGraph(1, "SHORT", "dddddff", 4, "SO20");
         actualGraph.setCounter(2);
-        actualGraph.startGenerating(167, DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
+        actualGraph.startGenerating(167, DAYS_IN_MONTH, shortAndHolidays, dayHours, nightHours);
 
         if(!graphsIsEquals(actualGraph, correctGraph, correctNormTime))
             fail("SHORT (PAR6)" + makeDebugInfo(actualGraph, correctGraph, correctNormTime));
@@ -161,7 +161,7 @@ public class UnitTests {
 
         DayGraph actualGraph = new FiveDayGraph(1, "STANDARD", "dddddff", 7, "NEP4");
         actualGraph.setCounter(1);
-        actualGraph.startGenerating(167, DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
+        actualGraph.startGenerating(167, DAYS_IN_MONTH, shortAndHolidays, dayHours, nightHours);
 
         if(!graphsIsEquals(actualGraph, correctGraph, correctNormTime))
             fail("STANDARD (NEP4)" + makeDebugInfo(actualGraph, correctGraph, correctNormTime));
@@ -180,7 +180,7 @@ public class UnitTests {
 
         DayGraph actualGraph = new UniqueGraph(1, "UNIQUE", "dududff", 6, "NEP3", 5, "NEP5");
         actualGraph.setCounter(1);
-        actualGraph.startGenerating(167, DAY_OF_MONTH, shortDayAndHolidays, dayHours, nightHours);
+        actualGraph.startGenerating(167, DAYS_IN_MONTH, shortAndHolidays, dayHours, nightHours);
 
         if(!graphsIsEquals(actualGraph, correctGraph, correctNormTime))
             fail("UNIQUE (NEP6)" + makeDebugInfo(actualGraph, correctGraph, correctNormTime));

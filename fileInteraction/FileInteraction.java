@@ -3,34 +3,14 @@ package ru.polynkina.irina.fileInteraction;
 import ru.polynkina.irina.graphs.*;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.util.List;
-import java.util.Map;
 import java.io.File;
 
 public class FileInteraction {
 
     final static int INDEX_OF_SHEET = 0;
-
-    // constants in the file main.xls
-    final static int COL_INDEX_OF_ID = 0;
-    final static int COL_INDEX_OF_NAME = 1;
-    final static int COL_INDEX_OF_RULE = 2;
-    final static int COL_INDEX_OF_TYPE = 3;
-    final static int COL_INDEX_OF_DAYTIME = 4;
-    final static int COL_INDEX_OF_DAYTIME_SIGN = 5;
-    final static int COL_INDEX_OF_NIGHTTIME = 6;
-    final static int COL_INDEX_OF_NIGHTTIME_SIGN = 7;
-
-    final static String STRING_DESIGNATION_OF_STANDARD_GRAPHS = "STANDARD";
-    final static String STRING_DESIGNATION_OF_DIURNAL_GRAPHS = "DIURNAL";
-    final static String STRING_DESIGNATION_OF_SHORT_DAY_GRAPHS = "SHORT";
-    final static String STRING_DESIGNATION_OF_UNIQUE_GRAPHS = "UNIQUE";
-    final static String STRING_DESIGNATION_OF_FLOAT_GRAPHS = "FLOAT";
-    final static String STRING_DESIGNATION_OF_DAY_GRAPHS = "DAY";
-    final static String STRING_DESIGNATION_OF_MIX_GRAPHS = "MIX";
 
     // constants in the file counter_...xls
     final static int COL_INDEX_COUNTER_ID = 0;
@@ -50,100 +30,9 @@ public class FileInteraction {
     final static int CELL_OFFSET_FOR_TEXT = 2;
     final static int CELL_OFFSET_FOR_NUMBER = 3;
 
-    // constants in the file dayHours.xls and in the file nightHours.xls
-    final static int COL_INDEX_HOUR = 0;
-    final static int COL_INDEX_HOUR_NAME = 1;
-
-
     /*******************************************************************************************************************************************
                                                         public methods
      ******************************************************************************************************************************************/
-
-
-    public static void fabricateGraphs(List<DayGraph> graphs){
-        try{
-            String filename = "rules.xls";
-            FileInputStream fis = new FileInputStream("./_files/rules/" + filename);
-            Workbook wb = new HSSFWorkbook(fis);
-
-            int indexRow = 0;
-            while(true){
-                try{
-                    int id = (int) wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDEX_OF_ID).getNumericCellValue();
-                    if (id != indexRow) throw new Exception("Файл " + filename + " поврежден!");
-                    String name = wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDEX_OF_NAME).getStringCellValue();
-                    String rule = wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDEX_OF_RULE).getStringCellValue();
-                    String type = wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDEX_OF_TYPE).getStringCellValue();
-                    double daytime = wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDEX_OF_DAYTIME).getNumericCellValue();
-                    String daytimeSign = wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDEX_OF_DAYTIME_SIGN).getStringCellValue();
-
-                    if(type.equals(STRING_DESIGNATION_OF_DAY_GRAPHS)) {
-                        graphs.add(new DayGraph(id, name, rule, daytime, daytimeSign));
-                    } else if(type.equals(STRING_DESIGNATION_OF_SHORT_DAY_GRAPHS)) {
-                        graphs.add(new ShortGraph(id, name, rule, daytime, daytimeSign));
-                    } else if(type.equals(STRING_DESIGNATION_OF_STANDARD_GRAPHS)) {
-                        graphs.add(new FiveDayGraph(id, name, rule, daytime, daytimeSign));
-                    } else if(type.equals(STRING_DESIGNATION_OF_FLOAT_GRAPHS)) {
-                        graphs.add(new FractionalGraph(id, name, rule, daytime, daytimeSign));
-                    } else if(type.equals(STRING_DESIGNATION_OF_DIURNAL_GRAPHS)) {
-                        graphs.add(new DiurnalGraph(id, name, rule, daytime, daytimeSign));
-                    } else if(type.equals(STRING_DESIGNATION_OF_UNIQUE_GRAPHS) || (type.equals(STRING_DESIGNATION_OF_MIX_GRAPHS))){
-                        double uniqueTime = wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDEX_OF_NIGHTTIME).getNumericCellValue();
-                        String uTimeSign = wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDEX_OF_NIGHTTIME_SIGN).getStringCellValue();
-                        if(type.equals(STRING_DESIGNATION_OF_UNIQUE_GRAPHS)) {
-                            graphs.add(new UniqueGraph(id, name, rule, daytime, daytimeSign, uniqueTime, uTimeSign));
-                        } else graphs.add(new MixedGraph(id, name, rule, daytime, daytimeSign, uniqueTime, uTimeSign));
-                    }
-                    else throw new Exception("Тип графика: " + type + " неизвестен!");
-
-                    ++indexRow;
-                }catch(NullPointerException nullExc){
-                    break;
-                } catch (Exception exc) {
-                    exc.printStackTrace();
-                }
-            }
-            wb.close();
-            fis.close();
-        }catch(Exception exc){
-            exc.printStackTrace();
-            System.exit(0);
-        }
-    }
-
-
-
-    public static void readCountersForGraphs(List<DayGraph> graphs, int month, int year){
-        try {
-            String filename = "counter_" + month + "_" + year + ".xls";
-            FileInputStream fis = new FileInputStream("./_files/counters/" + filename);
-            Workbook wb = new HSSFWorkbook(fis);
-
-            for (DayGraph obj : graphs) {
-                int idGraph = obj.getId();
-                int idCounter = (int) wb.getSheetAt(0).getRow(idGraph).getCell(COL_INDEX_COUNTER_ID).getNumericCellValue();
-                if (idGraph != idCounter){
-                    wb.close();
-                    fis.close();
-                    throw new Exception("Файл " + filename + " поврежден");
-                }
-
-                int valueCounter = (int) wb.getSheetAt(0).getRow(idGraph).getCell(COL_INDEX_COUNTER_VALUE).getNumericCellValue();
-                obj.setCounter(valueCounter);
-            }
-
-            wb.close();
-            fis.close();
-        }catch(FileNotFoundException excFile){
-            System.out.println("Не сгенерирован график за предыдущий месяц!");
-            System.exit(0);
-        }catch(Exception exc){
-            exc.printStackTrace();
-            System.exit(0);
-        }
-    }
-
-
 
     public static void writeWorkTimeInFile(final List<DayGraph> graphs, final int AMOUNT_OF_DAYS){
         try{
@@ -182,34 +71,6 @@ public class FileInteraction {
             wb.close();
             fis.close();
         }catch(Exception exc){
-            exc.printStackTrace();
-            System.exit(0);
-        }
-    }
-
-
-    public static void readDayHours(Map<Double, String> dayHours){ readHours("./_files/library/dayHours.xls", dayHours); }
-
-    public static void readNightHours(Map<Double, String> nightHours){ readHours("./_files/library/nightHours.xls", nightHours); }
-
-    private static void readHours(String directory, Map<Double, String> hours) {
-        try {
-            FileInputStream fis = new FileInputStream(directory);
-            Workbook wb = new HSSFWorkbook(fis);
-            int indexRow = 0;
-            while(true) {
-                try {
-                    double hour = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_HOUR).getNumericCellValue();
-                    String hourName = wb.getSheetAt(INDEX_OF_SHEET).getRow(indexRow).getCell(COL_INDEX_HOUR_NAME).getStringCellValue();
-                    hours.put(hour, hourName);
-                    ++indexRow;
-                } catch (NullPointerException nullExc) {
-                    break;
-                }
-            }
-            wb.close();
-            fis.close();
-        } catch (Exception exc) {
             exc.printStackTrace();
             System.exit(0);
         }
@@ -326,28 +187,4 @@ public class FileInteraction {
         }
     }
 
-
-    public static void readGraphsForRegion(String nameRegion, List<String> graphsForRegion) {
-        try {
-            FileInputStream fis = new FileInputStream("./_files/regions/" + nameRegion + ".xls");
-            Workbook wb = new HSSFWorkbook(fis);
-            int indexRow = 0;
-            while (true) {
-                try {
-                    String nameGraph = wb.getSheetAt(0).getRow(indexRow).getCell(0).getStringCellValue();
-                    if (nameGraph.equals("")) break;
-                    graphsForRegion.add(nameGraph);
-                    ++indexRow;
-                } catch (NullPointerException nullExc) {
-                    break;
-                }
-            }
-
-            wb.close();
-            fis.close();
-        } catch (Exception exc) {
-            exc.printStackTrace();
-            System.exit(0);
-        }
-    }
 }

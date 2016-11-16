@@ -1,6 +1,7 @@
 package ru.polynkina.irina.main;
 
 import ru.polynkina.irina.fileInteraction.FileInteraction;
+import ru.polynkina.irina.fileInteraction.LibraryReader;
 import ru.polynkina.irina.userInteraction.UserForm;
 import ru.polynkina.irina.calendar.Calendar;
 import ru.polynkina.irina.graphs.DayGraph;
@@ -12,36 +13,34 @@ public class Main {
         try {
             final int YEAR = UserForm.readYear();
             final int MONTH = UserForm.readMonth();
-            final int DAY_OF_MONTH = Calendar.getDaysInMonth(MONTH, YEAR);
+            final int DAYS_IN_MONTH = Calendar.getDaysInMonth(MONTH, YEAR);
             final double NORM_TIME = UserForm.readNormTime();
 
-            Map<Integer, Integer> shortAndHolidays = new LinkedHashMap<Integer, Integer>();
-            UserForm.readShortAndHolidays(shortAndHolidays, DAY_OF_MONTH);
-
-            Map<Double, String> dayHours = new HashMap<Double, String>();
-            FileInteraction.readDayHours(dayHours);
-            Map<Double, String> nightHours = new HashMap<Double, String>();
-            FileInteraction.readNightHours(nightHours);
-
             List<DayGraph> graphs = new ArrayList<DayGraph>();
-            FileInteraction.fabricateGraphs(graphs);
-            FileInteraction.readCountersForGraphs(graphs, MONTH, YEAR);
+            LibraryReader.createGraphsOnRules(graphs);
+            LibraryReader.readCountersForGraphs(graphs, MONTH, YEAR);
 
-            for(DayGraph obj : graphs)
-                obj.startGenerating(NORM_TIME, DAY_OF_MONTH, shortAndHolidays, dayHours, nightHours);
-            FileInteraction.writeWorkTimeInFile(graphs, DAY_OF_MONTH);
+            Map<Integer, Integer> shortAndHolidays = new HashMap<Integer, Integer>();
+            UserForm.readShortAndHolidays(shortAndHolidays, DAYS_IN_MONTH);
+            Map<Double, String> dayHours = new HashMap<Double, String>();
+            LibraryReader.readDayHours(dayHours);
+            Map<Double, String> nightHours = new HashMap<Double, String>();
+            LibraryReader.readNightHours(nightHours);
+
+            for(DayGraph graph : graphs)
+                graph.startGenerating(NORM_TIME, DAYS_IN_MONTH, shortAndHolidays, dayHours, nightHours);
 
             Map<String, Integer> regions = new HashMap<String, Integer>();
             UserForm.readRegions(regions);
-
-            for(Map.Entry<String, Integer> obj : regions.entrySet()) {
-                if(obj.getValue() == 0) continue;
-                List<String> graphsForRegion = new ArrayList<String>();
-                FileInteraction.readGraphsForRegion(obj.getKey(), graphsForRegion);
-                FileInteraction.writeGraphsIntoTemplate(graphs, graphsForRegion, obj.getKey(), MONTH, YEAR);
+            for(Map.Entry<String, Integer> region : regions.entrySet()) {
+                if(region.getValue() == 0) continue;
+                List<String> graphsInRegions = new ArrayList<String>();
+                LibraryReader.readGraphsInRegions(region.getKey(), graphsInRegions);
+                FileInteraction.writeGraphsIntoTemplate(graphs, graphsInRegions, region.getKey(), MONTH, YEAR);
             }
 
-            FileInteraction.writeNextCounter(graphs, DAY_OF_MONTH, MONTH, YEAR);
+            FileInteraction.writeWorkTimeInFile(graphs, DAYS_IN_MONTH);
+            FileInteraction.writeNextCounter(graphs, DAYS_IN_MONTH, MONTH, YEAR);
             FileInteraction.deleteOldCounter(MONTH, YEAR);
 
             System.out.println("Генерация графиков завершена успешно!");
