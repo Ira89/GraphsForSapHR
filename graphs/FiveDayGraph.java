@@ -52,12 +52,12 @@ public class FiveDayGraph extends DayGraph {
     protected void setHolidaysAndShortDaysSign(final Map<Integer, Integer> shortDayAndHolidays) {
         for(Map.Entry<Integer, Integer> obj : shortDayAndHolidays.entrySet()) {
             if(obj.getValue() == CODE_HOLIDAY) {
-                setHolidaysSign((obj.getKey() - 1), "1");
-                setShortDaysSign((obj.getKey() - 1), "F");
+                setHolidaysSign((obj.getKey() - 1), '1');
+                setShortDaysSign((obj.getKey() - 1), 'F');
             } else if(obj.getValue() == CODE_SHORT_DAY && getRuleOfDay(obj.getKey() - 1) != SIGN_WEEKEND) {
-                setShortDaysSign((obj.getKey() - 1), "A");
+                setShortDaysSign((obj.getKey() - 1), 'A');
             } else if(obj.getValue() == CODE_DAY_OFF && getRuleOfDay(obj.getKey() - 1) != SIGN_WEEKEND) {
-                setShortDaysSign((obj.getKey() - 1), "F");
+                setShortDaysSign((obj.getKey() - 1), 'F');
             }
         }
     }

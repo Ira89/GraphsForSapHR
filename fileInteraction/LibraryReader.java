@@ -11,7 +11,7 @@ import java.io.FileNotFoundException;
 
 public class LibraryReader {
 
-    // in file rules.xls
+    // rules.xls
     private final static int COL_INDICATES_ID = 0;
     private final static int COL_INDICATES_NAME = 1;
     private final static int COL_INDICATES_RULE = 2;
@@ -21,11 +21,11 @@ public class LibraryReader {
     private final static int COL_INDICATES_EXTRA_TIME = 6;
     private final static int COL_INDICATES_EXTRA_TIME_SIGN = 7;
 
-    // in file counter_...xls
+    // counter_...xls
     private final static int COL_INDEX_COUNTER_ID = 0;
     private final static int COL_INDEX_COUNTER_VALUE = 1;
 
-    // in file dayHours.xls and nightHours.xls
+    // dayHours.xls and nightHours.xls
     private final static int COL_INDICATES_HOUR = 0;
     private final static int COL_INDICATES_HOUR_NAME = 1;
 

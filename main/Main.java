@@ -1,6 +1,6 @@
 package ru.polynkina.irina.main;
 
-import ru.polynkina.irina.fileInteraction.FileInteraction;
+import ru.polynkina.irina.fileInteraction.LibraryEditor;
 import ru.polynkina.irina.fileInteraction.LibraryReader;
 import ru.polynkina.irina.userInteraction.UserForm;
 import ru.polynkina.irina.calendar.Calendar;
@@ -36,12 +36,12 @@ public class Main {
                 if(region.getValue() == 0) continue;
                 List<String> graphsInRegions = new ArrayList<String>();
                 LibraryReader.readGraphsInRegions(region.getKey(), graphsInRegions);
-                FileInteraction.writeGraphsIntoTemplate(graphs, graphsInRegions, region.getKey(), MONTH, YEAR);
+                LibraryEditor.writeGraphsIntoTemplate(graphs, region.getKey(), graphsInRegions, MONTH, YEAR);
             }
 
-            FileInteraction.writeWorkTimeInFile(graphs, DAYS_IN_MONTH);
-            FileInteraction.writeNextCounter(graphs, DAYS_IN_MONTH, MONTH, YEAR);
-            FileInteraction.deleteOldCounter(MONTH, YEAR);
+            LibraryEditor.writeWorkHoursInFile(graphs, MONTH, YEAR);
+            LibraryEditor.writeNextCounter(graphs, DAYS_IN_MONTH, MONTH, YEAR);
+            LibraryEditor.deleteOldCounter(MONTH, YEAR);
 
             System.out.println("Генерация графиков завершена успешно!");
             System.out.println("Версия программы: 2.0.0");

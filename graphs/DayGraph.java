@@ -23,8 +23,8 @@ public class DayGraph {
 
     private double workTime[];
     private String workTimeSign[];
-    private String holidaysSign[];
-    private String shortDaysSign[];
+    private char holidaysSign[];
+    private char shortDaysSign[];
 
     public DayGraph(int id, String name, String rule, double daytime, String daytimeSign) {
         this.id = id;
@@ -45,10 +45,14 @@ public class DayGraph {
     public double getNormTime(){ return normTime; }
     public int getAmountDay() { return workTime.length; }
 
+    public boolean isNightTime(int indexDay) throws Exception {
+        if(indexDayIsCorrect(indexDay)) return getRuleOfDay(indexDay) == SIGN_NIGHT;
+        else throw new Exception("Индекс " + indexDay + " выходит за пределы массива");
+    }
 
-    public double getWorkTime(final int indexDay){
+    public double getWorkTime(final int indexDay) {
         if(indexDayIsCorrect(indexDay)) return workTime[indexDay];
-        else return -1.0;
+        else return -1;
     }
 
     public String getWorkTimeSign(final int indexDay) {
@@ -56,14 +60,14 @@ public class DayGraph {
         else return "";
     }
 
-    public String getHolidaysSign(int indexDay) {
+    public char getHolidaysSign(int indexDay) {
         if(indexDayIsCorrect(indexDay)) return holidaysSign[indexDay];
-        else return "";
+        else return  ' ';
     }
 
-    public String getShortDaysSign(int indexDay) {
+    public char getShortDaysSign(int indexDay) {
         if(indexDayIsCorrect(indexDay)) return shortDaysSign[indexDay];
-        else return "";
+        else return ' ';
     }
 
     protected void setWorkTime(int indexDay, double time){
@@ -74,11 +78,11 @@ public class DayGraph {
         if(indexDayIsCorrect(indexDay)) workTimeSign[indexDay] = sign;
     }
 
-    protected void setHolidaysSign(int indexDay, String sign) {
+    protected void setHolidaysSign(int indexDay, char sign) {
         if(indexDayIsCorrect(indexDay)) holidaysSign[indexDay] = sign;
     }
 
-    protected void setShortDaysSign(int indexDay, String sign) {
+    protected void setShortDaysSign(int indexDay, char sign) {
         if(indexDayIsCorrect(indexDay)) shortDaysSign[indexDay] = sign;
     }
 
@@ -93,7 +97,7 @@ public class DayGraph {
         return true;
     }
 
-    public char getRuleOfDay(final int indexDay) {
+    public char getRuleOfDay(int indexDay) {
         int rulesPosition = counter + indexDay;
         rulesPosition %= rule.length();
         if(rulesPosition < 0) rulesPosition = rule.length() + rulesPosition;
@@ -143,13 +147,13 @@ public class DayGraph {
     private void createEmptyArray(int dayOfMonth) {
         workTime = new double[dayOfMonth];
         workTimeSign = new String[dayOfMonth];
-        holidaysSign = new String[dayOfMonth];
-        shortDaysSign = new String[dayOfMonth];
+        holidaysSign = new char[dayOfMonth];
+        shortDaysSign = new char[dayOfMonth];
         for(int indexDay = 0; indexDay < dayOfMonth; ++indexDay) {
             setWorkTime(indexDay, UNINITIALIZED_VALUE);
             setWorkTimeSign(indexDay, "");
-            setHolidaysSign(indexDay, "");
-            setShortDaysSign(indexDay, "");
+            setHolidaysSign(indexDay, ' ');
+            setShortDaysSign(indexDay, ' ');
         }
     }
 
@@ -193,7 +197,7 @@ public class DayGraph {
         } else fillMissingWorkDays(maxWorkTime, amountDaysWithMaxTime, minWorkTime, amountDaysWithMinTime, frequency);
     }
 
-    protected int calcMissingDays(){
+    protected int calcMissingDays() {
         int amountMissingDays = 0;
         for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
             if(getWorkTime(indexDay) == UNINITIALIZED_VALUE) ++amountMissingDays;
@@ -201,7 +205,7 @@ public class DayGraph {
         return amountMissingDays;
     }
 
-    protected double calcMissingTime(){
+    protected double calcMissingTime() {
         double missingTime = 0;
         for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
             if(getWorkTime(indexDay) != UNINITIALIZED_VALUE) missingTime += getWorkTime(indexDay);
@@ -224,7 +228,8 @@ public class DayGraph {
         return amountDaysWithMinTime == 0 ? amountDaysWithMaxTime : (double) amountDaysWithMaxTime / amountDaysWithMinTime;
     }
 
-    private void fillMissingWorkDays(int spreadValue, int amountSpreadValue, int rareValue, int amountRareValue, double frequency) {
+    private void fillMissingWorkDays(int spreadValue, int amountSpreadValue, int rareValue, int amountRareValue,
+                                     double frequency) {
         double currentFrequency = 0;
         int counterSpreadTime = 0;
         int counterRareTime = 0;
@@ -273,9 +278,9 @@ public class DayGraph {
     protected void setHolidaysAndShortDaysSign(final Map<Integer, Integer> shortDayAndHolidays) {
         for(Map.Entry<Integer, Integer> obj : shortDayAndHolidays.entrySet()) {
             if(obj.getValue() == CODE_HOLIDAY) {
-                setHolidaysSign((obj.getKey() - 1), "1");
+                setHolidaysSign((obj.getKey() - 1), '1');
             } else if(obj.getValue() == CODE_SHORT_DAY && getRuleOfDay(obj.getKey() - 1) != SIGN_WEEKEND) {
-                setShortDaysSign((obj.getKey() - 1), "A");
+                setShortDaysSign((obj.getKey() - 1), 'A');
             }
         }
     }
