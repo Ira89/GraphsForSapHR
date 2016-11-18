@@ -4,53 +4,56 @@ import java.util.Map;
 
 public class UniqueGraph extends FiveDayGraph {
 
-    private double uniqueTime;
-    private String uniqueTimeSign;
+    private double extraTime;
+    private String extraTimeSign;
 
-    public UniqueGraph(int id, String name, String rule, double daytime, String daytimeSign, double uniqueTime, String uniqueTimeSign){
-        super(id, name, rule, daytime, daytimeSign);
-        this.uniqueTime = uniqueTime;
-        this.uniqueTimeSign = uniqueTimeSign;
+    public UniqueGraph(int id, String name, String rule, double basicTime, String basicTimeSign,
+                       double extraTime, String extraTimeSign) throws Exception {
+
+        super(id, name, rule, basicTime, basicTimeSign);
+        if(!timeIsCorrect(extraTime)) throw new Exception("Рабочее время не может принимать значение: " + extraTime);
+        this.extraTime = extraTime;
+        this.extraTimeSign = extraTimeSign;
     }
 
-    private double getUniqueTime() { return uniqueTime; }
-    private String getUniqueTimeSign(){ return uniqueTimeSign; }
+    // ---------------------------------------------------- getters ----------------------------------------------------
 
+    private double getExtraTime() { return extraTime; }
+    private String getExtraTimeSign(){ return extraTimeSign; }
+
+    // ----------------------------------------------- step 3 ----------------------------------------------------------
     @Override
-    protected void setShortDaysAndHolidays(final Map<Integer, Integer> shortDayAndHolidays){
-        for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay){
-            if(getRuleOfDay(indexDay) != SIGN_WEEKEND){
-                for(Map.Entry<Integer, Integer> obj : shortDayAndHolidays.entrySet()){
-                    if(obj.getKey() == indexDay + 1){
-                        if(obj.getValue() == CODE_SHORT_DAY){
-                            if(getRuleOfDay(indexDay) == SIGN_DAY) setWorkTime(indexDay, getDaytime() - 1);
-                            else if(getRuleOfDay(indexDay) == SIGN_UNIVERSAL_DAY) setWorkTime(indexDay, getUniqueTime() - 1);
-                        }
-                        else if(obj.getValue() == CODE_HOLIDAY) setWorkTime(indexDay, 0);
-                        else if(obj.getValue() == CODE_DAY_OFF) setWorkTime(indexDay, 0);
-                    }
-                }
-            }
+    protected void setShortAndHolidays(Map<Integer, Integer> shortAndHolidays) {
+        for (Map.Entry<Integer, Integer> day : shortAndHolidays.entrySet()) {
+            if (getRuleOfDay(day.getKey() - 1) == SIGN_WEEKEND) continue;
+            if (day.getValue() == CODE_SHORT_DAY) {
+                if (getRuleOfDay(day.getKey() - 1) == SIGN_DAY) setWorkTime(day.getKey() - 1, getBasicTime() - 1);
+                else setWorkTime(day.getKey() - 1, getExtraTime() - 1);
+            } else if(day.getValue() == CODE_HOLIDAY || day.getValue() == CODE_DAY_OFF) setWorkTime(day.getKey() - 1, 0);
         }
     }
 
+    // ----------------------------------------------- step 4 ----------------------------------------------------------
     @Override
-    protected void generateGraph(){
+    protected void generateGraph() throws Exception {
         for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay){
-            if(getWorkTime(indexDay) == UNINITIALIZED_VALUE){
-                if(getRuleOfDay(indexDay) == SIGN_DAY) setWorkTime(indexDay, getDaytime());
-                else if(getRuleOfDay(indexDay) == SIGN_UNIVERSAL_DAY) setWorkTime(indexDay, getUniqueTime());
+            if(getWorkTime(indexDay) == UNINITIALIZED_WORK_TIME){
+                if(getRuleOfDay(indexDay) == SIGN_DAY) setWorkTime(indexDay, getBasicTime());
+                else setWorkTime(indexDay, getExtraTime());
             }
         }
         overwriteNormTime();
     }
 
+    // ----------------------------------------------- step 5 ----------------------------------------------------------
     @Override
-    protected void setWorkTimeSign(Map<Integer, Integer> shortDayAndHolidays, Map<Double, String> dayHours, Map<Double, String> nightHours) {
+    protected void setWorkTimeSign(Map<Integer, Integer> shortAndHolidays, Map<Double, String> dayHours,
+                                   Map<Double, String> nightHours) throws Exception {
+
         for (int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
             if (getRuleOfDay(indexDay) != SIGN_WEEKEND) {
-                if(getRuleOfDay(indexDay) == 'd') setWorkTimeSign(indexDay, getDaytimeSign());
-                else setWorkTimeSign(indexDay, getUniqueTimeSign());
+                if(getRuleOfDay(indexDay) == SIGN_DAY) setWorkTimeSign(indexDay, getBasicTimeSign());
+                else setWorkTimeSign(indexDay, getExtraTimeSign());
             } else setWorkTimeSign(indexDay, findHourName(dayHours, 0));
         }
     }

@@ -7,7 +7,8 @@ public class MixedGraph extends DayGraph {
     private double nightTime;
     private String nightTimeSign;
 
-    public MixedGraph(int id, String name, String rule, double daytime, String daytimeSign, double nightTime, String nightTimeSign){
+    public MixedGraph(int id, String name, String rule, double daytime, String daytimeSign,
+                      double nightTime, String nightTimeSign) throws Exception {
         super(id, name, rule, daytime, daytimeSign);
         this.nightTime = nightTime;
         this.nightTimeSign = nightTimeSign;
@@ -17,10 +18,10 @@ public class MixedGraph extends DayGraph {
     private String getNightTimeSign(){ return nightTimeSign; }
 
 
-    private void fillWorkTimeByType(final char dayType, final double setValue, final int maxAmountSetting){
+    private void fillWorkTimeByType(final char dayType, final double setValue, final int maxAmountSetting) throws Exception {
         int amountSetting = 0;
         for(int indexDay = 0; indexDay < getAmountDay() && amountSetting <= maxAmountSetting; ++indexDay){
-            if(getRuleOfDay(indexDay) == dayType && getWorkTime(indexDay) == UNINITIALIZED_VALUE){
+            if(getRuleOfDay(indexDay) == dayType && getWorkTime(indexDay) == UNINITIALIZED_WORK_TIME){
                 setWorkTime(indexDay, setValue);
                 ++amountSetting;
             }
@@ -28,7 +29,7 @@ public class MixedGraph extends DayGraph {
     }
 
     @Override
-    protected void generateGraph(){
+    protected void generateGraph() throws Exception {
         int amountMissingDays = calcMissingDays();
         double missingTime = calcMissingTime();
 
@@ -50,11 +51,12 @@ public class MixedGraph extends DayGraph {
     }
 
     @Override
-    protected void setWorkTimeSign(Map<Integer, Integer> shortDayAndHolidays, Map<Double, String> dayHours, Map<Double, String> nightHours) {
+    protected void setWorkTimeSign(Map<Integer, Integer> shortAndHolidays, Map<Double, String> dayHours,
+                                   Map<Double, String> nightHours) throws Exception {
         final String SECOND_NIGHT_SHIFT_FOR_HOLIDAYS = "C_33";
         for (int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
             double hour = getWorkTime(indexDay);
-            Integer codeDay = shortDayAndHolidays.get(indexDay + 1);
+            Integer codeDay = shortAndHolidays.get(indexDay + 1);
             if(getRuleOfDay(indexDay) != SIGN_WEEKEND) {
                 if(codeDay != null && codeDay == CODE_SHORT_DAY) ++hour;
             }
@@ -65,7 +67,7 @@ public class MixedGraph extends DayGraph {
                 else if(getNightTime() == hour) setWorkTimeSign(indexDay, getNightTimeSign());
                 else setWorkTimeSign(indexDay, findHourName(nightHours, hour));
             } else {
-                if(getDaytime() == hour) setWorkTimeSign(indexDay, getDaytimeSign());
+                if(getBasicTime() == hour) setWorkTimeSign(indexDay, getBasicTimeSign());
                 else setWorkTimeSign(indexDay, findHourName(dayHours, hour));
             }
         }

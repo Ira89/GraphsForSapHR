@@ -2,17 +2,17 @@ package ru.polynkina.irina.graphs;
 
 public class FractionalGraph extends DayGraph {
 
-    public FractionalGraph(int id, String name, String rule, double daytime, String daytimeSign){
+    public FractionalGraph(int id, String name, String rule, double daytime, String daytimeSign) throws Exception {
         super(id, name, rule, daytime, daytimeSign);
     }
 
-    private void setFloatDay(final double floatTime, final int counterFloatDay, final int amountUninitializedDays){
+    private void setFloatDay(double floatTime, int counterFloatDay, int amountUninitializedDays) throws Exception {
         double frequency = calcFrequency(counterFloatDay, amountUninitializedDays);
         double currentFrequency = 0;
         int amountWorkDay = 0;
 
         for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay){
-            if(getWorkTime(indexDay) == UNINITIALIZED_VALUE){
+            if(getWorkTime(indexDay) == UNINITIALIZED_WORK_TIME){
                 if(currentFrequency + 1 < frequency  && amountWorkDay < amountUninitializedDays - counterFloatDay){
                     ++currentFrequency;
                     ++amountWorkDay;
@@ -40,7 +40,7 @@ public class FractionalGraph extends DayGraph {
     }
 
     @Override
-    protected void generateGraph(){
+    protected void generateGraph() throws Exception {
         int amountMissingDays = calcMissingDays();
         double missingTime = calcMissingTime();
         final double MINUTE_FOR_FLOAT_TIME = 0.2;

@@ -2,20 +2,20 @@ package ru.polynkina.irina.graphs;
 
 public class ShortGraph extends DayGraph {
 
-    public ShortGraph(int id, String name, String rule, double daytime, String daytimeSign){
-        super(id, name, rule, daytime, daytimeSign);
+    public ShortGraph(int id, String name, String rule, double basicTime, String basicTimeSign) throws Exception{
+        super(id, name, rule, basicTime, basicTimeSign);
     }
 
+    // ----------------------------------------------- step 2 ----------------------------------------------------------
     @Override
-    protected void setNormTime(double normTime){
-        final double STANDARD_TIME_IN_DAY = 8.0;
-        int hoursInShortDays = 0;
-        while(normTime % STANDARD_TIME_IN_DAY != 0){
+    protected void setNormTime(double normTime) {
+        int reducedHours = 0;
+        while(normTime % STANDARD_TIME_IN_DAY != 0) {
             ++normTime;
-            ++hoursInShortDays;
+            ++reducedHours;
         }
         double amountDay = normTime / STANDARD_TIME_IN_DAY;
-        double newWorkTimeInMonth =  getDaytime() * amountDay - hoursInShortDays;
-        super.setNormTime(newWorkTimeInMonth);
+        double newNormTime =  getBasicTime() * amountDay - reducedHours;
+        super.setNormTime(newNormTime);
     }
 }

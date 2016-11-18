@@ -37,7 +37,7 @@ public class UnitTests {
         nightHours.put(12.0, "4O12");
     }
 
-    private String makeDebugInfo(DayGraph actualGraph, String correctGraph[], double correctNormTime) {
+    private String makeDebugInfo(DayGraph actualGraph, String correctGraph[], double correctNormTime) throws Exception {
         String textInfo = '\n' + " actual -> " + actualGraph.getNormTime() + " ";
         for(int i = 0; i < DAYS_IN_MONTH; ++i) textInfo += actualGraph.getWorkTimeSign(i) + " ";
 
@@ -46,7 +46,7 @@ public class UnitTests {
         return textInfo;
     }
 
-    private boolean graphsIsEquals(DayGraph actualGraph, String correctGraph[], double correctNormTime) {
+    private boolean graphsIsEquals(DayGraph actualGraph, String correctGraph[], double correctNormTime) throws Exception {
         for(int i = 0; i < DAYS_IN_MONTH; ++i) {
             if (!correctGraph[i].equals(actualGraph.getWorkTimeSign(i))) return false;
         }
@@ -54,7 +54,7 @@ public class UnitTests {
     }
 
     @Test
-    public void testDayGraph() {
+    public void testDayGraph() throws Exception {
         final double correctNormTime = 167;
         final String correctGraph[] = {
                 "FL11", "FL11", "4C10", "FREE", "FREE", "FREE", "4C10",
@@ -73,7 +73,7 @@ public class UnitTests {
     }
 
     @Test
-    public void testDiurnalGraph() {
+    public void testDiurnalGraph() throws Exception {
         final double correctNormTime = 167;
         final String correctGraph[] = {
                 "FREE", "FREE", "FREE", "SUTK", "FREE", "4C13", "FREE",
@@ -92,7 +92,7 @@ public class UnitTests {
     }
 
     @Test
-    public void testFractionalGraph() {
+    public void testFractionalGraph() throws Exception {
         final double correctNormTime = 150.2;
         final String correctGraph[] = {
                 "NO72", "NO72", "4AC7", "4AC7", "4AC6", "FREE", "FREE",
@@ -111,7 +111,7 @@ public class UnitTests {
     }
 
     @Test
-    public void testMixedGraph() {
+    public void testMixedGraph() throws Exception {
         final double correctNormTime = 167;
         final String correctGraph[] = {
                 "CNO4", "C_33", "FREE", "FREE", "FREE", "FREE", "CDEN",
@@ -130,7 +130,7 @@ public class UnitTests {
     }
 
     @Test
-    public void testShortGraph() {
+    public void testShortGraph() throws Exception {
         final double correctNormTime = 83;
         final String correctGraph[] = {
                 "SO20", "SO20", "SO20", "FREE", "FREE", "SO20", "4AC3",
@@ -149,7 +149,7 @@ public class UnitTests {
     }
 
     @Test
-    public void testFiveDayGraph() {
+    public void testFiveDayGraph() throws Exception {
         final double correctNormTime = 146;
         final String correctGraph[] = {
                 "NEP4", "NEP4", "NEP4", "NEP4", "FREE", "FREE", "NEP4",
@@ -168,7 +168,7 @@ public class UnitTests {
     }
 
     @Test
-    public void testUniqueGraph() {
+    public void testUniqueGraph() throws Exception {
         final double correctNormTime = 116;
         final String correctGraph[] = {
                 "NEP5", "NEP3", "NEP5", "NEP3", "FREE", "FREE", "NEP3",
