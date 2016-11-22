@@ -97,8 +97,8 @@ public class UnitTests {
         final String correctGraph[] = {
                 "NO72", "NO72", "4AC7", "4AC7", "4AC6", "FREE", "FREE",
                 "4AC7", "4AC6", "NO62", "4AC7", "4AC7", "FREE", "FREE",
-                "4AC6", "4AC7", "4AC6", "NO62", "4AC7", "FREE", "FREE",
-                "4AC7", "4AC6", "4AC7", "4AC6", "NO62", "FREE", "FREE",
+                "4AC6", "4AC7", "NO62", "4AC6", "4AC7", "FREE", "FREE",
+                "4AC7", "4AC6", "NO62", "4AC7", "4AC6",  "FREE", "FREE",
                 "4AC7", "4AC6", "NO62"
         };
 

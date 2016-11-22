@@ -63,10 +63,13 @@ public class UserForm {
         Workbook wb = new HSSFWorkbook(fis);
         for(int indexRow = ROW_INDICATES_SHORT_DAY; indexRow <= ROW_INDICATES_DAY_OFF; ++indexRow) {
             for(int indexCol = COL_INDICATES_DATE; indexCol <= daysInMonth; ++indexCol) {
-                int indexDay = (int) wb.getSheetAt(0).getRow(indexRow).getCell(indexCol).getNumericCellValue();
-                if(indexDay == 0) break;
-                if(dateIsCorrect(indexDay, daysInMonth, shortAndHolidays))
-                    shortAndHolidays.put(indexDay, indexRow - AMOUNT_OF_HEADERS);
+                try {
+                    int indexDay = (int) wb.getSheetAt(0).getRow(indexRow).getCell(indexCol).getNumericCellValue();
+                    if(indexDay == 0) break;
+                    if(dateIsCorrect(indexDay, daysInMonth, shortAndHolidays))
+                        shortAndHolidays.put(indexDay, indexRow - AMOUNT_OF_HEADERS);
+                } catch (NullPointerException nullExc) { break; }
+
             }
         }
         wb.close();

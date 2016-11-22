@@ -4,6 +4,14 @@ import java.util.Map;
 
 public class DayGraph {
 
+    public final static String DAY_TYPE = "DAY";
+    public final static String SHORT_TYPE = "SHORT";
+    public final static String FIVE_DAY_TYPE = "STANDARD";
+    public final static String FRACTIONAL_TYPE = "FLOAT";
+    public final static String DIURNAL_TYPE = "DIURNAL";
+    public final static String UNIQUE_TYPE = "UNIQUE";
+    public final static String MIXED_TYPE = "MIX";
+
     final static double MAX_WORK_TIME_IN_DIURNAL = 22.0;
     final static double MAX_WORK_TIME_IN_DAY_TIME = 15.0;
     final static double STANDARD_TIME_IN_DAY = 8.0;
@@ -13,6 +21,7 @@ public class DayGraph {
     final static int CODE_HOLIDAY = 1;
     final static int CODE_DAY_OFF = 2;
 
+    final static String SECOND_NIGHT_SHIFT = "C_33";
     private final static char SIGN_UNIVERSAL_DAY = 'u';
     final static char SIGN_WEEKEND = 'f';
     final static char SIGN_NIGHT = 'n';
@@ -60,6 +69,21 @@ public class DayGraph {
         return time > 0 && time <= MAX_WORK_TIME_IN_DIURNAL;
     }
 
+    public boolean isNightTime(int indexDay) throws Exception {
+        checkIndexOfDay(indexDay);
+        return getRuleOfDay(indexDay) == SIGN_NIGHT;
+    }
+
+    public boolean isNonWorkingDay(int indexDay) throws Exception {
+        checkIndexOfDay(indexDay);
+        return getWorkTime(indexDay) != 0;
+    }
+
+    private void checkIndexOfDay(int indexDay) throws Exception {
+        if(indexDay < 0 || indexDay >= getAmountDay())
+            throw new Exception("Индекс " + indexDay + " выходит за пределы массива");
+    }
+
     // ---------------------------------------------------- getters ----------------------------------------------------
 
     public int getId(){ return id; }
@@ -72,23 +96,23 @@ public class DayGraph {
     public int getAmountDay() { return workTime.length; }
 
     public double getWorkTime(int indexDay) throws Exception {
-        if(indexDayIsCorrect(indexDay)) return workTime[indexDay];
-        else throw new Exception("Индекс дня не может быть равен: " + indexDay);
+        checkIndexOfDay(indexDay);
+        return workTime[indexDay];
     }
 
-    public String getWorkTimeSign(final int indexDay) throws Exception {
-        if(indexDayIsCorrect(indexDay)) return workTimeSign[indexDay];
-        else throw new Exception("Индекс дня не может быть равен: " + indexDay);
+    public String getWorkTimeSign(int indexDay) throws Exception {
+        checkIndexOfDay(indexDay);
+        return workTimeSign[indexDay];
     }
 
     public char getHolidaysSign(int indexDay) throws Exception {
-        if(indexDayIsCorrect(indexDay)) return holidaysSign[indexDay];
-        else throw new Exception("Индекс дня не может быть равен: " + indexDay);
+        checkIndexOfDay(indexDay);
+        return holidaysSign[indexDay];
     }
 
     public char getShortDaysSign(int indexDay) throws Exception {
-        if(indexDayIsCorrect(indexDay)) return shortDaysSign[indexDay];
-        else throw new Exception("Индекс дня не может быть равен: " + indexDay);
+        checkIndexOfDay(indexDay);
+        return shortDaysSign[indexDay];
     }
 
     char getRuleOfDay(int indexDay) {
@@ -97,19 +121,27 @@ public class DayGraph {
         return rule.charAt(rulesPosition);
     }
 
-    public boolean isNightTime(int indexDay) throws Exception {
-        if(indexDayIsCorrect(indexDay)) return getRuleOfDay(indexDay) == SIGN_NIGHT;
-        else throw new Exception("Индекс " + indexDay + " выходит за пределы массива");
-    }
-
-    private boolean indexDayIsCorrect(int indexDay) { return indexDay >= 0 && indexDay < getAmountDay(); }
-
     // -------------------------------------------------- setters ------------------------------------------------------
 
-    void setWorkTime(int indexDay, double time){ if(indexDayIsCorrect(indexDay)) workTime[indexDay] = time; }
-    void setWorkTimeSign(int indexDay, String sign){ if(indexDayIsCorrect(indexDay)) workTimeSign[indexDay] = sign; }
-    void setHolidaysSign(int indexDay, char sign) { if(indexDayIsCorrect(indexDay)) holidaysSign[indexDay] = sign; }
-    void setShortDaysSign(int indexDay, char sign) { if(indexDayIsCorrect(indexDay)) shortDaysSign[indexDay] = sign; }
+    void setWorkTime(int indexDay, double time) throws Exception {
+        checkIndexOfDay(indexDay);
+        workTime[indexDay] = time;
+    }
+
+    void setWorkTimeSign(int indexDay, String sign) throws Exception {
+        checkIndexOfDay(indexDay);
+        workTimeSign[indexDay] = sign;
+    }
+
+    void setHolidaysSign(int indexDay, char sign) throws Exception {
+        checkIndexOfDay(indexDay);
+        holidaysSign[indexDay] = sign;
+    }
+
+    void setShortDaysSign(int indexDay, char sign) throws Exception {
+        checkIndexOfDay(indexDay);
+        shortDaysSign[indexDay] = sign;
+    }
 
     public void setCounter(int counter) throws Exception {
         if(counter >= getLengthRule()) throw new Exception("Позиция счетчика не может быть больше, чем правило");
@@ -117,7 +149,7 @@ public class DayGraph {
     }
 
     // ----------------------------------------------- generation ------------------------------------------------------
-
+    // facade
     public void startGenerating(double normTime, int dayInMonth, Map<Integer, Integer> shortAndHolidays,
                                 Map<Double, String> dayHours, Map<Double, String> nightHours) throws Exception {
 
@@ -132,7 +164,7 @@ public class DayGraph {
 
     // ----------------------------------------------- step 0 ----------------------------------------------------------
 
-    private void createEmptyArrays(int dayInMonth) {
+    private void createEmptyArrays(int dayInMonth) throws Exception {
         workTime = new double[dayInMonth];
         workTimeSign = new String[dayInMonth];
         holidaysSign = new char[dayInMonth];
@@ -152,7 +184,7 @@ public class DayGraph {
 
     // ----------------------------------------------- step 2 ----------------------------------------------------------
 
-    private void setWeekend(){
+    private void setWeekend() throws Exception {
         for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
             if(getRuleOfDay(indexDay) == SIGN_WEEKEND) setWorkTime(indexDay, 0);
         }
@@ -160,7 +192,7 @@ public class DayGraph {
 
     // ----------------------------------------------- step 3 ----------------------------------------------------------
 
-    protected void setShortAndHolidays(final Map<Integer, Integer> shortDayAndHolidays) {
+    protected void setShortAndHolidays(Map<Integer, Integer> shortDayAndHolidays) throws Exception {
         for(Map.Entry<Integer, Integer> day : shortDayAndHolidays.entrySet()) {
             if(getRuleOfDay(day.getKey() - 1) == SIGN_WEEKEND) continue;
             if(day.getValue() == CODE_SHORT_DAY) setWorkTime(day.getKey() - 1, getBasicTime() - 1);
@@ -245,10 +277,11 @@ public class DayGraph {
 
         for (int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
             double hour = getWorkTime(indexDay);
-            if(getRuleOfDay(indexDay) != SIGN_WEEKEND) {
-                Integer codeDay = shortAndHolidays.get(indexDay + 1);
-                if(codeDay != null && codeDay == CODE_SHORT_DAY) ++hour;
+            Integer codeDay = shortAndHolidays.get(indexDay + 1);
+            if(codeDay != null) {
+                if(getRuleOfDay(indexDay) != SIGN_WEEKEND && codeDay == CODE_SHORT_DAY) ++hour;
             }
+
             if (getBasicTime() == hour) setWorkTimeSign(indexDay, getBasicTimeSign());
             else setWorkTimeSign(indexDay, findHourName(dayHours, hour));
         }
@@ -263,7 +296,7 @@ public class DayGraph {
 
     // ----------------------------------------------- step 6 ----------------------------------------------------------
 
-    protected void setShortAndHolidaysSign(Map<Integer, Integer> shortAndHolidays) {
+    protected void setShortAndHolidaysSign(Map<Integer, Integer> shortAndHolidays) throws Exception {
         for(Map.Entry<Integer, Integer> day : shortAndHolidays.entrySet()) {
             if(day.getValue() == CODE_HOLIDAY) setHolidaysSign((day.getKey() - 1), '1');
             else if(day.getValue() == CODE_SHORT_DAY && getRuleOfDay(day.getKey() - 1) != SIGN_WEEKEND)

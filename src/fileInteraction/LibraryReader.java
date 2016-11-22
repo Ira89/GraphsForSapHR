@@ -29,6 +29,8 @@ public class LibraryReader {
     private final static int COL_INDICATES_HOUR = 0;
     private final static int COL_INDICATES_HOUR_NAME = 1;
 
+
+    // factory
     public static void createGraphsOnRules(List<DayGraph> graphs) throws Exception {
         FileInputStream fis = new FileInputStream("./_files/rules/rules.xls");
         Workbook wb = new HSSFWorkbook(fis);
@@ -44,15 +46,16 @@ public class LibraryReader {
                 double basicTime = wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDICATES_BASIC_TIME).getNumericCellValue();
                 String basicTimeSign = wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDICATES_BASIC_TIME_SIGN).getStringCellValue();
 
-                if(type.equals("DAY")) graphs.add(new DayGraph(id, name, rule, basicTime, basicTimeSign));
-                else if(type.equals("SHORT")) graphs.add(new ShortGraph(id, name, rule, basicTime, basicTimeSign));
-                else if(type.equals("STANDARD")) graphs.add(new FiveDayGraph(id, name, rule, basicTime, basicTimeSign));
-                else if(type.equals("FLOAT")) graphs.add(new FractionalGraph(id, name, rule, basicTime, basicTimeSign));
-                else if(type.equals("DIURNAL")) graphs.add(new DiurnalGraph(id, name, rule, basicTime, basicTimeSign));
-                else if(type.equals("UNIQUE") || type.equals("MIX")) {
+                if(type.equals(DayGraph.DAY_TYPE)) graphs.add(new DayGraph(id, name, rule, basicTime, basicTimeSign));
+                else if(type.equals(DayGraph.SHORT_TYPE)) graphs.add(new ShortGraph(id, name, rule, basicTime, basicTimeSign));
+                else if(type.equals(DayGraph.FIVE_DAY_TYPE)) graphs.add(new FiveDayGraph(id, name, rule, basicTime, basicTimeSign));
+                else if(type.equals(DayGraph.FRACTIONAL_TYPE)) graphs.add(new FractionalGraph(id, name, rule, basicTime, basicTimeSign));
+                else if(type.equals(DayGraph.DIURNAL_TYPE)) graphs.add(new DiurnalGraph(id, name, rule, basicTime, basicTimeSign));
+                else if(type.equals(DayGraph.UNIQUE_TYPE) || type.equals(DayGraph.MIXED_TYPE)) {
                     double extraTime = wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDICATES_EXTRA_TIME).getNumericCellValue();
                     String extraTimeSign = wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDICATES_EXTRA_TIME_SIGN).getStringCellValue();
-                    if(type.equals("MIX")) graphs.add(new MixedGraph(id, name, rule, basicTime, basicTimeSign, extraTime, extraTimeSign));
+                    if(type.equals(DayGraph.MIXED_TYPE))
+                        graphs.add(new MixedGraph(id, name, rule, basicTime, basicTimeSign, extraTime, extraTimeSign));
                     else graphs.add(new UniqueGraph(id, name, rule, basicTime, basicTimeSign, extraTime, extraTimeSign));
                 } else throw new Exception("Тип графика: " + type + " неизвестен!");
 

@@ -18,7 +18,7 @@ public class FiveDayGraph extends DayGraph {
 
     // ----------------------------------------------- step 3 ----------------------------------------------------------
     @Override
-    protected void setShortAndHolidays(final Map<Integer, Integer> shortAndHolidays) {
+    protected void setShortAndHolidays(Map<Integer, Integer> shortAndHolidays) throws Exception {
         for (Map.Entry<Integer, Integer> day : shortAndHolidays.entrySet()) {
             if (getRuleOfDay(day.getKey() - 1) == SIGN_WEEKEND) continue;
             if (day.getValue() == CODE_SHORT_DAY) setWorkTime(day.getKey() - 1, getBasicTime() - 1);
@@ -48,7 +48,7 @@ public class FiveDayGraph extends DayGraph {
 
     // ----------------------------------------------- step 6 ----------------------------------------------------------
     @Override
-    protected void setShortAndHolidaysSign(final Map<Integer, Integer> shortAndHolidays) {
+    protected void setShortAndHolidaysSign(final Map<Integer, Integer> shortAndHolidays) throws Exception {
         for(Map.Entry<Integer, Integer> obj : shortAndHolidays.entrySet()) {
             if(obj.getValue() == CODE_HOLIDAY) setHolidaysSign((obj.getKey() - 1), '1');
             if(getRuleOfDay(obj.getKey() - 1) != SIGN_WEEKEND) {

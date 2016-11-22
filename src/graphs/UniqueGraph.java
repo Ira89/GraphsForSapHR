@@ -23,7 +23,7 @@ public class UniqueGraph extends FiveDayGraph {
 
     // ----------------------------------------------- step 3 ----------------------------------------------------------
     @Override
-    protected void setShortAndHolidays(Map<Integer, Integer> shortAndHolidays) {
+    protected void setShortAndHolidays(Map<Integer, Integer> shortAndHolidays) throws Exception {
         for (Map.Entry<Integer, Integer> day : shortAndHolidays.entrySet()) {
             if (getRuleOfDay(day.getKey() - 1) == SIGN_WEEKEND) continue;
             if (day.getValue() == CODE_SHORT_DAY) {

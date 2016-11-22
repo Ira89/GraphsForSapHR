@@ -96,7 +96,7 @@ public class LibraryEditor {
                 cell.setCellValue(hourName);
 
                 // set color
-                if (!hourName.equals("FREE")) {
+                if (graph.isNonWorkingDay(indexDay)) {
                     if (graph.isNightTime(indexDay)) cell.setCellStyle(styleForNightTime);
                     else cell.setCellStyle(styleForDaytime);
                 }
