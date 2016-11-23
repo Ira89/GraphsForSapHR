@@ -1,7 +1,8 @@
 package ru.polynkina.irina.fileInteraction;
 
-import ru.polynkina.irina.graphs.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import ru.polynkina.irina.graphs.*;
 import org.apache.poi.ss.usermodel.*;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
@@ -23,6 +24,7 @@ public class LibraryEditor {
     private final static int COL_INDICATES_WORK_TIME = 1;
     private final static int FIRST_COL_INDICATES_HOUR = 2;
 
+    private final static int COL_INDICATES_TEXT_IN_TEMPLATE = 0;
     private final static int COL_INDICATES_NAME_GRAPH_IN_TEMPLATE = 1;
     private final static int COL_INDICATES_WORK_TIME_IN_TEMPLATE = 2;
     private final static int FIRST_COL_INDICATES_HOUR_IN_TEMPLATE = 3;
@@ -69,8 +71,8 @@ public class LibraryEditor {
     public static void writeGraphsIntoTemplate(final List<DayGraph> graphs, String nameRegion, final List<String> regions,
                                                 int month, int year) throws Exception {
 
-        FileInputStream fis = new FileInputStream("./_files/templates/templateForSapHR.xls");
-        Workbook wb = new HSSFWorkbook(fis);
+        FileInputStream fis = new FileInputStream("./_files/templates/templateForSapHR.xlsx");
+        Workbook wb = new XSSFWorkbook(fis);
 
         CellStyle styleForDaytime = wb.createCellStyle();
         styleForDaytime.setFillPattern(CellStyle.SOLID_FOREGROUND);
@@ -84,7 +86,9 @@ public class LibraryEditor {
         for(DayGraph graph : graphs) {
             if(!regions.contains(graph.getName())) continue;
             Row row = wb.getSheetAt(0).createRow(rowIndexFile + AMOUNT_ROW_IN_HEADER);
-            Cell cell = row.createCell(COL_INDICATES_NAME_GRAPH_IN_TEMPLATE);
+            Cell cell = row.createCell(COL_INDICATES_TEXT_IN_TEMPLATE);
+            cell.setCellValue(graph.getText());
+            cell = row.createCell(COL_INDICATES_NAME_GRAPH_IN_TEMPLATE);
             cell.setCellValue(graph.getName());
             cell = row.createCell(COL_INDICATES_WORK_TIME_IN_TEMPLATE);
             cell.setCellValue(graph.getNormTime());
@@ -115,7 +119,7 @@ public class LibraryEditor {
             }
             ++rowIndexFile;
         }
-        FileOutputStream fos = new FileOutputStream("./" + nameRegion + "_" + month + "_" + year + ".xls");
+        FileOutputStream fos = new FileOutputStream("./" + nameRegion + "_" + month + "_" + year + ".xlsx");
         wb.write(fos);
 
         fos.close();

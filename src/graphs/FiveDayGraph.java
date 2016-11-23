@@ -4,8 +4,8 @@ import java.util.Map;
 
 public class FiveDayGraph extends DayGraph {
 
-    public FiveDayGraph(int id, String name, String rule, double basicTime, String basicTimeSign) throws Exception {
-        super(id, name, rule, basicTime, basicTimeSign);
+    public FiveDayGraph(int id, String name, String rule, double basicTime, String basicTimeSign, String text) throws Exception {
+        super(id, name, rule, basicTime, basicTimeSign, text);
     }
 
     void overwriteNormTime() throws Exception {

@@ -20,6 +20,7 @@ public class LibraryReader {
     private final static int COL_INDICATES_BASIC_TIME_SIGN = 5;
     private final static int COL_INDICATES_EXTRA_TIME = 6;
     private final static int COL_INDICATES_EXTRA_TIME_SIGN = 7;
+    private final static int COL_INDICATES_TEXT = 8;
 
     // counter_...xls
     private final static int COL_INDEX_COUNTER_ID = 0;
@@ -45,18 +46,19 @@ public class LibraryReader {
                 String type = wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDICATES_TYPE).getStringCellValue();
                 double basicTime = wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDICATES_BASIC_TIME).getNumericCellValue();
                 String basicTimeSign = wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDICATES_BASIC_TIME_SIGN).getStringCellValue();
+                String text = wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDICATES_TEXT).getStringCellValue();
 
-                if(type.equals(DayGraph.DAY_TYPE)) graphs.add(new DayGraph(id, name, rule, basicTime, basicTimeSign));
-                else if(type.equals(DayGraph.SHORT_TYPE)) graphs.add(new ShortGraph(id, name, rule, basicTime, basicTimeSign));
-                else if(type.equals(DayGraph.FIVE_DAY_TYPE)) graphs.add(new FiveDayGraph(id, name, rule, basicTime, basicTimeSign));
-                else if(type.equals(DayGraph.FRACTIONAL_TYPE)) graphs.add(new FractionalGraph(id, name, rule, basicTime, basicTimeSign));
-                else if(type.equals(DayGraph.DIURNAL_TYPE)) graphs.add(new DiurnalGraph(id, name, rule, basicTime, basicTimeSign));
+                if(type.equals(DayGraph.DAY_TYPE)) graphs.add(new DayGraph(id, name, rule, basicTime, basicTimeSign, text));
+                else if(type.equals(DayGraph.SHORT_TYPE)) graphs.add(new ShortGraph(id, name, rule, basicTime, basicTimeSign, text));
+                else if(type.equals(DayGraph.FIVE_DAY_TYPE)) graphs.add(new FiveDayGraph(id, name, rule, basicTime, basicTimeSign, text));
+                else if(type.equals(DayGraph.FRACTIONAL_TYPE)) graphs.add(new FractionalGraph(id, name, rule, basicTime, basicTimeSign, text));
+                else if(type.equals(DayGraph.DIURNAL_TYPE)) graphs.add(new DiurnalGraph(id, name, rule, basicTime, basicTimeSign, text));
                 else if(type.equals(DayGraph.UNIQUE_TYPE) || type.equals(DayGraph.MIXED_TYPE)) {
                     double extraTime = wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDICATES_EXTRA_TIME).getNumericCellValue();
                     String extraTimeSign = wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDICATES_EXTRA_TIME_SIGN).getStringCellValue();
                     if(type.equals(DayGraph.MIXED_TYPE))
-                        graphs.add(new MixedGraph(id, name, rule, basicTime, basicTimeSign, extraTime, extraTimeSign));
-                    else graphs.add(new UniqueGraph(id, name, rule, basicTime, basicTimeSign, extraTime, extraTimeSign));
+                        graphs.add(new MixedGraph(id, name, rule, basicTime, basicTimeSign, text, extraTime, extraTimeSign));
+                    else graphs.add(new UniqueGraph(id, name, rule, basicTime, basicTimeSign, text, extraTime, extraTimeSign));
                 } else throw new Exception("Тип графика: " + type + " неизвестен!");
 
                 ++indexRow;
@@ -74,8 +76,10 @@ public class LibraryReader {
 
             for (DayGraph obj : graphs) {
                 int idGraph = obj.getId();
-                if(idGraph != (int) wb.getSheetAt(0).getRow(idGraph).getCell(COL_INDEX_COUNTER_ID).getNumericCellValue())
+                if(idGraph != (int) wb.getSheetAt(0).getRow(idGraph).getCell(COL_INDEX_COUNTER_ID).getNumericCellValue()) {
+                    wb.close();
                     throw new Exception("Файл " + filename + " поврежден");
+                }
                 obj.setCounter((int) wb.getSheetAt(0).getRow(idGraph).getCell(COL_INDEX_COUNTER_VALUE).getNumericCellValue());
             }
 

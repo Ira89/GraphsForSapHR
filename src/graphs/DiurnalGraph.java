@@ -4,8 +4,8 @@ import java.util.Map;
 
 public class DiurnalGraph extends DayGraph {
 
-    public DiurnalGraph(int id, String name, String rule, double basicTime, String basicTimeSign) throws Exception {
-        super(id, name, rule, basicTime, basicTimeSign);
+    public DiurnalGraph(int id, String name, String rule, double basicTime, String basicTimeSign, String text) throws Exception {
+        super(id, name, rule, basicTime, basicTimeSign, text);
     }
 
     private void setAdditionalWorkDay(double additionalTime) throws Exception {

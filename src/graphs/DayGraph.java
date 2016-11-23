@@ -35,13 +35,14 @@ public class DayGraph {
     private String basicTimeSign;
     private int counter;
     private double normTime;
+    private String text;
 
     private double workTime[];
     private String workTimeSign[];
     private char holidaysSign[];
     private char shortDaysSign[];
 
-    public DayGraph(int id, String name, String rule, double basicTime, String basicTimeSign) throws Exception {
+    public DayGraph(int id, String name, String rule, double basicTime, String basicTimeSign, String text) throws Exception {
         if(!ruleIsCorrect(rule)) throw new Exception("Поведение правила " + rule + " не определено");
         if(!timeIsCorrect(basicTime)) throw new Exception("Рабочее время не может принимать значение: " + basicTime);
 
@@ -50,6 +51,7 @@ public class DayGraph {
         this.rule = rule;
         this.basicTime = basicTime;
         this.basicTimeSign = basicTimeSign;
+        this.text = text;
     }
 
     private boolean ruleIsCorrect(String rule){
@@ -91,6 +93,7 @@ public class DayGraph {
     public int getLengthRule(){ return rule.length(); }
     double getBasicTime(){ return basicTime; }
     String getBasicTimeSign(){ return basicTimeSign; }
+    public String getText() { return text; }
     public int getCounter(){ return counter; }
     public double getNormTime(){ return normTime; }
     public int getAmountDay() { return workTime.length; }

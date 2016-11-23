@@ -7,10 +7,10 @@ public class UniqueGraph extends FiveDayGraph {
     private double extraTime;
     private String extraTimeSign;
 
-    public UniqueGraph(int id, String name, String rule, double basicTime, String basicTimeSign,
+    public UniqueGraph(int id, String name, String rule, double basicTime, String basicTimeSign, String text,
                        double extraTime, String extraTimeSign) throws Exception {
 
-        super(id, name, rule, basicTime, basicTimeSign);
+        super(id, name, rule, basicTime, basicTimeSign, text);
         if(!timeIsCorrect(extraTime)) throw new Exception("Рабочее время не может принимать значение: " + extraTime);
         this.extraTime = extraTime;
         this.extraTimeSign = extraTimeSign;

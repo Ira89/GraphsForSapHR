@@ -2,8 +2,8 @@ package ru.polynkina.irina.graphs;
 
 public class FractionalGraph extends DayGraph {
 
-    public FractionalGraph(int id, String name, String rule, double basicTime, String basicTimeSign) throws Exception {
-        super(id, name, rule, basicTime, basicTimeSign);
+    public FractionalGraph(int id, String name, String rule, double basicTime, String basicTimeSign, String text) throws Exception {
+        super(id, name, rule, basicTime, basicTimeSign, text);
     }
 
     private void setFloatDay(double floatTime, int amountFloatDay, int amountMissingDays) throws Exception {

@@ -64,7 +64,7 @@ public class UnitTests {
                 "FREE", "FREE", "FL11"
         };
 
-        DayGraph actualGraph = new DayGraph(1, "DAY", "dddfff", 11, "FL11");
+        DayGraph actualGraph = new DayGraph(1, "DAY", "dddfff", 11, "FL11", "text");
         actualGraph.setCounter(0);
         actualGraph.startGenerating(167, DAYS_IN_MONTH, shortAndHolidays, dayHours, nightHours);
 
@@ -83,7 +83,7 @@ public class UnitTests {
                 "FREE", "FREE", "FREE"
         };
 
-        DayGraph actualGraph = new DiurnalGraph(1, "DIURNAL", "nfff", 22, "SUTK");
+        DayGraph actualGraph = new DiurnalGraph(1, "DIURNAL", "nfff", 22, "SUTK", "text");
         actualGraph.setCounter(1);
         actualGraph.startGenerating(167, DAYS_IN_MONTH, shortAndHolidays, dayHours, nightHours);
 
@@ -102,7 +102,7 @@ public class UnitTests {
                 "4AC7", "4AC6", "NO62"
         };
 
-        DayGraph actualGraph = new FractionalGraph(1, "FLOAT", "dddddff", 7.2, "NO72");
+        DayGraph actualGraph = new FractionalGraph(1, "FLOAT", "dddddff", 7.2, "NO72", "text");
         actualGraph.setCounter(0);
         actualGraph.startGenerating(167, DAYS_IN_MONTH, shortAndHolidays, dayHours, nightHours);
 
@@ -121,7 +121,7 @@ public class UnitTests {
                 "FREE", "FREE", "CDEN"
         };
 
-        DayGraph actualGraph = new MixedGraph(1, "MIX", "ddnnffff", 11, "CDEN", 11, "CNO4");
+        DayGraph actualGraph = new MixedGraph(1, "MIX", "ddnnffff", 11, "CDEN", "text", 11, "CNO4");
         actualGraph.setCounter(2);
         actualGraph.startGenerating(167, DAYS_IN_MONTH, shortAndHolidays, dayHours, nightHours);
 
@@ -140,7 +140,7 @@ public class UnitTests {
                 "4AC3", "SO20", "4AC3"
         };
 
-        DayGraph actualGraph = new ShortGraph(1, "SHORT", "dddddff", 4, "SO20");
+        DayGraph actualGraph = new ShortGraph(1, "SHORT", "dddddff", 4, "SO20", "text");
         actualGraph.setCounter(2);
         actualGraph.startGenerating(167, DAYS_IN_MONTH, shortAndHolidays, dayHours, nightHours);
 
@@ -159,7 +159,7 @@ public class UnitTests {
                 "NEP4", "NEP4", "NEP4"
         };
 
-        DayGraph actualGraph = new FiveDayGraph(1, "STANDARD", "dddddff", 7, "NEP4");
+        DayGraph actualGraph = new FiveDayGraph(1, "STANDARD", "dddddff", 7, "NEP4", "text");
         actualGraph.setCounter(1);
         actualGraph.startGenerating(167, DAYS_IN_MONTH, shortAndHolidays, dayHours, nightHours);
 
@@ -178,7 +178,7 @@ public class UnitTests {
                 "NEP5", "NEP3", "NEP5"
         };
 
-        DayGraph actualGraph = new UniqueGraph(1, "UNIQUE", "dududff", 6, "NEP3", 5, "NEP5");
+        DayGraph actualGraph = new UniqueGraph(1, "UNIQUE", "dududff", 6, "NEP3", "text", 5, "NEP5");
         actualGraph.setCounter(1);
         actualGraph.startGenerating(167, DAYS_IN_MONTH, shortAndHolidays, dayHours, nightHours);
 
