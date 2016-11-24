@@ -49,11 +49,7 @@ public class FractionalGraph extends DayGraph {
         double floatTime = (int) averageWorkTime + MINUTE_FOR_FLOAT_TIME;
 
         int amountFloatDay = 0;
-        double sumFloatHours = 0;
-        while((missingTime - sumFloatHours) % 1 > 0.001) {
-            sumFloatHours += floatTime;
-            ++amountFloatDay;
-        }
+        while((missingTime - floatTime * amountFloatDay + 1.0e-10) % 1 > 0.001) ++amountFloatDay;
 
         if(amountFloatDay != 0) setFloatDay(floatTime, amountFloatDay, amountMissingDays);
         super.generateGraph();

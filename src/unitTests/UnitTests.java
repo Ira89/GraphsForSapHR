@@ -28,6 +28,8 @@ public class UnitTests {
         dayHours.put(1.0, "4AC1");
         dayHours.put(3.0, "4AC3");
         dayHours.put(4.0, "SO20");
+        dayHours.put(5.0, "4AC5");
+        dayHours.put(5.2, "NO52");
         dayHours.put(6.0, "4AC6");
         dayHours.put(6.2, "NO62");
         dayHours.put(7.0, "4AC7");
@@ -184,5 +186,24 @@ public class UnitTests {
 
         if(!graphsIsEquals(actualGraph, correctGraph, correctNormTime))
             fail("UNIQUE (NEP6)" + makeDebugInfo(actualGraph, correctGraph, correctNormTime));
+    }
+
+    @Test
+    public void testWorkTime() throws Exception {
+        final double correctNormTime = 128.6;
+        final String correctGraph[] = {
+                "NO72", "NO72", "FREE", "FREE", "4AC6", "4AC6", "4AC6",
+                "4AC6", "4AC5", "FREE", "FREE", "4AC6", "4AC6", "4AC6",
+                "4AC6", "4AC5", "FREE", "FREE", "4AC6", "4AC6", "4AC6",
+                "4AC6", "4AC5", "FREE", "FREE", "4AC6", "4AC6", "4AC6",
+                "4AC5", "NO52", "FREE"
+        };
+
+        DayGraph actualGraph = new FractionalGraph(1, "FLOAT", "dddddff", 7.2, "NO72", "text");
+        actualGraph.setCounter(3);
+        actualGraph.startGenerating(143, DAYS_IN_MONTH, shortAndHolidays, dayHours, nightHours);
+
+        if(!graphsIsEquals(actualGraph, correctGraph, correctNormTime))
+            fail("FLOAT (G5/2)" + makeDebugInfo(actualGraph, correctGraph, correctNormTime));
     }
 }

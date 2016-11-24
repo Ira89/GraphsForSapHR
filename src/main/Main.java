@@ -43,8 +43,8 @@ public class Main {
             LibraryEditor.writeNextCounter(graphs, DAYS_IN_MONTH, MONTH, YEAR);
             LibraryEditor.deleteOldCounter(MONTH, YEAR);
 
-            System.out.println("Генерация графиков завершена успешно!");
-            System.out.println("Версия программы: 2.0.1");
+            System.out.println("Генерация графиков завершена!");
+            System.out.println("Версия программы: 2.1.1");
 
         } catch (Exception exc) {
             exc.printStackTrace();
