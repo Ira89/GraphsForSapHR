@@ -59,7 +59,7 @@ public class MixedGraph extends DayGraph {
             double hour = getWorkTime(indexDay);
             Integer codeDay = shortAndHolidays.get(indexDay + 1);
             if(codeDay != null) {
-                if(codeDay == CODE_SHORT_DAY && getRuleOfDay(indexDay) != SIGN_WEEKEND) ++hour;
+                if(getRuleOfDay(indexDay) != SIGN_WEEKEND && codeDay == CODE_SHORT_DAY) ++hour;
                 if(codeDay == CODE_HOLIDAY && getExtraTime() == hour &&
                     getRuleOfDay(indexDay) == SIGN_NIGHT && getRuleOfDay(indexDay - 1) == SIGN_NIGHT) {
                         setWorkTimeSign(indexDay, SECOND_NIGHT_SHIFT);

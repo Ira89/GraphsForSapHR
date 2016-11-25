@@ -6,19 +6,23 @@ public class FractionalGraph extends DayGraph {
         super(id, name, rule, basicTime, basicTimeSign, text);
     }
 
-    private void setFloatDay(double floatTime, int amountFloatDay, int amountMissingDays) throws Exception {
-        double frequency = calcFrequency(amountFloatDay, amountMissingDays - amountFloatDay);
+    private void setFloatDay(double floatTime, int amountFloatDays, int amountMissingDays) throws Exception {
+        int amountIntegerDays = amountMissingDays - amountFloatDays;
+        double frequency = calcFrequency(amountFloatDays, amountIntegerDays);
+
         double currentFrequency = 0;
-        int amountOfAddedDays = 0;
+        int counterFloatDays = 0;
+        int counterIntegerDays = 0;
 
         for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
-            if(getWorkTime(indexDay) == UNINITIALIZED_WORK_TIME) {
-                if(currentFrequency < frequency) ++currentFrequency;
-                else if(amountOfAddedDays <= amountFloatDay) {
-                    ++amountOfAddedDays;
-                    currentFrequency -= frequency;
-                    setWorkTime(indexDay, floatTime);
-                }
+            if(getWorkTime(indexDay) != UNINITIALIZED_WORK_TIME) continue;
+            if(currentFrequency < frequency && counterIntegerDays < amountIntegerDays || counterFloatDays == amountFloatDays) {
+                ++counterIntegerDays;
+                ++currentFrequency;
+            } else if(counterFloatDays <= amountFloatDays) {
+                ++counterFloatDays;
+                currentFrequency -= frequency;
+                setWorkTime(indexDay, floatTime);
             }
         }
     }
@@ -48,10 +52,10 @@ public class FractionalGraph extends DayGraph {
         double averageWorkTime = amountMissingDays != 0 ? missingTime / amountMissingDays : missingTime;
         double floatTime = (int) averageWorkTime + MINUTE_FOR_FLOAT_TIME;
 
-        int amountFloatDay = 0;
-        while((missingTime - floatTime * amountFloatDay + 1.0e-10) % 1 > 0.001) ++amountFloatDay;
+        int amountFloatDays = 0;
+        while((missingTime - floatTime * amountFloatDays + 1.0e-10) % 1 > 0.001) ++amountFloatDays;
 
-        if(amountFloatDay != 0) setFloatDay(floatTime, amountFloatDay, amountMissingDays);
+        if(amountFloatDays != 0) setFloatDay(floatTime, amountFloatDays, amountMissingDays);
         super.generateGraph();
     }
 }

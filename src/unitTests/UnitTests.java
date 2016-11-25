@@ -189,7 +189,7 @@ public class UnitTests {
     }
 
     @Test
-    public void testWorkTime() throws Exception {
+    public void testRoundingHours() throws Exception {
         final double correctNormTime = 128.6;
         final String correctGraph[] = {
                 "NO72", "NO72", "FREE", "FREE", "4AC6", "4AC6", "4AC6",
@@ -205,5 +205,30 @@ public class UnitTests {
 
         if(!graphsIsEquals(actualGraph, correctGraph, correctNormTime))
             fail("FLOAT (G5/2)" + makeDebugInfo(actualGraph, correctGraph, correctNormTime));
+    }
+
+    @Test
+    public void testSetFractionalDay() throws Exception {
+        Map<Integer, Integer> shortAndHolidays = new HashMap<Integer, Integer>();
+        shortAndHolidays.put(7, 0);
+        shortAndHolidays.put(8, 1);
+        shortAndHolidays.put(27, 0);
+        shortAndHolidays.put(28, 1);
+
+        final double correctNormTime = 149.2;
+        final String correctGraph[] = {
+                "4AC6", "4AC6", "4AC7", "4AC6", "FREE", "FREE", "NO72",
+                "NO72", "4AC7", "4AC6", "NO62", "FREE", "FREE", "4AC7",
+                "4AC6", "4AC7", "4AC6", "4AC7", "FREE", "FREE", "4AC6",
+                "NO62", "4AC7", "4AC6", "4AC7", "FREE", "FREE", "NO72",
+                "4AC6", "4AC7", "NO62"
+        };
+
+        DayGraph actualGraph = new FractionalGraph(1, "FLOAT", "dddddff", 7.2, "NO72", "text");
+        actualGraph.setCounter(1);
+        actualGraph.startGenerating(166, DAYS_IN_MONTH, shortAndHolidays, dayHours, nightHours);
+
+        if(!graphsIsEquals(actualGraph, correctGraph, correctNormTime))
+            fail("FLOAT (G5-2)" + makeDebugInfo(actualGraph, correctGraph, correctNormTime));
     }
 }

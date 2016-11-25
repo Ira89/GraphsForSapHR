@@ -44,7 +44,7 @@ public class Main {
             LibraryEditor.deleteOldCounter(MONTH, YEAR);
 
             System.out.println("Генерация графиков завершена!");
-            System.out.println("Версия программы: 2.1.1");
+            System.out.println("Версия программы: 2.2.1");
 
         } catch (Exception exc) {
             exc.printStackTrace();
