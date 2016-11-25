@@ -5,6 +5,7 @@ import ru.polynkina.irina.fileInteraction.LibraryReader;
 import ru.polynkina.irina.userInteraction.UserForm;
 import ru.polynkina.irina.calendar.Calendar;
 import ru.polynkina.irina.graphs.DayGraph;
+import static java.lang.Math.abs;
 import java.util.*;
 
 public class Main {
@@ -42,6 +43,15 @@ public class Main {
             LibraryEditor.writeWorkHoursInFile(graphs, MONTH, YEAR);
             LibraryEditor.writeNextCounter(graphs, DAYS_IN_MONTH, MONTH, YEAR);
             LibraryEditor.deleteOldCounter(MONTH, YEAR);
+
+            for(DayGraph graph : graphs) {
+                double plannedRateOfTime = graph.getNormTime();
+                double actualRateOfTime = graph.calcRealNormTime();
+                if(abs(plannedRateOfTime - actualRateOfTime) > 0.001) {
+                    System.out.print("ВНИМАНИЕ! Для графика " + graph.getName() + " норма времени должна быть: " + plannedRateOfTime);
+                    System.out.println(" Фактические часы составляют: " + actualRateOfTime);
+                }
+            }
 
             System.out.println("Генерация графиков завершена!");
             System.out.println("Версия программы: 2.2.1");

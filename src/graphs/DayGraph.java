@@ -1,6 +1,5 @@
 package ru.polynkina.irina.graphs;
 
-import static java.lang.Math.abs;
 import java.util.Map;
 
 public class DayGraph {
@@ -68,6 +67,11 @@ public class DayGraph {
         return true;
     }
 
+    private void checkIndexOfDay(int indexDay) throws Exception {
+        if(indexDay < 0 || indexDay >= getAmountDay())
+            throw new Exception("Индекс " + indexDay + " выходит за пределы массива");
+    }
+
     boolean timeIsCorrect(double time) {
         return time > 0 && time <= MAX_WORK_TIME_IN_DIURNAL;
     }
@@ -82,9 +86,10 @@ public class DayGraph {
         return getWorkTime(indexDay) != 0;
     }
 
-    private void checkIndexOfDay(int indexDay) throws Exception {
-        if(indexDay < 0 || indexDay >= getAmountDay())
-            throw new Exception("Индекс " + indexDay + " выходит за пределы массива");
+    public double calcRealNormTime() throws Exception {
+        double sumHours = 0;
+        for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay) sumHours += getWorkTime(indexDay);
+        return sumHours;
     }
 
     // ---------------------------------------------------- getters ----------------------------------------------------
@@ -164,7 +169,6 @@ public class DayGraph {
         generateGraph();                                                // step 4
         setWorkTimeSign(shortAndHolidays, dayHours, nightHours);        // step 5
         setShortAndHolidaysSign(shortAndHolidays);                      // step 6
-        displayAnErrorInGeneration();                                   // step 7
     }
 
     // ----------------------------------------------- step 0 ----------------------------------------------------------
@@ -306,17 +310,6 @@ public class DayGraph {
             if(day.getValue() == CODE_HOLIDAY) setHolidaysSign((day.getKey() - 1), '1');
             else if(day.getValue() == CODE_SHORT_DAY && getRuleOfDay(day.getKey() - 1) != SIGN_WEEKEND)
                 setShortDaysSign((day.getKey() - 1), 'A');
-        }
-    }
-
-    // ----------------------------------------------- step 7 ----------------------------------------------------------
-
-    private void displayAnErrorInGeneration() throws Exception {
-        double sumHours = 0;
-        for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay) sumHours += getWorkTime(indexDay);
-        if(abs(sumHours - getNormTime()) > 0.01) {
-            System.out.print("ВНИМАНИЕ! Для графика " + getName() + " норма времени должна быть: " + getNormTime() + " ");
-            System.out.println("Фактические часы составляют: " + sumHours);
         }
     }
 }
