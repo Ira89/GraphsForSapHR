@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.junit.BeforeClass;
 import static org.junit.Assert.fail;
 
-public class UnitTests {
+public class UnitTest {
 
     private static Map<Integer, Integer> shortAndHolidays = new HashMap<Integer, Integer>();
     private static Map<Double, String> dayHours = new HashMap<Double, String>();
