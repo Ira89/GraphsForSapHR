@@ -1,5 +1,7 @@
 package ru.polynkina.irina.graphs;
 
+import ru.polynkina.irina.period.ReportingPeriod;
+
 import java.util.Map;
 
 public class DayGraph {
@@ -159,11 +161,11 @@ public class DayGraph {
 
     // ----------------------------------------------- generation ------------------------------------------------------
     // facade
-    public void startGenerating(double normTime, int dayInMonth, Map<Integer, Integer> shortAndHolidays,
+    public void startGenerating(ReportingPeriod period, Map<Integer, Integer> shortAndHolidays,
                                 Map<Double, String> dayHours, Map<Double, String> nightHours) throws Exception {
 
-        createEmptyArrays(dayInMonth);                                  // step 0
-        setNormTime(normTime);                                          // step 1
+        createEmptyArrays(period.getDaysInMonth());                                  // step 0
+        setNormTime(period.getNormTime());                                          // step 1
         setWeekend();                                                   // step 2
         setShortAndHolidays(shortAndHolidays);                          // step 3
         generateGraph();                                                // step 4

@@ -2,6 +2,7 @@ package ru.polynkina.irina.fileInteraction;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
+import ru.polynkina.irina.period.ReportingPeriod;
 import ru.polynkina.irina.graphs.*;
 
 import java.util.Map;
@@ -68,9 +69,9 @@ public class LibraryReader {
         fis.close();
     }
 
-    public static void readCountersForGraphs(List<DayGraph> graphs, int month, int year) throws Exception {
+    public static void readCountersForGraphs(List<DayGraph> graphs, ReportingPeriod period) throws Exception {
         try {
-            String filename = "counter_" + month + "_" + year + ".xls";
+            String filename = "counter_" + period.getMonth() + "_" + period.getYear() + ".xls";
             FileInputStream fis = new FileInputStream("./_files/counters/" + filename);
             Workbook wb = new HSSFWorkbook(fis);
 

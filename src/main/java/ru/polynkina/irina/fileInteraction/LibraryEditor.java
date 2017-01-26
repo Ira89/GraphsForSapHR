@@ -2,6 +2,7 @@ package ru.polynkina.irina.fileInteraction;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import ru.polynkina.irina.period.ReportingPeriod;
 import ru.polynkina.irina.graphs.*;
 import org.apache.poi.ss.usermodel.*;
 import java.io.FileOutputStream;
@@ -32,7 +33,7 @@ public class LibraryEditor {
     private final static int OFFSET_FOR_SHORT_DAYS = 3;
     private final static int SIZE_STEP = 5;
 
-    public static void writeWorkHoursInFile(final List<DayGraph> graphs, int month, int year) throws Exception {
+    public static void writeWorkHoursInFile(final List<DayGraph> graphs, ReportingPeriod period) throws Exception {
         FileInputStream fis = new FileInputStream("./_files/templates/templateWorkingTime.xls");
         Workbook wb = new HSSFWorkbook(fis);
 
@@ -60,7 +61,7 @@ public class LibraryEditor {
                 }
             }
         }
-        FileOutputStream fos = new FileOutputStream("./workHours_" + month + "_" + year + ".xls");
+        FileOutputStream fos = new FileOutputStream("./workHours_" + period.getMonth() + "_" + period.getYear() + ".xls");
         wb.write(fos);
 
         fos.close();
@@ -69,7 +70,7 @@ public class LibraryEditor {
     }
 
     public static void writeGraphsIntoTemplate(final List<DayGraph> graphs, String nameRegion, final List<String> regions,
-                                                int month, int year) throws Exception {
+                                               ReportingPeriod period) throws Exception {
 
         FileInputStream fis = new FileInputStream("./_files/templates/templateForSapHR.xlsx");
         Workbook wb = new XSSFWorkbook(fis);
@@ -119,7 +120,7 @@ public class LibraryEditor {
             }
             ++rowIndexFile;
         }
-        FileOutputStream fos = new FileOutputStream("./" + nameRegion + "_" + month + "_" + year + ".xlsx");
+        FileOutputStream fos = new FileOutputStream("./" + nameRegion + "_" + period.getMonth() + "_" + period.getYear() + ".xlsx");
         wb.write(fos);
 
         fos.close();
@@ -127,13 +128,13 @@ public class LibraryEditor {
         fis.close();
     }
 
-    public static void writeNextCounter(final List<DayGraph> graphs, int daysInMonth, int month, int year) throws Exception {
-        String filename = "counter_" + month + "_" + year + ".xls";
+    public static void writeNextCounter(final List<DayGraph> graphs, ReportingPeriod period) throws Exception {
+        String filename = "counter_" + period.getMonth() + "_" + period.getYear() + ".xls";
         FileInputStream fis = new FileInputStream("./_files/counters/" + filename);
         Workbook wb = new HSSFWorkbook(fis);
 
         for(DayGraph graph : graphs){
-            int nextCounter = (daysInMonth + graph.getCounter()) % graph.getLengthRule();
+            int nextCounter = (period.getDaysInMonth() + graph.getCounter()) % graph.getLengthRule();
             Row row = wb.getSheetAt(0).getRow(graph.getId());
             Cell cell = row.createCell(COL_INDICATES_ID);
             cell.setCellValue(graph.getId());
@@ -141,8 +142,8 @@ public class LibraryEditor {
             cell.setCellValue(nextCounter);
         }
 
-        String nameNextFile = "counter_" + (month + 1) + "_" + year + ".xls";
-        if(month + 1 > MAX_INDEX_MONTH) nameNextFile = "counter_" + "1" + "_" + (year + 1) + ".xls";
+        String nameNextFile = "counter_" + (period.getMonth() + 1) + "_" + period.getYear() + ".xls";
+        if(period.getMonth() + 1 > MAX_INDEX_MONTH) nameNextFile = "counter_" + "1" + "_" + (period.getYear() + 1) + ".xls";
         FileOutputStream fos = new FileOutputStream("./_files/counters/" + nameNextFile);
         wb.write(fos);
 
@@ -151,9 +152,9 @@ public class LibraryEditor {
         fis.close();
     }
 
-    public static void deleteOldCounter(int month, int year){
-        String filenameOldCounter = "counter_" + month + "_" + (year - 1) + ".xls";
+    public static void deleteOldCounter(ReportingPeriod period){
+        String filenameOldCounter = "counter_" + period.getMonth() + "_" + (period.getYear() - 1) + ".xls";
         File oldFile = new File("./_files/counters/" + filenameOldCounter);
-        if(oldFile.delete()) System.out.println("Удален счетчик за " + month + "." + (year - 1));
+        if(oldFile.delete()) System.out.println("Удален счетчик за " + period.getMonth() + "." + (period.getYear() - 1));
     }
 }
