@@ -5,7 +5,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import ru.polynkina.irina.period.ReportingPeriod;
 import ru.polynkina.irina.graphs.*;
 
-import java.util.Map;
 import java.util.List;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -87,31 +86,6 @@ public class LibraryReader {
             wb.close();
             fis.close();
         } catch(FileNotFoundException excFile){ throw new Exception("Не сгенерирован график за предыдущий месяц!"); }
-    }
-
-    public static void readDayHours(Map<Double, String> dayHours) throws Exception {
-        readHours("./_files/library/dayHours.xls", dayHours);
-    }
-
-    public static void readNightHours(Map<Double, String> nightHours) throws Exception {
-        readHours("./_files/library/nightHours.xls", nightHours);
-    }
-
-    private static void readHours(String directory, Map<Double, String> hours) throws Exception {
-        FileInputStream fis = new FileInputStream(directory);
-        Workbook wb = new HSSFWorkbook(fis);
-
-        int indexRow = 0;
-        while(true) {
-            try {
-                double hour = wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDICATES_HOUR).getNumericCellValue();
-                String hourName = wb.getSheetAt(0).getRow(indexRow).getCell(COL_INDICATES_HOUR_NAME).getStringCellValue();
-                hours.put(hour, hourName);
-                ++indexRow;
-            } catch (NullPointerException nullExc) { break; }
-        }
-        wb.close();
-        fis.close();
     }
 
     public static void readGraphsInRegions(String nameRegion, List<String> graphsForRegion) throws Exception {

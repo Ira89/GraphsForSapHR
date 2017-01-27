@@ -1,5 +1,7 @@
 package ru.polynkina.irina.graphs;
 
+import ru.polynkina.irina.hours.Hours;
+
 import java.util.Map;
 
 public class MixedGraph extends DayGraph {
@@ -52,8 +54,7 @@ public class MixedGraph extends DayGraph {
     // ----------------------------------------------- step 5 ----------------------------------------------------------
 
     @Override
-    protected void setWorkTimeSign(Map<Integer, Integer> shortAndHolidays, Map<Double, String> dayHours,
-                                   Map<Double, String> nightHours) throws Exception {
+    protected void setWorkTimeSign(Map<Integer, Integer> shortAndHolidays, Hours libHours) throws Exception {
 
         for (int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
             double hour = getWorkTime(indexDay);
@@ -68,10 +69,10 @@ public class MixedGraph extends DayGraph {
             }
             if(getRuleOfDay(indexDay) == SIGN_NIGHT) {
                 if(getExtraTime() == hour) setWorkTimeSign(indexDay, getExtraTimeSign());
-                else setWorkTimeSign(indexDay, findHourName(nightHours, hour));
+                else setWorkTimeSign(indexDay, libHours.findSignNightHours(hour));
             } else {
                 if(getBasicTime() == hour) setWorkTimeSign(indexDay, getBasicTimeSign());
-                else setWorkTimeSign(indexDay, findHourName(dayHours, hour));
+                else setWorkTimeSign(indexDay, libHours.findSignDayHours(hour));
             }
         }
     }

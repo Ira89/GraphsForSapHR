@@ -2,14 +2,14 @@ package ru.polynkina.irina.unitTests;
 
 import ru.polynkina.irina.period.ReportingPeriod;
 
-public class TestPeriod implements ReportingPeriod {
+public class ClassForTestPeriod implements ReportingPeriod {
 
     private int year;
     private int month;
     private int daysInMonth;
     private double normTime;
 
-    public TestPeriod(int year, int month, int daysInMonth, double normTime) {
+    public ClassForTestPeriod(int year, int month, int daysInMonth, double normTime) {
         this.year = year;
         this.month = month;
         this.daysInMonth = daysInMonth;

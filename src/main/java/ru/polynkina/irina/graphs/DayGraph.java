@@ -1,5 +1,6 @@
 package ru.polynkina.irina.graphs;
 
+import ru.polynkina.irina.hours.Hours;
 import ru.polynkina.irina.period.ReportingPeriod;
 
 import java.util.Map;
@@ -162,14 +163,14 @@ public class DayGraph {
     // ----------------------------------------------- generation ------------------------------------------------------
     // facade
     public void startGenerating(ReportingPeriod period, Map<Integer, Integer> shortAndHolidays,
-                                Map<Double, String> dayHours, Map<Double, String> nightHours) throws Exception {
+                                Hours libHours) throws Exception {
 
         createEmptyArrays(period.getDaysInMonth());                                  // step 0
         setNormTime(period.getNormTime());                                          // step 1
         setWeekend();                                                   // step 2
         setShortAndHolidays(shortAndHolidays);                          // step 3
         generateGraph();                                                // step 4
-        setWorkTimeSign(shortAndHolidays, dayHours, nightHours);        // step 5
+        setWorkTimeSign(shortAndHolidays, libHours);        // step 5
         setShortAndHolidaysSign(shortAndHolidays);                      // step 6
     }
 
@@ -283,8 +284,7 @@ public class DayGraph {
 
     // ----------------------------------------------- step 5 ----------------------------------------------------------
 
-    protected void setWorkTimeSign(Map<Integer, Integer> shortAndHolidays, Map<Double, String> dayHours,
-                                   Map<Double, String> nightHours) throws Exception {
+    protected void setWorkTimeSign(Map<Integer, Integer> shortAndHolidays, Hours libHours) throws Exception {
 
         for (int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
             double hour = getWorkTime(indexDay);
@@ -294,7 +294,7 @@ public class DayGraph {
             }
 
             if (getBasicTime() == hour) setWorkTimeSign(indexDay, getBasicTimeSign());
-            else setWorkTimeSign(indexDay, findHourName(dayHours, hour));
+            else setWorkTimeSign(indexDay, libHours.findSignDayHours(hour));
         }
     }
 

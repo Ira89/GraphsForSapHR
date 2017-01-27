@@ -1,10 +1,10 @@
 package ru.polynkina.irina.main;
 
-import ru.polynkina.irina.period.UserPeriod;
-import ru.polynkina.irina.fileInteraction.LibraryEditor;
-import ru.polynkina.irina.fileInteraction.LibraryReader;
-import ru.polynkina.irina.userInteraction.UserForm;
-import ru.polynkina.irina.graphs.DayGraph;
+import ru.polynkina.irina.hours.*;
+import ru.polynkina.irina.period.*;
+import ru.polynkina.irina.fileInteraction.*;
+import ru.polynkina.irina.userInteraction.*;
+import ru.polynkina.irina.graphs.*;
 import static java.lang.Math.abs;
 import java.util.*;
 
@@ -12,7 +12,7 @@ public class Main {
 
     public static void main(String[] needRunningTests) {
         try {
-            UserPeriod period = new UserPeriod();
+            ReportingPeriod period = new UserPeriod();
 
             List<DayGraph> graphs = new ArrayList<DayGraph>();
             LibraryReader.createGraphsOnRules(graphs);
@@ -20,13 +20,11 @@ public class Main {
 
             Map<Integer, Integer> shortAndHolidays = new HashMap<Integer, Integer>();
             UserForm.readShortAndHolidays(shortAndHolidays, period);
-            Map<Double, String> dayHours = new HashMap<Double, String>();
-            LibraryReader.readDayHours(dayHours);
-            Map<Double, String> nightHours = new HashMap<Double, String>();
-            LibraryReader.readNightHours(nightHours);
+
+            Hours libHours = new LibHours();
 
             for(DayGraph graph : graphs)
-                graph.startGenerating(period, shortAndHolidays, dayHours, nightHours);
+                graph.startGenerating(period, shortAndHolidays, libHours);
 
             Map<String, Integer> regions = new HashMap<String, Integer>();
             UserForm.readRegions(regions);

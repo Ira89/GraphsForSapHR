@@ -1,5 +1,7 @@
 package ru.polynkina.irina.graphs;
 
+import ru.polynkina.irina.hours.Hours;
+
 import java.util.Map;
 
 public class FiveDayGraph extends DayGraph {
@@ -37,12 +39,11 @@ public class FiveDayGraph extends DayGraph {
 
     // ----------------------------------------------- step 5 ----------------------------------------------------------
     @Override
-    protected void setWorkTimeSign(Map<Integer, Integer> shortAndHolidays, Map<Double, String> dayHours,
-                                   Map<Double, String> nightHours) throws Exception {
+    protected void setWorkTimeSign(Map<Integer, Integer> shortAndHolidays, Hours libHours) throws Exception {
 
         for (int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
             if (getRuleOfDay(indexDay) != SIGN_WEEKEND) setWorkTimeSign(indexDay, getBasicTimeSign());
-            else setWorkTimeSign(indexDay, findHourName(dayHours, 0));
+            else setWorkTimeSign(indexDay, libHours.findSignDayHours(0));
         }
     }
 

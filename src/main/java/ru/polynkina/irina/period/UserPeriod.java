@@ -5,6 +5,17 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.FileInputStream;
 
+/**
+ * <br> Инициализация объекта происходит при создании экземпляра </br>
+ * <br> Значения для инициализации берутся из файла userForm.xls </br>
+ * <br> Файл user.xls изменяется пользователем </br>
+ * <br> Если файл отсутствует - возбуждается исключение типа Exception </br>
+ * <br> Если пользователь ввел некорректное значение - возбуждается исключение типа Exception </br>
+ * <br> Допустимыми значениями являются: </br>
+ *      <br> год - от 2017 до 2117  </br>
+ *      <br> месяц - от 1 до 12 </br>
+ *      <br> норма времени - от 100 до 200 </br>
+ */
 public class UserPeriod implements ReportingPeriod {
 
     private final static int[] DAYS_IN_MONTH = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
@@ -28,8 +39,8 @@ public class UserPeriod implements ReportingPeriod {
     private int daysInMonth;
     private double normTime;
 
-    public UserPeriod() {
-        initializingField();
+    public UserPeriod() throws Exception {
+        initializingFields();
     }
 
     public int getYear() { return year; }
@@ -37,16 +48,11 @@ public class UserPeriod implements ReportingPeriod {
     public int getDaysInMonth() { return daysInMonth; }
     public double getNormTime() { return normTime; }
 
-    private void initializingField() {
-        try{
-            year = takeCorrectYear(PATH_TO_USER_FILE, ROW_INDICATES_YEAR, COL_INDICATES_DATE);
-            month = takeCorrectMonth(PATH_TO_USER_FILE, ROW_INDICATES_MONTH, COL_INDICATES_DATE);
-            daysInMonth = getDaysInMonth(month, year);
-            normTime = takeCorrectNormTime(PATH_TO_USER_FILE, ROW_INDICATES_NORM_TIME, COL_INDICATES_DATE);
-        } catch (Exception exc) {
-            exc.printStackTrace();
-            System.exit(-1);
-        }
+    private void initializingFields() throws Exception {
+        year = takeCorrectYear(PATH_TO_USER_FILE, ROW_INDICATES_YEAR, COL_INDICATES_DATE);
+        month = takeCorrectMonth(PATH_TO_USER_FILE, ROW_INDICATES_MONTH, COL_INDICATES_DATE);
+        daysInMonth = getDaysInMonth(month, year);
+        normTime = takeCorrectNormTime(PATH_TO_USER_FILE, ROW_INDICATES_NORM_TIME, COL_INDICATES_DATE);
     }
 
     private int takeCorrectYear(String pathFile, int indexRow, int indexColumn) throws Exception {
