@@ -11,8 +11,6 @@ public class UserForm {
 
     private final static int ROW_INDICATES_SHORT_DAY = 3;
     private final static int ROW_INDICATES_DAY_OFF = 5;
-    private final static int ROW_INDICATES_CALENDAR = 7;
-    private final static int ROW_INDICATES_NEED_CALENDAR = 8;
 
     private final static int COL_INDICATES_DATE = 1;
     private final static int AMOUNT_OF_HEADERS = 3;
@@ -30,23 +28,6 @@ public class UserForm {
                 } catch (NullPointerException nullExc) { break; }
 
             }
-        }
-        wb.close();
-        fis.close();
-    }
-
-    public static void readRegions(Map<String, Integer> regions) throws Exception {
-        FileInputStream fis = new FileInputStream("./_files/userForm/userForm.xls");
-        Workbook wb = new HSSFWorkbook(fis);
-        int indexCol = COL_INDICATES_DATE;
-        while(true) {
-            try {
-                String nameCalendar = wb.getSheetAt(0).getRow(ROW_INDICATES_CALENDAR).getCell(indexCol).getStringCellValue();
-                Integer statusCalendar = (int) wb.getSheetAt(0).getRow(ROW_INDICATES_NEED_CALENDAR).getCell(indexCol).getNumericCellValue();
-                if(nameCalendar.equals("")) break;
-                regions.put(nameCalendar, statusCalendar);
-                ++indexCol;
-            } catch (NullPointerException nullExc) { break; }
         }
         wb.close();
         fis.close();

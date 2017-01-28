@@ -88,20 +88,4 @@ public class LibraryReader {
         } catch(FileNotFoundException excFile){ throw new Exception("Не сгенерирован график за предыдущий месяц!"); }
     }
 
-    public static void readGraphsInRegions(String nameRegion, List<String> graphsForRegion) throws Exception {
-        FileInputStream fis = new FileInputStream("./_files/regions/" + nameRegion + ".xls");
-        Workbook wb = new HSSFWorkbook(fis);
-
-        int indexRow = 0;
-        while (true) {
-            try {
-                String nameGraph = wb.getSheetAt(0).getRow(indexRow).getCell(0).getStringCellValue();
-                if (nameGraph.equals("")) break;
-                graphsForRegion.add(nameGraph);
-                ++indexRow;
-            } catch (NullPointerException nullExc) { break; }
-        }
-        wb.close();
-        fis.close();
-    }
 }

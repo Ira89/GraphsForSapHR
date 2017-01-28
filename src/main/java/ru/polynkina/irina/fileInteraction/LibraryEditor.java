@@ -5,6 +5,8 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import ru.polynkina.irina.period.ReportingPeriod;
 import ru.polynkina.irina.graphs.*;
 import org.apache.poi.ss.usermodel.*;
+import ru.polynkina.irina.regions.AllUserRegions;
+
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.util.List;
@@ -69,63 +71,66 @@ public class LibraryEditor {
         fis.close();
     }
 
-    public static void writeGraphsIntoTemplate(final List<DayGraph> graphs, String nameRegion, final List<String> regions,
+    public static void writeGraphsIntoTemplate(final List<DayGraph> graphs, AllUserRegions regions,
                                                ReportingPeriod period) throws Exception {
 
-        FileInputStream fis = new FileInputStream("./_files/templates/templateForSapHR.xlsx");
-        Workbook wb = new XSSFWorkbook(fis);
+        for(int indexRegion = 0; indexRegion < regions.getAmountRegions(); ++indexRegion) {
+            if(!regions.generationNeededForRegion(indexRegion)) continue;
 
-        CellStyle styleForDaytime = wb.createCellStyle();
-        styleForDaytime.setFillPattern(CellStyle.SOLID_FOREGROUND);
-        styleForDaytime.setFillForegroundColor(IndexedColors.LIGHT_YELLOW.getIndex());
+            FileInputStream fis = new FileInputStream("./_files/templates/templateForSapHR.xlsx");
+            Workbook wb = new XSSFWorkbook(fis);
 
-        CellStyle styleForNightTime = wb.createCellStyle();
-        styleForNightTime.setFillPattern(CellStyle.SOLID_FOREGROUND);
-        styleForNightTime.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+            CellStyle styleForDaytime = wb.createCellStyle();
+            styleForDaytime.setFillPattern(CellStyle.SOLID_FOREGROUND);
+            styleForDaytime.setFillForegroundColor(IndexedColors.LIGHT_YELLOW.getIndex());
 
-        int rowIndexFile = 0;
-        for(DayGraph graph : graphs) {
-            if(!regions.contains(graph.getName())) continue;
-            Row row = wb.getSheetAt(0).createRow(rowIndexFile + AMOUNT_ROW_IN_HEADER);
-            Cell cell = row.createCell(COL_INDICATES_TEXT_IN_TEMPLATE);
-            cell.setCellValue(graph.getText());
-            cell = row.createCell(COL_INDICATES_NAME_GRAPH_IN_TEMPLATE);
-            cell.setCellValue(graph.getName());
-            cell = row.createCell(COL_INDICATES_WORK_TIME_IN_TEMPLATE);
-            cell.setCellValue(graph.getNormTime());
+            CellStyle styleForNightTime = wb.createCellStyle();
+            styleForNightTime.setFillPattern(CellStyle.SOLID_FOREGROUND);
+            styleForNightTime.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
 
-            for (int indexDay = 0; indexDay < graph.getAmountDay(); ++indexDay) {
-                // write hour sign
-                cell = row.createCell(FIRST_COL_INDICATES_HOUR_IN_TEMPLATE + indexDay * SIZE_STEP);
-                String hourName = graph.getWorkTimeSign(indexDay);
-                cell.setCellValue(hourName);
+            int rowIndexFile = 0;
+            for(DayGraph graph : graphs) {
+                if(!regions.graphUsedInRegion(indexRegion, graph.getName())) continue;
+                Row row = wb.getSheetAt(0).createRow(rowIndexFile + AMOUNT_ROW_IN_HEADER);
+                Cell cell = row.createCell(COL_INDICATES_TEXT_IN_TEMPLATE);
+                cell.setCellValue(graph.getText());
+                cell = row.createCell(COL_INDICATES_NAME_GRAPH_IN_TEMPLATE);
+                cell.setCellValue(graph.getName());
+                cell = row.createCell(COL_INDICATES_WORK_TIME_IN_TEMPLATE);
+                cell.setCellValue(graph.getNormTime());
 
-                // set color
-                if (graph.isNonWorkingDay(indexDay)) {
-                    if (graph.isNightTime(indexDay)) cell.setCellStyle(styleForNightTime);
-                    else cell.setCellStyle(styleForDaytime);
+                for (int indexDay = 0; indexDay < graph.getAmountDay(); ++indexDay) {
+                    // write hour sign
+                    cell = row.createCell(FIRST_COL_INDICATES_HOUR_IN_TEMPLATE + indexDay * SIZE_STEP);
+                    String hourName = graph.getWorkTimeSign(indexDay);
+                    cell.setCellValue(hourName);
+
+                    // set color
+                    if (graph.isNonWorkingDay(indexDay)) {
+                        if (graph.isNightTime(indexDay)) cell.setCellStyle(styleForNightTime);
+                        else cell.setCellStyle(styleForDaytime);
+                    }
+
+                    // write short days sign
+                    if(graph.getShortDaysSign(indexDay) != ' ') {
+                        cell = row.createCell(FIRST_COL_INDICATES_HOUR_IN_TEMPLATE + indexDay * SIZE_STEP + OFFSET_FOR_SHORT_DAYS);
+                        cell.setCellValue(Character.toString(graph.getShortDaysSign(indexDay)));
+                    }
+
+                    // write holidays sign
+                    if(graph.getHolidaysSign(indexDay) != ' ') {
+                        cell = row.createCell(FIRST_COL_INDICATES_HOUR_IN_TEMPLATE + indexDay * SIZE_STEP + OFFSET_FOR_HOLIDAYS);
+                        cell.setCellValue(Integer.parseInt(Character.toString(graph.getHolidaysSign(indexDay))));
+                    }
                 }
-
-                // write short days sign
-                if(graph.getShortDaysSign(indexDay) != ' ') {
-                    cell = row.createCell(FIRST_COL_INDICATES_HOUR_IN_TEMPLATE + indexDay * SIZE_STEP + OFFSET_FOR_SHORT_DAYS);
-                    cell.setCellValue(Character.toString(graph.getShortDaysSign(indexDay)));
-                }
-
-                // write holidays sign
-                if(graph.getHolidaysSign(indexDay) != ' ') {
-                    cell = row.createCell(FIRST_COL_INDICATES_HOUR_IN_TEMPLATE + indexDay * SIZE_STEP + OFFSET_FOR_HOLIDAYS);
-                    cell.setCellValue(Integer.parseInt(Character.toString(graph.getHolidaysSign(indexDay))));
-                }
+                ++rowIndexFile;
             }
-            ++rowIndexFile;
+            FileOutputStream fos = new FileOutputStream("./" + regions.getNameRegion(indexRegion) + "_" + period.getMonth() + "_" + period.getYear() + ".xlsx");
+            wb.write(fos);
+            fos.close();
+            wb.close();
+            fis.close();
         }
-        FileOutputStream fos = new FileOutputStream("./" + nameRegion + "_" + period.getMonth() + "_" + period.getYear() + ".xlsx");
-        wb.write(fos);
-
-        fos.close();
-        wb.close();
-        fis.close();
     }
 
     public static void writeNextCounter(final List<DayGraph> graphs, ReportingPeriod period) throws Exception {

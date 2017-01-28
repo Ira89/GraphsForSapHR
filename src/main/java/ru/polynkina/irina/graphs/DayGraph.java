@@ -165,12 +165,12 @@ public class DayGraph {
     public void startGenerating(ReportingPeriod period, Map<Integer, Integer> shortAndHolidays,
                                 Hours libHours) throws Exception {
 
-        createEmptyArrays(period.getDaysInMonth());                                  // step 0
-        setNormTime(period.getNormTime());                                          // step 1
+        createEmptyArrays(period.getDaysInMonth());                     // step 0
+        setNormTime(period.getNormTime());                              // step 1
         setWeekend();                                                   // step 2
         setShortAndHolidays(shortAndHolidays);                          // step 3
         generateGraph();                                                // step 4
-        setWorkTimeSign(shortAndHolidays, libHours);        // step 5
+        setWorkTimeSign(shortAndHolidays, libHours);                    // step 5
         setShortAndHolidaysSign(shortAndHolidays);                      // step 6
     }
 
@@ -296,13 +296,6 @@ public class DayGraph {
             if (getBasicTime() == hour) setWorkTimeSign(indexDay, getBasicTimeSign());
             else setWorkTimeSign(indexDay, libHours.findSignDayHours(hour));
         }
-    }
-
-
-    String findHourName(Map<Double, String> hours, double desiredValue) throws Exception {
-        String hourName = hours.get(desiredValue);
-        if(hourName == null) throw new Exception("Не найден график на " + desiredValue + " часов");
-        return hourName;
     }
 
     // ----------------------------------------------- step 6 ----------------------------------------------------------

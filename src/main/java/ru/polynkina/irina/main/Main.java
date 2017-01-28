@@ -2,6 +2,7 @@ package ru.polynkina.irina.main;
 
 import ru.polynkina.irina.hours.*;
 import ru.polynkina.irina.period.*;
+import ru.polynkina.irina.regions.*;
 import ru.polynkina.irina.fileInteraction.*;
 import ru.polynkina.irina.userInteraction.*;
 import ru.polynkina.irina.graphs.*;
@@ -10,9 +11,11 @@ import java.util.*;
 
 public class Main {
 
-    public static void main(String[] needRunningTests) {
+    public static void main(String[] args) {
         try {
             ReportingPeriod period = new UserPeriod();
+            AllUserRegions regions = new AllUserRegions();
+            Hours libHours = new LibHours();
 
             List<DayGraph> graphs = new ArrayList<DayGraph>();
             LibraryReader.createGraphsOnRules(graphs);
@@ -21,20 +24,10 @@ public class Main {
             Map<Integer, Integer> shortAndHolidays = new HashMap<Integer, Integer>();
             UserForm.readShortAndHolidays(shortAndHolidays, period);
 
-            Hours libHours = new LibHours();
-
             for(DayGraph graph : graphs)
                 graph.startGenerating(period, shortAndHolidays, libHours);
 
-            Map<String, Integer> regions = new HashMap<String, Integer>();
-            UserForm.readRegions(regions);
-            for(Map.Entry<String, Integer> region : regions.entrySet()) {
-                if(region.getValue() == 0) continue;
-                List<String> graphsInRegions = new ArrayList<String>();
-                LibraryReader.readGraphsInRegions(region.getKey(), graphsInRegions);
-                LibraryEditor.writeGraphsIntoTemplate(graphs, region.getKey(), graphsInRegions, period);
-            }
-
+            LibraryEditor.writeGraphsIntoTemplate(graphs, regions, period);
             LibraryEditor.writeWorkHoursInFile(graphs, period);
             LibraryEditor.writeNextCounter(graphs, period);
             LibraryEditor.deleteOldCounter(period);

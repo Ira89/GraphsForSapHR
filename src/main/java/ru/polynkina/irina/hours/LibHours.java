@@ -52,6 +52,8 @@ public class LibHours implements Hours {
         readLibHours(PATH_TO_LIB_NIGHT_HOURS, nightHours);
     }
 
+    // При возникновении NullPointerException чтение из файла завершается
+    // NullPointerException игнорируется, т.к. его появление указывает на то, что мы прочитали все данные
     private void readLibHours(String pathFile, Map<Double, String> hours) throws Exception {
         FileInputStream fis = new FileInputStream(pathFile);
         Workbook wb = new HSSFWorkbook(fis);
