@@ -17,9 +17,9 @@ public class MixedGraph extends DayGraph {
         this.extraTimeSign = extraTimeSign;
     }
 
-    private void fillWorkTimeByType(char dayType, double setValue, int maxAmountSetting) throws Exception {
+    private void fillWorkTimeByType(char dayType, double setValue, int maxAmountSetting, ReportingPeriod period) throws Exception {
         int amountSetting = 0;
-        for(int indexDay = 0; indexDay < getAmountDay() && amountSetting <= maxAmountSetting; ++indexDay) {
+        for(int indexDay = 0; indexDay < period.getDaysInMonth() && amountSetting <= maxAmountSetting; ++indexDay) {
             if(getRuleOfDay(indexDay) == dayType && getWorkTime(indexDay) == UNINITIALIZED_WORK_TIME) {
                 setWorkTime(indexDay, setValue);
                 ++amountSetting;
@@ -35,9 +35,9 @@ public class MixedGraph extends DayGraph {
     // ----------------------------------------------- step 4 ----------------------------------------------------------
 
     @Override
-    protected void generateGraph() throws Exception {
-        int amountMissingDays = calcMissingDays();
-        double missingTime = calcMissingTime();
+    protected void generateGraph(ReportingPeriod period) throws Exception {
+        int amountMissingDays = calcMissingDays(period);
+        double missingTime = calcMissingTime(period);
         int minWorkTime = amountMissingDays == 0 ? (int) missingTime : (int) missingTime / amountMissingDays;
         int maxWorkTime = minWorkTime + 1;
 
@@ -45,9 +45,9 @@ public class MixedGraph extends DayGraph {
         int amountDaysWithMaxTime = amountMissingDays - amountDaysWithMinTime;
 
         if(amountDaysWithMinTime >= amountDaysWithMaxTime)
-            fillWorkTimeByType(SIGN_DAY, minWorkTime, amountDaysWithMinTime);
-        else fillWorkTimeByType(SIGN_NIGHT, maxWorkTime, amountDaysWithMaxTime);
-        super.generateGraph();
+            fillWorkTimeByType(SIGN_DAY, minWorkTime, amountDaysWithMinTime, period);
+        else fillWorkTimeByType(SIGN_NIGHT, maxWorkTime, amountDaysWithMaxTime, period);
+        super.generateGraph(period);
     }
 
     // ----------------------------------------------- step 5 ----------------------------------------------------------
@@ -55,7 +55,7 @@ public class MixedGraph extends DayGraph {
     @Override
     protected void setWorkTimeSign(ReportingPeriod period, Hours libHours) throws Exception {
 
-        for (int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
+        for (int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay) {
             double hour = getWorkTime(indexDay);
             Integer codeDay = period.getCopyShortAndHolidays().get(indexDay + 1);
             if(codeDay != null) {

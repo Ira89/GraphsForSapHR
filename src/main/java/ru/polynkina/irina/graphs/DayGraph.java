@@ -5,31 +5,7 @@ import ru.polynkina.irina.period.ReportingPeriod;
 
 import java.util.Map;
 
-public class DayGraph {
-
-    public final static String DAY_TYPE = "DAY";
-    public final static String SHORT_TYPE = "SHORT";
-    public final static String FIVE_DAY_TYPE = "STANDARD";
-    public final static String FRACTIONAL_TYPE = "FLOAT";
-    public final static String DIURNAL_TYPE = "DIURNAL";
-    public final static String UNIQUE_TYPE = "UNIQUE";
-    public final static String MIXED_TYPE = "MIX";
-
-    final static double MAX_WORK_TIME_IN_DIURNAL = 22.0;
-    final static double MAX_WORK_TIME_IN_DAY_TIME = 15.0;
-    final static double STANDARD_TIME_IN_DAY = 8.0;
-    final static double UNINITIALIZED_WORK_TIME = -1.0;
-
-    final static int CODE_SHORT_DAY = 0;
-    final static int CODE_HOLIDAY = 1;
-    final static int CODE_DAY_OFF = 2;
-
-    final static String SECOND_NIGHT_SHIFT = "C_33";
-    private final static char SIGN_UNIVERSAL_DAY = 'u';
-    final static char SIGN_WEEKEND = 'f';
-    final static char SIGN_NIGHT = 'n';
-    final static char SIGN_DAY = 'd';
-
+public class DayGraph implements Graph {
 
     private int id;
     private String name;
@@ -71,7 +47,7 @@ public class DayGraph {
     }
 
     private void checkIndexOfDay(int indexDay) throws Exception {
-        if(indexDay < 0 || indexDay >= getAmountDay())
+        if(indexDay < 0 || indexDay >= workTime.length)
             throw new Exception("Индекс " + indexDay + " выходит за пределы массива");
     }
 
@@ -79,19 +55,9 @@ public class DayGraph {
         return time > 0 && time <= MAX_WORK_TIME_IN_DIURNAL;
     }
 
-    public boolean isNightTime(int indexDay) throws Exception {
-        checkIndexOfDay(indexDay);
-        return getRuleOfDay(indexDay) == SIGN_NIGHT;
-    }
-
-    public boolean isNonWorkingDay(int indexDay) throws Exception {
-        checkIndexOfDay(indexDay);
-        return getWorkTime(indexDay) != 0;
-    }
-
     public double calcRealNormTime() throws Exception {
         double sumHours = 0;
-        for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay) sumHours += getWorkTime(indexDay);
+        for(int indexDay = 0; indexDay < workTime.length; ++indexDay) sumHours += getWorkTime(indexDay);
         return sumHours;
     }
 
@@ -100,12 +66,11 @@ public class DayGraph {
     public int getId(){ return id; }
     public String getName(){ return name; }
     public int getLengthRule(){ return rule.length(); }
-    double getBasicTime(){ return basicTime; }
-    String getBasicTimeSign(){ return basicTimeSign; }
+    public double getBasicTime(){ return basicTime; }
+    public String getBasicTimeSign(){ return basicTimeSign; }
     public String getText() { return text; }
     public int getCounter(){ return counter; }
     public double getNormTime(){ return normTime; }
-    public int getAmountDay() { return workTime.length; }
 
     public double getWorkTime(int indexDay) throws Exception {
         checkIndexOfDay(indexDay);
@@ -127,7 +92,7 @@ public class DayGraph {
         return shortDaysSign[indexDay];
     }
 
-    char getRuleOfDay(int indexDay) {
+    public char getRuleOfDay(int indexDay) {
         int rulesPosition = (getCounter() + indexDay) % rule.length();
         if(rulesPosition < 0) rulesPosition = getLengthRule() + rulesPosition;
         return rule.charAt(rulesPosition);
@@ -135,22 +100,22 @@ public class DayGraph {
 
     // -------------------------------------------------- setters ------------------------------------------------------
 
-    void setWorkTime(int indexDay, double time) throws Exception {
+    public void setWorkTime(int indexDay, double time) throws Exception {
         checkIndexOfDay(indexDay);
         workTime[indexDay] = time;
     }
 
-    void setWorkTimeSign(int indexDay, String sign) throws Exception {
+    public void setWorkTimeSign(int indexDay, String sign) throws Exception {
         checkIndexOfDay(indexDay);
         workTimeSign[indexDay] = sign;
     }
 
-    void setHolidaysSign(int indexDay, char sign) throws Exception {
+    public void setHolidaysSign(int indexDay, char sign) throws Exception {
         checkIndexOfDay(indexDay);
         holidaysSign[indexDay] = sign;
     }
 
-    void setShortDaysSign(int indexDay, char sign) throws Exception {
+    public void setShortDaysSign(int indexDay, char sign) throws Exception {
         checkIndexOfDay(indexDay);
         shortDaysSign[indexDay] = sign;
     }
@@ -166,11 +131,11 @@ public class DayGraph {
 
         createEmptyArrays(period.getDaysInMonth());                     // step 0
         setNormTime(period.getNormTime());                              // step 1
-        setWeekend();                                                   // step 2
-        setShortAndHolidays(period);                          // step 3
-        generateGraph();                                                // step 4
-        setWorkTimeSign(period, libHours);                    // step 5
-        setShortAndHolidaysSign(period);                      // step 6
+        setWeekend(period);                                             // step 2
+        setShortAndHolidays(period);                                    // step 3
+        generateGraph(period);                                          // step 4
+        setWorkTimeSign(period, libHours);                              // step 5
+        setShortAndHolidaysSign(period);                                // step 6
     }
 
     // ----------------------------------------------- step 0 ----------------------------------------------------------
@@ -195,8 +160,8 @@ public class DayGraph {
 
     // ----------------------------------------------- step 2 ----------------------------------------------------------
 
-    private void setWeekend() throws Exception {
-        for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
+    private void setWeekend(ReportingPeriod period) throws Exception {
+        for(int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay) {
             if(getRuleOfDay(indexDay) == SIGN_WEEKEND) setWorkTime(indexDay, 0);
         }
     }
@@ -213,9 +178,9 @@ public class DayGraph {
 
     // ----------------------------------------------- step 4 ----------------------------------------------------------
 
-    protected void generateGraph() throws Exception {
-        int amountMissingDays = calcMissingDays();
-        double missingTime = calcMissingTime();
+    protected void generateGraph(ReportingPeriod period) throws Exception {
+        int amountMissingDays = calcMissingDays(period);
+        double missingTime = calcMissingTime(period);
         int minWorkTime = amountMissingDays == 0 ? (int) missingTime : (int) missingTime / amountMissingDays;
         int maxWorkTime = minWorkTime + 1;
 
@@ -224,22 +189,22 @@ public class DayGraph {
         double frequency = calcFrequency(amountDaysWithMinTime, amountDaysWithMaxTime);
 
         if(amountDaysWithMinTime >= amountDaysWithMaxTime)
-            fillMissingWorkDays(minWorkTime, amountDaysWithMinTime, maxWorkTime, amountDaysWithMaxTime, frequency);
-        else fillMissingWorkDays(maxWorkTime, amountDaysWithMaxTime, minWorkTime, amountDaysWithMinTime, frequency);
+            fillMissingWorkDays(minWorkTime, amountDaysWithMinTime, maxWorkTime, amountDaysWithMaxTime, frequency, period);
+        else fillMissingWorkDays(maxWorkTime, amountDaysWithMaxTime, minWorkTime, amountDaysWithMinTime, frequency, period);
     }
 
 
-    int calcMissingDays() throws Exception {
+    int calcMissingDays(ReportingPeriod period) throws Exception {
         int amountMissingDays = 0;
-        for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
+        for(int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay) {
             if(getWorkTime(indexDay) == UNINITIALIZED_WORK_TIME) ++amountMissingDays;
         }
         return amountMissingDays;
     }
 
-    double calcMissingTime() throws Exception {
+    double calcMissingTime(ReportingPeriod period) throws Exception {
         double missingTime = 0;
-        for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
+        for(int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay) {
             if(getWorkTime(indexDay) != UNINITIALIZED_WORK_TIME) missingTime += getWorkTime(indexDay);
         }
         return getNormTime() - missingTime;
@@ -261,13 +226,13 @@ public class DayGraph {
     }
 
     private void fillMissingWorkDays(int spreadValue, int amountSpreadValue, int rareValue, int amountRareValue,
-                                     double frequency) throws Exception {
+                                     double frequency, ReportingPeriod period) throws Exception {
 
         double currentFrequency = 0;
         int counterSpreadValue = 0;
         int counterRareValue = 0;
 
-        for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
+        for(int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay) {
             if(getWorkTime(indexDay) != UNINITIALIZED_WORK_TIME) continue;
             if(currentFrequency < frequency && counterSpreadValue < amountSpreadValue || counterRareValue == amountRareValue) {
                 setWorkTime(indexDay, spreadValue);
@@ -285,7 +250,7 @@ public class DayGraph {
 
     protected void setWorkTimeSign(ReportingPeriod period, Hours libHours) throws Exception {
 
-        for (int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
+        for (int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay) {
             double hour = getWorkTime(indexDay);
             Integer codeDay = period.getCopyShortAndHolidays().get(indexDay + 1);
             if(codeDay != null) {
@@ -300,7 +265,6 @@ public class DayGraph {
     // ----------------------------------------------- step 6 ----------------------------------------------------------
 
     protected void setShortAndHolidaysSign(ReportingPeriod period) throws Exception {
-        period.getCopyShortAndHolidays().put(20, 0);
         for(Map.Entry<Integer, Integer> day : period.getCopyShortAndHolidays().entrySet()) {
             if(day.getValue() == CODE_HOLIDAY) setHolidaysSign((day.getKey() - 1), '1');
             else if(day.getValue() == CODE_SHORT_DAY && getRuleOfDay(day.getKey() - 1) != SIGN_WEEKEND)

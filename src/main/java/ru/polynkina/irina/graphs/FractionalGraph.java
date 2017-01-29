@@ -1,12 +1,14 @@
 package ru.polynkina.irina.graphs;
 
+import ru.polynkina.irina.period.ReportingPeriod;
+
 public class FractionalGraph extends DayGraph {
 
     public FractionalGraph(int id, String name, String rule, double basicTime, String basicTimeSign, String text) throws Exception {
         super(id, name, rule, basicTime, basicTimeSign, text);
     }
 
-    private void setFloatDay(double floatTime, int amountFloatDays, int amountMissingDays) throws Exception {
+    private void setFloatDay(double floatTime, int amountFloatDays, int amountMissingDays, ReportingPeriod period) throws Exception {
         int amountIntegerDays = amountMissingDays - amountFloatDays;
         double frequency = calcFrequency(amountFloatDays, amountIntegerDays);
 
@@ -14,7 +16,7 @@ public class FractionalGraph extends DayGraph {
         int counterFloatDays = 0;
         int counterIntegerDays = 0;
 
-        for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
+        for(int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay) {
             if(getWorkTime(indexDay) != UNINITIALIZED_WORK_TIME) continue;
             if(currentFrequency < frequency && counterIntegerDays < amountIntegerDays || counterFloatDays == amountFloatDays) {
                 ++counterIntegerDays;
@@ -45,17 +47,17 @@ public class FractionalGraph extends DayGraph {
     // ----------------------------------------------- step 4 ----------------------------------------------------------
 
     @Override
-    protected void generateGraph() throws Exception {
+    protected void generateGraph(ReportingPeriod period) throws Exception {
         final double MINUTE_FOR_FLOAT_TIME = 0.2;
-        int amountMissingDays = calcMissingDays();
-        double missingTime = calcMissingTime();
+        int amountMissingDays = calcMissingDays(period);
+        double missingTime = calcMissingTime(period);
         double averageWorkTime = amountMissingDays != 0 ? missingTime / amountMissingDays : missingTime;
         double floatTime = (int) averageWorkTime + MINUTE_FOR_FLOAT_TIME;
 
         int amountFloatDays = 0;
         while((missingTime - floatTime * amountFloatDays + 1.0e-10) % 1 > 0.001) ++amountFloatDays;
 
-        if(amountFloatDays != 0) setFloatDay(floatTime, amountFloatDays, amountMissingDays);
-        super.generateGraph();
+        if(amountFloatDays != 0) setFloatDay(floatTime, amountFloatDays, amountMissingDays, period);
+        super.generateGraph(period);
     }
 }

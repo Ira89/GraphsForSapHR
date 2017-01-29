@@ -51,6 +51,22 @@ public class UserPeriod implements ReportingPeriod {
     public Map<Integer, Integer> getCopyShortAndHolidays() { return new HashMap<Integer, Integer>(shortAndHolidays); }
 
 
+    public int getNextMonth() {
+        final int MAX_INDEX_MONTH = 12;
+        int nextMonth = month + 1;
+        if(nextMonth > MAX_INDEX_MONTH) nextMonth = 1;
+        return nextMonth;
+    }
+
+
+    public int getYearAfterIncreaseMonth() {
+        final int MAX_INDEX_MONTH = 12;
+        int nextYear = year;
+        if (month + 1 > MAX_INDEX_MONTH) ++nextYear;
+        return nextYear;
+    }
+
+
     private int takeYear(String pathFile, int indexRow, int indexColumn) throws Exception {
         final int MIN_INDEX_YEAR = 2017;
         final int MAX_INDEX_YEAR = 2117;

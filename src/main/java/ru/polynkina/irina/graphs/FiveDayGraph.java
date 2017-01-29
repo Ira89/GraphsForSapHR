@@ -11,9 +11,9 @@ public class FiveDayGraph extends DayGraph {
         super(id, name, rule, basicTime, basicTimeSign, text);
     }
 
-    void overwriteNormTime() throws Exception {
+    void overwriteNormTime(ReportingPeriod period) throws Exception {
         double sumTime = 0;
-        for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay){
+        for(int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay){
             sumTime += getWorkTime(indexDay);
         }
         super.setNormTime(sumTime);
@@ -31,18 +31,18 @@ public class FiveDayGraph extends DayGraph {
 
     // ----------------------------------------------- step 4 ----------------------------------------------------------
     @Override
-    protected void generateGraph() throws Exception {
-        for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay){
+    protected void generateGraph(ReportingPeriod period) throws Exception {
+        for(int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay){
             if(getWorkTime(indexDay) == UNINITIALIZED_WORK_TIME) setWorkTime(indexDay, getBasicTime());
         }
-        overwriteNormTime();
+        overwriteNormTime(period);
     }
 
     // ----------------------------------------------- step 5 ----------------------------------------------------------
     @Override
     protected void setWorkTimeSign(ReportingPeriod period, Hours libHours) throws Exception {
 
-        for (int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
+        for (int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay) {
             if (getRuleOfDay(indexDay) != SIGN_WEEKEND) setWorkTimeSign(indexDay, getBasicTimeSign());
             else setWorkTimeSign(indexDay, libHours.findSignDayHours(0));
         }

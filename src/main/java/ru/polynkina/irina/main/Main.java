@@ -1,12 +1,11 @@
 package ru.polynkina.irina.main;
 
-import ru.polynkina.irina.hours.*;
-import ru.polynkina.irina.period.*;
-import ru.polynkina.irina.regions.*;
-import ru.polynkina.irina.fileInteraction.*;
-import ru.polynkina.irina.graphs.*;
-import static java.lang.Math.abs;
-import java.util.*;
+import ru.polynkina.irina.graphs.GraphsContainer;
+import ru.polynkina.irina.regions.RegionsContainer;
+import ru.polynkina.irina.period.ReportingPeriod;
+import ru.polynkina.irina.period.UserPeriod;
+import ru.polynkina.irina.hours.Hours;
+import ru.polynkina.irina.hours.LibHours;
 
 public class Main {
 
@@ -16,29 +15,13 @@ public class Main {
             Hours libHours = new LibHours();
             RegionsContainer regions = new RegionsContainer();
 
-            List<DayGraph> graphs = new ArrayList<DayGraph>();
-            LibraryReader.createGraphsOnRules(graphs);
-            LibraryReader.readCountersForGraphs(graphs, period);
+            GraphsContainer graphs = new GraphsContainer(period);
+            graphs.startGenerating(period, libHours);
+            graphs.writeGraphsInFile(period, regions);
+            graphs.deleteOldCounter(period);
+            graphs.printCheckResults();
 
-            for(DayGraph graph : graphs)
-                graph.startGenerating(period, libHours);
-
-            LibraryEditor.writeGraphsIntoTemplate(graphs, regions, period);
-            LibraryEditor.writeWorkHoursInFile(graphs, period);
-            LibraryEditor.writeNextCounter(graphs, period);
-            LibraryEditor.deleteOldCounter(period);
-
-            for(DayGraph graph : graphs) {
-                double plannedRateOfTime = graph.getNormTime();
-                double actualRateOfTime = graph.calcRealNormTime();
-                if(abs(plannedRateOfTime - actualRateOfTime) > 0.001) {
-                    System.out.print("ВНИМАНИЕ! Для графика " + graph.getName() + " норма времени должна быть: " + plannedRateOfTime);
-                    System.out.println(" Фактические часы составляют: " + actualRateOfTime);
-                }
-            }
-
-            System.out.println("Генерация графиков завершена!");
-            System.out.println("Версия программы: 2.2.1");
+            System.out.println("Версия программы: 3.0.0");
         } catch (Exception exc) {
             exc.printStackTrace();
             System.exit(-1);

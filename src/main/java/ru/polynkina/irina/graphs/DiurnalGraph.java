@@ -9,10 +9,10 @@ public class DiurnalGraph extends DayGraph {
         super(id, name, rule, basicTime, basicTimeSign, text);
     }
 
-    private void setAdditionalWorkDay(double additionalTime) throws Exception {
+    private void setAdditionalWorkDay(double additionalTime, ReportingPeriod period) throws Exception {
         final int INDEX_MIDDLE_DAY_OFF = 2;
-        for(int indexDay = 0; indexDay < getAmountDay() && additionalTime != 0; ++indexDay) {
-            if(getRuleOfDay(indexDay) == SIGN_NIGHT && indexDay + INDEX_MIDDLE_DAY_OFF < getAmountDay()) {
+        for(int indexDay = 0; indexDay < period.getDaysInMonth() && additionalTime != 0; ++indexDay) {
+            if(getRuleOfDay(indexDay) == SIGN_NIGHT && indexDay + INDEX_MIDDLE_DAY_OFF < period.getDaysInMonth()) {
                 double hoursFofCurrDay = additionalTime < MAX_WORK_TIME_IN_DAY_TIME ? additionalTime : MAX_WORK_TIME_IN_DAY_TIME;
                 setWorkTime(indexDay + INDEX_MIDDLE_DAY_OFF, hoursFofCurrDay);
                 additionalTime -= hoursFofCurrDay;
@@ -23,14 +23,14 @@ public class DiurnalGraph extends DayGraph {
     // ----------------------------------------------- step 4 ----------------------------------------------------------
 
     @Override
-    protected void generateGraph() throws Exception {
-        int amountMissingDays = calcMissingDays();
-        double missingTime = calcMissingTime();
+    protected void generateGraph(ReportingPeriod period) throws Exception {
+        int amountMissingDays = calcMissingDays(period);
+        double missingTime = calcMissingTime(period);
         double averageWorkTime = amountMissingDays != 0 ? missingTime / amountMissingDays : missingTime;
 
         if(averageWorkTime > MAX_WORK_TIME_IN_DIURNAL)
-            setAdditionalWorkDay(missingTime - (amountMissingDays * MAX_WORK_TIME_IN_DIURNAL));
-        super.generateGraph();
+            setAdditionalWorkDay(missingTime - (amountMissingDays * MAX_WORK_TIME_IN_DIURNAL), period);
+        super.generateGraph(period);
     }
 
     // ----------------------------------------------- step 5 ----------------------------------------------------------
@@ -38,7 +38,7 @@ public class DiurnalGraph extends DayGraph {
     @Override
     protected void setWorkTimeSign(ReportingPeriod period, Hours libHours) throws Exception {
 
-        for (int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
+        for (int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay) {
             double hour = getWorkTime(indexDay);
             Integer codeDay = period.getCopyShortAndHolidays().get(indexDay + 1);
             if (codeDay != null) {

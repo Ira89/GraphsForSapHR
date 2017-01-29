@@ -63,20 +63,6 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 				</descriptorRefs>
 			</configuration>
 		</plugin>
-		<!--
-		<plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-jar-plugin</artifactId>
-			<configuration>
-			<archive>
-				<manifest>
-				<addClasspath>true</addClasspath>
-					<mainClass>ru.polynkina.irina.main.Main</mainClass>
-				</manifest>
-			</archive>
-			</configuration>
-		</plugin>
-		-->
 	</plugins>
 	</build>
 		

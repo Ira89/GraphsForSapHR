@@ -10,4 +10,7 @@ public interface ReportingPeriod {
     double getNormTime();
     Map<Integer, Integer> getCopyShortAndHolidays();
 
+    int getNextMonth();
+    int getYearAfterIncreaseMonth();
+
 }

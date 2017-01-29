@@ -38,21 +38,21 @@ public class UniqueGraph extends FiveDayGraph {
 
     // ----------------------------------------------- step 4 ----------------------------------------------------------
     @Override
-    protected void generateGraph() throws Exception {
-        for(int indexDay = 0; indexDay < getAmountDay(); ++indexDay){
+    protected void generateGraph(ReportingPeriod period) throws Exception {
+        for(int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay){
             if(getWorkTime(indexDay) == UNINITIALIZED_WORK_TIME){
                 if(getRuleOfDay(indexDay) == SIGN_DAY) setWorkTime(indexDay, getBasicTime());
                 else setWorkTime(indexDay, getExtraTime());
             }
         }
-        overwriteNormTime();
+        overwriteNormTime(period);
     }
 
     // ----------------------------------------------- step 5 ----------------------------------------------------------
     @Override
     protected void setWorkTimeSign(ReportingPeriod period, Hours libHours) throws Exception {
 
-        for (int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
+        for (int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay) {
             if (getRuleOfDay(indexDay) != SIGN_WEEKEND) {
                 if(getRuleOfDay(indexDay) == SIGN_DAY) setWorkTimeSign(indexDay, getBasicTimeSign());
                 else setWorkTimeSign(indexDay, getExtraTimeSign());
