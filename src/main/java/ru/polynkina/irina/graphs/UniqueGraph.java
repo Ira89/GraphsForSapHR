@@ -1,6 +1,7 @@
 package ru.polynkina.irina.graphs;
 
 import ru.polynkina.irina.hours.Hours;
+import ru.polynkina.irina.period.ReportingPeriod;
 
 import java.util.Map;
 
@@ -25,8 +26,8 @@ public class UniqueGraph extends FiveDayGraph {
 
     // ----------------------------------------------- step 3 ----------------------------------------------------------
     @Override
-    protected void setShortAndHolidays(Map<Integer, Integer> shortAndHolidays) throws Exception {
-        for (Map.Entry<Integer, Integer> day : shortAndHolidays.entrySet()) {
+    protected void setShortAndHolidays(ReportingPeriod period) throws Exception {
+        for (Map.Entry<Integer, Integer> day : period.getCopyShortAndHolidays().entrySet()) {
             if (getRuleOfDay(day.getKey() - 1) == SIGN_WEEKEND) continue;
             if (day.getValue() == CODE_SHORT_DAY) {
                 if (getRuleOfDay(day.getKey() - 1) == SIGN_DAY) setWorkTime(day.getKey() - 1, getBasicTime() - 1);
@@ -49,7 +50,7 @@ public class UniqueGraph extends FiveDayGraph {
 
     // ----------------------------------------------- step 5 ----------------------------------------------------------
     @Override
-    protected void setWorkTimeSign(Map<Integer, Integer> shortAndHolidays, Hours libHours) throws Exception {
+    protected void setWorkTimeSign(ReportingPeriod period, Hours libHours) throws Exception {
 
         for (int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
             if (getRuleOfDay(indexDay) != SIGN_WEEKEND) {

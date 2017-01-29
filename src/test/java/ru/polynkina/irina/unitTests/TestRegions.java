@@ -3,18 +3,18 @@ package ru.polynkina.irina.unitTests;
 import org.junit.Assert;
 import org.junit.*;
 import java.util.*;
-import ru.polynkina.irina.regions.AllUserRegions;
+import ru.polynkina.irina.regions.RegionsContainer;
 
 public class TestRegions {
 
     private static final int AMOUNT_REGIONS = 9;
-    private static AllUserRegions regions;
+    private static RegionsContainer regions;
     private static List<String> nameRegions = new ArrayList<String>();
     private static int indexRegionRU;
 
     @BeforeClass
     public static void init() throws Exception {
-        regions = new AllUserRegions();
+        regions = new RegionsContainer();
         nameRegions.add("RU");
 
         for(int indexRegion = 0; indexRegion < AMOUNT_REGIONS; ++indexRegion) {

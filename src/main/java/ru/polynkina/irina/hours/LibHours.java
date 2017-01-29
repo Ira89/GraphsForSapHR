@@ -19,17 +19,17 @@ import java.util.Map;
  */
 public class LibHours implements Hours {
 
-    private final static int COL_INDICATES_HOUR = 0;
-    private final static int COL_INDICATES_HOUR_NAME = 1;
-    private final static String PATH_TO_LIB_DAY_HOURS = "./_files/library/dayHours.xls";
-    private final static String PATH_TO_LIB_NIGHT_HOURS = "./_files/library/nightHours.xls";
-
     private Map<Double, String> dayHours = new HashMap<Double, String>();
     private Map<Double, String> nightHours = new HashMap<Double, String>();
 
+
     public LibHours() throws Exception {
-        initializingFields();
+        final String PATH_TO_LIB_DAY_HOURS = "./_files/library/dayHours.xls";
+        readLibHours(PATH_TO_LIB_DAY_HOURS, dayHours);
+        final String PATH_TO_LIB_NIGHT_HOURS = "./_files/library/nightHours.xls";
+        readLibHours(PATH_TO_LIB_NIGHT_HOURS, nightHours);
     }
+
 
     public String findSignDayHours(double time) throws Exception {
         String signHourName = dayHours.get(time);
@@ -39,6 +39,7 @@ public class LibHours implements Hours {
         return signHourName;
     }
 
+
     public String findSignNightHours(double time) throws Exception {
         String signHourName = nightHours.get(time);
         if(signHourName == null) {
@@ -47,17 +48,15 @@ public class LibHours implements Hours {
         return signHourName;
     }
 
-    private void initializingFields() throws Exception {
-        readLibHours(PATH_TO_LIB_DAY_HOURS, dayHours);
-        readLibHours(PATH_TO_LIB_NIGHT_HOURS, nightHours);
-    }
 
     // При возникновении NullPointerException чтение из файла завершается
     // NullPointerException игнорируется, т.к. его появление указывает на то, что мы прочитали все данные
     private void readLibHours(String pathFile, Map<Double, String> hours) throws Exception {
+        final int COL_INDICATES_HOUR = 0;
+        final int COL_INDICATES_HOUR_NAME = 1;
+
         FileInputStream fis = new FileInputStream(pathFile);
         Workbook wb = new HSSFWorkbook(fis);
-
         int indexRow = 0;
         while (true) {
             try {
@@ -69,7 +68,6 @@ public class LibHours implements Hours {
                 break;
             }
         }
-
         wb.close();
         fis.close();
     }

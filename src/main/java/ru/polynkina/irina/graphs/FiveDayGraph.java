@@ -1,6 +1,7 @@
 package ru.polynkina.irina.graphs;
 
 import ru.polynkina.irina.hours.Hours;
+import ru.polynkina.irina.period.ReportingPeriod;
 
 import java.util.Map;
 
@@ -20,8 +21,8 @@ public class FiveDayGraph extends DayGraph {
 
     // ----------------------------------------------- step 3 ----------------------------------------------------------
     @Override
-    protected void setShortAndHolidays(Map<Integer, Integer> shortAndHolidays) throws Exception {
-        for (Map.Entry<Integer, Integer> day : shortAndHolidays.entrySet()) {
+    protected void setShortAndHolidays(ReportingPeriod period) throws Exception {
+        for (Map.Entry<Integer, Integer> day : period.getCopyShortAndHolidays().entrySet()) {
             if (getRuleOfDay(day.getKey() - 1) == SIGN_WEEKEND) continue;
             if (day.getValue() == CODE_SHORT_DAY) setWorkTime(day.getKey() - 1, getBasicTime() - 1);
             else if (day.getValue() == CODE_HOLIDAY || day.getValue() == CODE_DAY_OFF) setWorkTime(day.getKey() - 1, 0);
@@ -39,7 +40,7 @@ public class FiveDayGraph extends DayGraph {
 
     // ----------------------------------------------- step 5 ----------------------------------------------------------
     @Override
-    protected void setWorkTimeSign(Map<Integer, Integer> shortAndHolidays, Hours libHours) throws Exception {
+    protected void setWorkTimeSign(ReportingPeriod period, Hours libHours) throws Exception {
 
         for (int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
             if (getRuleOfDay(indexDay) != SIGN_WEEKEND) setWorkTimeSign(indexDay, getBasicTimeSign());
@@ -49,8 +50,8 @@ public class FiveDayGraph extends DayGraph {
 
     // ----------------------------------------------- step 6 ----------------------------------------------------------
     @Override
-    protected void setShortAndHolidaysSign(final Map<Integer, Integer> shortAndHolidays) throws Exception {
-        for(Map.Entry<Integer, Integer> obj : shortAndHolidays.entrySet()) {
+    protected void setShortAndHolidaysSign(ReportingPeriod period) throws Exception {
+        for(Map.Entry<Integer, Integer> obj : period.getCopyShortAndHolidays().entrySet()) {
             if(obj.getValue() == CODE_HOLIDAY) setHolidaysSign((obj.getKey() - 1), '1');
             if(getRuleOfDay(obj.getKey() - 1) != SIGN_WEEKEND) {
                 if(obj.getValue() == CODE_SHORT_DAY) setShortDaysSign((obj.getKey() - 1), 'A');

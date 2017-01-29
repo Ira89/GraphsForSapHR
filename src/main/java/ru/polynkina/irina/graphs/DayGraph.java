@@ -162,16 +162,15 @@ public class DayGraph {
 
     // ----------------------------------------------- generation ------------------------------------------------------
     // facade
-    public void startGenerating(ReportingPeriod period, Map<Integer, Integer> shortAndHolidays,
-                                Hours libHours) throws Exception {
+    public void startGenerating(ReportingPeriod period, Hours libHours) throws Exception {
 
         createEmptyArrays(period.getDaysInMonth());                     // step 0
         setNormTime(period.getNormTime());                              // step 1
         setWeekend();                                                   // step 2
-        setShortAndHolidays(shortAndHolidays);                          // step 3
+        setShortAndHolidays(period);                          // step 3
         generateGraph();                                                // step 4
-        setWorkTimeSign(shortAndHolidays, libHours);                    // step 5
-        setShortAndHolidaysSign(shortAndHolidays);                      // step 6
+        setWorkTimeSign(period, libHours);                    // step 5
+        setShortAndHolidaysSign(period);                      // step 6
     }
 
     // ----------------------------------------------- step 0 ----------------------------------------------------------
@@ -204,8 +203,8 @@ public class DayGraph {
 
     // ----------------------------------------------- step 3 ----------------------------------------------------------
 
-    protected void setShortAndHolidays(Map<Integer, Integer> shortDayAndHolidays) throws Exception {
-        for(Map.Entry<Integer, Integer> day : shortDayAndHolidays.entrySet()) {
+    protected void setShortAndHolidays(ReportingPeriod period) throws Exception {
+        for(Map.Entry<Integer, Integer> day : period.getCopyShortAndHolidays().entrySet()) {
             if(getRuleOfDay(day.getKey() - 1) == SIGN_WEEKEND) continue;
             if(day.getValue() == CODE_SHORT_DAY) setWorkTime(day.getKey() - 1, getBasicTime() - 1);
             else if(day.getValue() == CODE_HOLIDAY) setWorkTime(day.getKey() - 1, getBasicTime());
@@ -284,11 +283,11 @@ public class DayGraph {
 
     // ----------------------------------------------- step 5 ----------------------------------------------------------
 
-    protected void setWorkTimeSign(Map<Integer, Integer> shortAndHolidays, Hours libHours) throws Exception {
+    protected void setWorkTimeSign(ReportingPeriod period, Hours libHours) throws Exception {
 
         for (int indexDay = 0; indexDay < getAmountDay(); ++indexDay) {
             double hour = getWorkTime(indexDay);
-            Integer codeDay = shortAndHolidays.get(indexDay + 1);
+            Integer codeDay = period.getCopyShortAndHolidays().get(indexDay + 1);
             if(codeDay != null) {
                 if(getRuleOfDay(indexDay) != SIGN_WEEKEND && codeDay == CODE_SHORT_DAY) ++hour;
             }
@@ -300,8 +299,9 @@ public class DayGraph {
 
     // ----------------------------------------------- step 6 ----------------------------------------------------------
 
-    protected void setShortAndHolidaysSign(Map<Integer, Integer> shortAndHolidays) throws Exception {
-        for(Map.Entry<Integer, Integer> day : shortAndHolidays.entrySet()) {
+    protected void setShortAndHolidaysSign(ReportingPeriod period) throws Exception {
+        period.getCopyShortAndHolidays().put(20, 0);
+        for(Map.Entry<Integer, Integer> day : period.getCopyShortAndHolidays().entrySet()) {
             if(day.getValue() == CODE_HOLIDAY) setHolidaysSign((day.getKey() - 1), '1');
             else if(day.getValue() == CODE_SHORT_DAY && getRuleOfDay(day.getKey() - 1) != SIGN_WEEKEND)
                 setShortDaysSign((day.getKey() - 1), 'A');

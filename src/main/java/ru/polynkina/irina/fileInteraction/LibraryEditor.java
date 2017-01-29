@@ -5,7 +5,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import ru.polynkina.irina.period.ReportingPeriod;
 import ru.polynkina.irina.graphs.*;
 import org.apache.poi.ss.usermodel.*;
-import ru.polynkina.irina.regions.AllUserRegions;
+import ru.polynkina.irina.regions.RegionsContainer;
 
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
@@ -71,7 +71,7 @@ public class LibraryEditor {
         fis.close();
     }
 
-    public static void writeGraphsIntoTemplate(final List<DayGraph> graphs, AllUserRegions regions,
+    public static void writeGraphsIntoTemplate(final List<DayGraph> graphs, RegionsContainer regions,
                                                ReportingPeriod period) throws Exception {
 
         for(int indexRegion = 0; indexRegion < regions.getAmountRegions(); ++indexRegion) {
