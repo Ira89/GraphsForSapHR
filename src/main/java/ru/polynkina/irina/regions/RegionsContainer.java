@@ -7,8 +7,8 @@ import java.io.FileInputStream;
 import java.util.*;
 
 /**
- * <br> При создании экземпляра класса создается массив объектов UserRegion </br>
- * <br> Инициализация каждого объекта UserRegion происходит при создании экземпляра класса </br>
+ * <br> При создании экземпляра класса создается массив объектов Region </br>
+ * <br> Инициализация каждого объекта Region происходит при создании экземпляра класса RegionsContainer </br>
  * <br> Для инициализации берутся значения: </br>
  *      <br> из файла userForm.xls (значения данного файла изменяются пользователем) </br>
  *      <br> из папки regions (значения не изменяются) </br>
@@ -54,7 +54,8 @@ public class RegionsContainer {
         final String PATH_TO_USER_FILE = "./_files/userForm/userForm.xls";
         final int COL_INDICATES_DATE = 1;
         final int ROW_INDICATES_REGION = 7;
-        final int ROW_INDICATES_NEED_GRAPH = 8;
+        final int ROW_STATUS_REGION = 8;
+        final int GENERATION_IS_NEEDED = 1;
 
         FileInputStream fis = new FileInputStream(PATH_TO_USER_FILE);
         Workbook wb = new HSSFWorkbook(fis);
@@ -62,8 +63,8 @@ public class RegionsContainer {
         while(true) {
             try {
                 String nameRegion = wb.getSheetAt(0).getRow(ROW_INDICATES_REGION).getCell(indexCol).getStringCellValue();
-                int statusRegion = (int) wb.getSheetAt(0).getRow(ROW_INDICATES_NEED_GRAPH).getCell(indexCol).getNumericCellValue();
-                regions.put(nameRegion, statusRegion == 1);
+                int statusRegion = (int) wb.getSheetAt(0).getRow(ROW_STATUS_REGION).getCell(indexCol).getNumericCellValue();
+                regions.put(nameRegion, statusRegion == GENERATION_IS_NEEDED);
                 ++indexCol;
             } catch (NullPointerException exc) {
                 break;

@@ -12,10 +12,12 @@ import java.util.Map;
  * <br> Значения для инициалазиции берутся из файлов dayHours.xls и nightHours.xls </br>
  * <br> Содержимое файлов dayHours.xls и nightHours.xls не изменяется </br>
  * <br> Если один из файлов отсутствует - возбуждается исключение типа Exception </br>
- * <br> Если искать недопустимые значения в findSignDayHours или findSignNightHours - возбуждается исключение типа Exception </br>
- * <br> Допустимыми значениями являются: </br>
- *      <br> для findSignDayHours - от 0 включительно до 15 включительно </br>
- *      <br> для findSignNightHours - от 0 включительно до 22 включительно </br>
+ * <br> Если из dayHours или nightHours запросить значение, которого там не нет - возбуждается исключение типа Exception
+ *      т.к. без этого значения все равно нельзя корректно заполнить шаблон для SAP HR </br>
+ *      и работа программы уже не будет иметь смысла </br>
+ * <br> В данный момент есть значения: </br>
+ *      <br> в dayHours - от 0 включительно до 15 включительно </br>
+ *      <br> в nightHours - от 0 включительно до 22 включительно </br>
  */
 public class LibHours implements Hours {
 
@@ -31,6 +33,7 @@ public class LibHours implements Hours {
     }
 
 
+    // Если не нашли однодневный график - нет смысла продолжать работу
     public String findSignDayHours(double time) throws Exception {
         String signHourName = dayHours.get(time);
         if(signHourName == null) {
@@ -40,6 +43,7 @@ public class LibHours implements Hours {
     }
 
 
+    // Если не нашли однодневный график - нет смысла продолжать работу
     public String findSignNightHours(double time) throws Exception {
         String signHourName = nightHours.get(time);
         if(signHourName == null) {

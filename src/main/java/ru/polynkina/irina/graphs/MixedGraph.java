@@ -33,25 +33,38 @@ public class MixedGraph extends DayGraph {
     private String getExtraTimeSign(){ return extraTimeSign; }
 
     // ----------------------------------------------- step 4 ----------------------------------------------------------
-
+    // Данный тип графиков подразумевает и ночные, и дневные смены
+    // На ночные смены нужно по возможности поставить бОльшие часы
+    // К примеру, в месяце 20 рабочих дней, и из них 10 дневных, и 10 ночных
+    //
+    // Распределение часов: 6 часов * 15 дней + 7 часов * 5 дней = 125 часов
+    // То вначале на все Дневные смены в процедуре fillWorkTimeByType ставим по 6 часов,
+    // А затем запускаем родительскую функцию генерации
+    // И на ночные смены будет гарантировано проставлены 5 смен по 7 часов ( и 5 смен по 6 часов)
+    //
+    // Если распределение часов: 7 часов * 15 дней + 6 часов * 5 дней = 135 часов
+    // То вначале на все Ночные смены в процедуре fillWorkTimeByType ставим по 7 часов
+    // А затем запускаем родительскую функцию генерации
+    // В таком случае на все ночные смены мы поставим гарантированно бОльшие часы (все смены по 7 часов)
     @Override
     protected void generateGraph(ReportingPeriod period) throws Exception {
-        int amountMissingDays = calcMissingDays(period);
+        int amountBlankDays = calcBlankDays(period);
         double missingTime = calcMissingTime(period);
-        int minWorkTime = amountMissingDays == 0 ? (int) missingTime : (int) missingTime / amountMissingDays;
+        int minWorkTime = amountBlankDays == 0 ? (int) missingTime : (int) missingTime / amountBlankDays;
         int maxWorkTime = minWorkTime + 1;
 
-        int amountDaysWithMinTime = calcDaysWithMinTime(minWorkTime, maxWorkTime, missingTime, amountMissingDays);
-        int amountDaysWithMaxTime = amountMissingDays - amountDaysWithMinTime;
+        int amountDaysWithMinTime = calcDaysWithMinTime(minWorkTime, maxWorkTime, missingTime, amountBlankDays);
+        int amountDaysWithMaxTime = amountBlankDays - amountDaysWithMinTime;
 
         if(amountDaysWithMinTime >= amountDaysWithMaxTime)
-            fillWorkTimeByType(SIGN_DAY, minWorkTime, amountDaysWithMinTime, period);
-        else fillWorkTimeByType(SIGN_NIGHT, maxWorkTime, amountDaysWithMaxTime, period);
+            fillWorkTimeByType(DAY, minWorkTime, amountDaysWithMinTime, period);
+        else fillWorkTimeByType(NIGHT, maxWorkTime, amountDaysWithMaxTime, period);
         super.generateGraph(period);
     }
 
     // ----------------------------------------------- step 5 ----------------------------------------------------------
-
+    // Т.к. индексация массива с 0, а пользователь вводит даты в обычном виде - прибавляем 1 к indexDay при запросе codeDay
+    // Если день является сокращенным - ищем однодневный график на час больше (сокращение на 1 час будет в шаге 6)
     @Override
     protected void setWorkTimeSign(ReportingPeriod period, Hours libHours) throws Exception {
 
@@ -59,14 +72,14 @@ public class MixedGraph extends DayGraph {
             double hour = getWorkTime(indexDay);
             Integer codeDay = period.getCopyShortAndHolidays().get(indexDay + 1);
             if(codeDay != null) {
-                if(getRuleOfDay(indexDay) != SIGN_WEEKEND && codeDay == CODE_SHORT_DAY) ++hour;
+                if(getRuleOfDay(indexDay) != WEEKEND && codeDay == CODE_SHORT_DAY) ++hour;
                 if(codeDay == CODE_HOLIDAY && getExtraTime() == hour &&
-                    getRuleOfDay(indexDay) == SIGN_NIGHT && getRuleOfDay(indexDay - 1) == SIGN_NIGHT) {
+                    getRuleOfDay(indexDay) == NIGHT && getRuleOfDay(indexDay - 1) == NIGHT) {
                         setWorkTimeSign(indexDay, SECOND_NIGHT_SHIFT);
                         continue;
                 }
             }
-            if(getRuleOfDay(indexDay) == SIGN_NIGHT) {
+            if(getRuleOfDay(indexDay) == NIGHT) {
                 if(getExtraTime() == hour) setWorkTimeSign(indexDay, getExtraTimeSign());
                 else setWorkTimeSign(indexDay, libHours.findSignNightHours(hour));
             } else {

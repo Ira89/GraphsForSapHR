@@ -16,6 +16,14 @@ import java.util.List;
 
 import static ru.polynkina.irina.graphs.Graph.*;
 
+/**
+ * <br> При создании экземпляра класса создается массив объектов Graph </br>
+ * <br> Инициализация каждого объекта Graph происходит при создании экземпляра класса GraphsContainer </br>
+ * <br> Для инициализации берутся значения: </br>
+ *      <br> из файла rules.xls (значения данного файла не изменяются) </br>
+ *      <br> из файла counter_month_year.xls (при генерации графиков создается файл для следующего месяца) </br>
+ * <br> Если один из файлов отсутствует - возбуждается исключение типа Exception </br>
+ */
 public class GraphsContainer {
 
     private List<Graph> graphs = new ArrayList<Graph>();
@@ -26,7 +34,9 @@ public class GraphsContainer {
         readCounterForGraphs(period);
     }
 
-
+    /**
+     * Запускает генерацию по всем графикам, находящимся в шаблоне
+     */
     public void startGenerating(ReportingPeriod period, Hours libHours) throws Exception {
         for(Graph graph : graphs) {
             graph.startGenerating(period, libHours);
@@ -34,7 +44,9 @@ public class GraphsContainer {
         writeNextCounter(period);
     }
 
-
+    /**
+     * Записывает сгенерированные графики в шаблон для SAP HR (сигнатуры графиков) и в пользовательский шаблон (часы)
+     */
     public void writeGraphsInFile(ReportingPeriod period, RegionsContainer regions) throws Exception {
         writeWorkHoursInFile(period);
         writeGraphsInTemplates(period, regions);
@@ -42,7 +54,7 @@ public class GraphsContainer {
 
 
     /**
-     * Данный метод удаляет счетчик за предыдущий год
+     * Удаляет счетчик за предыдущий год
      */
     public void deleteOldCounter(ReportingPeriod period) {
         final String PATH_TO_COUNTERS = "./_files/counters/counter_";
@@ -52,7 +64,9 @@ public class GraphsContainer {
         }
     }
 
-
+    /**
+     * Если месячная норма отличается от фактически сгенерированных часов - в консоль будет выведено предупреждение
+     */
     public void printCheckResults() throws Exception {
         boolean graphIsCorrect = true;
         for(Graph graph : graphs) {
@@ -291,6 +305,6 @@ public class GraphsContainer {
 
 
     private boolean isNightTime(int idGraph, int indexDay) throws Exception {
-        return graphs.get(idGraph).getRuleOfDay(indexDay) == SIGN_NIGHT;
+        return graphs.get(idGraph).getRuleOfDay(indexDay) == NIGHT;
     }
 }

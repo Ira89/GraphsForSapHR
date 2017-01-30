@@ -8,7 +8,7 @@ import java.util.Map;
 import org.junit.*;
 import static org.junit.Assert.fail;
 
-public class UnitTest {
+public class TestGraphs {
 
     private static Map<Integer, Integer> shortAndHolidays = new HashMap<Integer, Integer>();
     private static ClassForTestPeriod period;
@@ -179,7 +179,6 @@ public class UnitTest {
 
     @Test
     public void testRoundingHours() throws Exception {
-        ClassForTestPeriod period = new ClassForTestPeriod(2017, 1, 31, 143, shortAndHolidays);
         final double correctNormTime = 128.6;
         final String correctGraph[] = {
                 "NO72", "NO72", "FREE", "FREE", "4AC6", "4AC6", "4AC6",
@@ -189,6 +188,7 @@ public class UnitTest {
                 "4AC5", "NO52", "FREE"
         };
 
+        ClassForTestPeriod period = new ClassForTestPeriod(2017, 1, 31, 143, shortAndHolidays);
         DayGraph actualGraph = new FractionalGraph(1, "FLOAT", "dddddff", 7.2, "NO72", "text");
         actualGraph.setCounter(3);
         actualGraph.startGenerating(period, libHours);
@@ -199,12 +199,6 @@ public class UnitTest {
 
     @Test
     public void testSetFractionalDay() throws Exception {
-        Map<Integer, Integer> shortAndHolidays = new HashMap<Integer, Integer>();
-        shortAndHolidays.put(7, 0);
-        shortAndHolidays.put(8, 1);
-        shortAndHolidays.put(27, 0);
-        shortAndHolidays.put(28, 1);
-        ClassForTestPeriod period = new ClassForTestPeriod(2017, 1, 31, 166, shortAndHolidays);
         final double correctNormTime = 149.2;
         final String correctGraph[] = {
                 "4AC6", "4AC6", "4AC7", "4AC6", "FREE", "FREE", "NO72",
@@ -214,6 +208,12 @@ public class UnitTest {
                 "4AC6", "4AC7", "NO62"
         };
 
+        Map<Integer, Integer> shortAndHolidays = new HashMap<Integer, Integer>();
+        shortAndHolidays.put(7, 0);
+        shortAndHolidays.put(8, 1);
+        shortAndHolidays.put(27, 0);
+        shortAndHolidays.put(28, 1);
+        ClassForTestPeriod period = new ClassForTestPeriod(2017, 1, 31, 166, shortAndHolidays);
         DayGraph actualGraph = new FractionalGraph(1, "FLOAT", "dddddff", 7.2, "NO72", "text");
         actualGraph.setCounter(1);
         actualGraph.startGenerating(period, libHours);

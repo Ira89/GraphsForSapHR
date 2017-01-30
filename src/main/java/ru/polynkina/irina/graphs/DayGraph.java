@@ -33,26 +33,28 @@ public class DayGraph implements Graph {
         this.text = text;
     }
 
+    // --------------------------------------------- функции для проверок ----------------------------------------------
+
     private boolean ruleIsCorrect(String rule){
         for(int positionForRule = 0; positionForRule < rule.length(); ++positionForRule){
             switch(rule.charAt(positionForRule)){
-                case SIGN_UNIVERSAL_DAY: break;
-                case SIGN_WEEKEND: break;
-                case SIGN_NIGHT: break;
-                case SIGN_DAY: break;
+                case UNIVERSAL_DAY: break;
+                case WEEKEND: break;
+                case NIGHT: break;
+                case DAY: break;
                 default: return false;
             }
         }
         return true;
     }
 
-    private void checkIndexOfDay(int indexDay) throws Exception {
-        if(indexDay < 0 || indexDay >= workTime.length)
-            throw new Exception("Индекс " + indexDay + " выходит за пределы массива");
-    }
-
     boolean timeIsCorrect(double time) {
         return time > 0 && time <= MAX_WORK_TIME_IN_DIURNAL;
+    }
+
+    private void checkIndexOfDay(int indexDay) throws Exception {
+        if(indexDay < 0 || indexDay >= workTime.length)
+            throw new Exception("Индекс " + indexDay + " не входит в диапазон от 0 до " + workTime.length + "!");
     }
 
     public double calcRealNormTime() throws Exception {
@@ -121,7 +123,8 @@ public class DayGraph implements Graph {
     }
 
     public void setCounter(int counter) throws Exception {
-        if(counter >= getLengthRule()) throw new Exception("Позиция счетчика не может быть больше, чем правило");
+        if(counter >= getLengthRule())
+            throw new Exception("Позиция счетчика (" + counter + ") превышает длину правила (" + getLengthRule() + ")!");
         this.counter = counter;
     }
 
@@ -162,15 +165,16 @@ public class DayGraph implements Graph {
 
     private void setWeekend(ReportingPeriod period) throws Exception {
         for(int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay) {
-            if(getRuleOfDay(indexDay) == SIGN_WEEKEND) setWorkTime(indexDay, 0);
+            if(getRuleOfDay(indexDay) == WEEKEND) setWorkTime(indexDay, 0);
         }
     }
 
     // ----------------------------------------------- step 3 ----------------------------------------------------------
-
+    // Если день является выходным - ничего не делаем, т.к. нулевое рабочее время уже установлено на шаге 2
+    // Индекс дня day.getKey() уменьшаем на 1, т.к. в массиве индексация с 0, а пользователь вводит числа в обычном виде
     protected void setShortAndHolidays(ReportingPeriod period) throws Exception {
         for(Map.Entry<Integer, Integer> day : period.getCopyShortAndHolidays().entrySet()) {
-            if(getRuleOfDay(day.getKey() - 1) == SIGN_WEEKEND) continue;
+            if(getRuleOfDay(day.getKey() - 1) == WEEKEND) continue;
             if(day.getValue() == CODE_SHORT_DAY) setWorkTime(day.getKey() - 1, getBasicTime() - 1);
             else if(day.getValue() == CODE_HOLIDAY) setWorkTime(day.getKey() - 1, getBasicTime());
         }
@@ -179,13 +183,13 @@ public class DayGraph implements Graph {
     // ----------------------------------------------- step 4 ----------------------------------------------------------
 
     protected void generateGraph(ReportingPeriod period) throws Exception {
-        int amountMissingDays = calcMissingDays(period);
+        int amountBlankDays = calcBlankDays(period);
         double missingTime = calcMissingTime(period);
-        int minWorkTime = amountMissingDays == 0 ? (int) missingTime : (int) missingTime / amountMissingDays;
+        int minWorkTime = amountBlankDays == 0 ? (int) missingTime : (int) missingTime / amountBlankDays;
         int maxWorkTime = minWorkTime + 1;
 
-        int amountDaysWithMinTime = calcDaysWithMinTime(minWorkTime, maxWorkTime, missingTime, amountMissingDays);
-        int amountDaysWithMaxTime = amountMissingDays - amountDaysWithMinTime;
+        int amountDaysWithMinTime = calcDaysWithMinTime(minWorkTime, maxWorkTime, missingTime, amountBlankDays);
+        int amountDaysWithMaxTime = amountBlankDays - amountDaysWithMinTime;
         double frequency = calcFrequency(amountDaysWithMinTime, amountDaysWithMaxTime);
 
         if(amountDaysWithMinTime >= amountDaysWithMaxTime)
@@ -193,15 +197,16 @@ public class DayGraph implements Graph {
         else fillMissingWorkDays(maxWorkTime, amountDaysWithMaxTime, minWorkTime, amountDaysWithMinTime, frequency, period);
     }
 
-
-    int calcMissingDays(ReportingPeriod period) throws Exception {
-        int amountMissingDays = 0;
+    // Считаем дни, которые остались незаполненными на предыдущих этапах
+    int calcBlankDays(ReportingPeriod period) throws Exception {
+        int amountBlankDays = 0;
         for(int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay) {
-            if(getWorkTime(indexDay) == UNINITIALIZED_WORK_TIME) ++amountMissingDays;
+            if(getWorkTime(indexDay) == UNINITIALIZED_WORK_TIME) ++amountBlankDays;
         }
-        return amountMissingDays;
+        return amountBlankDays;
     }
 
+    // Считаем, сколько часов еще нужно, чтобы в итоге выйти на месячную норму времени
     double calcMissingTime(ReportingPeriod period) throws Exception {
         double missingTime = 0;
         for(int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay) {
@@ -210,6 +215,9 @@ public class DayGraph implements Graph {
         return getNormTime() - missingTime;
     }
 
+    // Допустим, минимальное время 6 часов, максимальное время 7 часов. Нужно выйти на 125 часов при 20 рабочих днях
+    // Получится, что 6 часов * 15 дней + 7 часов * 5 дней = 125 часов
+    // Возвращаем дни для минимального времени - т.к. 15 дней
     int calcDaysWithMinTime(int minWorkTime, int maxWorkTime, double sumWorkTime, int amountWorkDays) {
         int daysWithMinTime;
         for(daysWithMinTime = 0; daysWithMinTime <= amountWorkDays; ++daysWithMinTime) {
@@ -219,12 +227,15 @@ public class DayGraph implements Graph {
         return daysWithMinTime;
     }
 
+    // Если в функцию переданы значения (15 и 5) или (5 и 15), на выходе должны получить 3, т.е. 15 / 5
     double calcFrequency(int amountDaysWithMinTime, int amountDaysWithMaxTime) {
         if(amountDaysWithMinTime > amountDaysWithMaxTime)
             return amountDaysWithMaxTime == 0 ? amountDaysWithMinTime : (double) amountDaysWithMinTime / amountDaysWithMaxTime;
         return amountDaysWithMinTime == 0 ? amountDaysWithMaxTime : (double) amountDaysWithMaxTime / amountDaysWithMinTime;
     }
 
+    // Незаполненные дни должны быть более или менее равномерно заполнены значениями 6 и 7 с частотой 3 к 1, т.е.
+    // 6; 6; 6; 7; 6; 6; 6; 7... и т.д.
     private void fillMissingWorkDays(int spreadValue, int amountSpreadValue, int rareValue, int amountRareValue,
                                      double frequency, ReportingPeriod period) throws Exception {
 
@@ -247,14 +258,15 @@ public class DayGraph implements Graph {
     }
 
     // ----------------------------------------------- step 5 ----------------------------------------------------------
-
+    // Т.к. индексация массива с 0, а пользователь вводит даты в обычном виде - прибавляем 1 к indexDay при запросе codeDay
+    // Если день является сокращенным - ищем однодневный график на час больше (сокращение на 1 час будет в шаге 6)
     protected void setWorkTimeSign(ReportingPeriod period, Hours libHours) throws Exception {
-
         for (int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay) {
             double hour = getWorkTime(indexDay);
             Integer codeDay = period.getCopyShortAndHolidays().get(indexDay + 1);
             if(codeDay != null) {
-                if(getRuleOfDay(indexDay) != SIGN_WEEKEND && codeDay == CODE_SHORT_DAY) ++hour;
+                if(getRuleOfDay(indexDay) != WEEKEND && codeDay == CODE_SHORT_DAY)
+                    ++hour;
             }
 
             if (getBasicTime() == hour) setWorkTimeSign(indexDay, getBasicTimeSign());
@@ -263,12 +275,14 @@ public class DayGraph implements Graph {
     }
 
     // ----------------------------------------------- step 6 ----------------------------------------------------------
-
+    // Индекс дня day.getKey() уменьшаем на 1, т.к. в массиве индексация с 0, а пользователь вводит числа в обычном виде
     protected void setShortAndHolidaysSign(ReportingPeriod period) throws Exception {
         for(Map.Entry<Integer, Integer> day : period.getCopyShortAndHolidays().entrySet()) {
-            if(day.getValue() == CODE_HOLIDAY) setHolidaysSign((day.getKey() - 1), '1');
-            else if(day.getValue() == CODE_SHORT_DAY && getRuleOfDay(day.getKey() - 1) != SIGN_WEEKEND)
-                setShortDaysSign((day.getKey() - 1), 'A');
+            if(day.getValue() == CODE_HOLIDAY) {
+                setHolidaysSign((day.getKey() - 1), SIGN_HOLIDAY);
+            } else if(day.getValue() == CODE_SHORT_DAY && getRuleOfDay(day.getKey() - 1) != WEEKEND) {
+                setShortDaysSign((day.getKey() - 1), SIGN_SHORT_DAY);
+            }
         }
     }
 }

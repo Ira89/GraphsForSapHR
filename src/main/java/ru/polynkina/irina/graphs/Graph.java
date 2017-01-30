@@ -24,10 +24,14 @@ public interface Graph {
     String UNIQUE_TYPE = "UNIQUE";
     String MIXED_TYPE = "MIX";
 
-    char SIGN_UNIVERSAL_DAY = 'u';
-    char SIGN_WEEKEND = 'f';
-    char SIGN_NIGHT = 'n';
-    char SIGN_DAY = 'd';
+    char UNIVERSAL_DAY = 'u';
+    char WEEKEND = 'f';
+    char NIGHT = 'n';
+    char DAY = 'd';
+
+    char SIGN_HOLIDAY = '1';
+    char SIGN_SHORT_DAY = 'A';
+    char SIGN_OFF_DAY = 'F';
 
     int getId();
     String getName();
@@ -37,7 +41,6 @@ public interface Graph {
     int getCounter();
     double getNormTime();
     String getText();
-
     double getWorkTime(int indexDay) throws Exception;
     String getWorkTimeSign(int indexDay) throws Exception;
     char getHolidaysSign(int indexDay) throws Exception;
