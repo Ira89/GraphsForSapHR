@@ -37,10 +37,10 @@ public class MixedGraph extends DayGraph {
     // На ночные смены нужно по возможности поставить бОльшие часы
     // К примеру, в месяце 20 рабочих дней, и из них 10 дневных, и 10 ночных
     //
-    // Распределение часов: 6 часов * 15 дней + 7 часов * 5 дней = 125 часов
+    // Если распределение часов: 6 часов * 15 дней + 7 часов * 5 дней = 125 часов
     // То вначале на все Дневные смены в процедуре fillWorkTimeByType ставим по 6 часов,
     // А затем запускаем родительскую функцию генерации
-    // И на ночные смены будет гарантировано проставлены 5 смен по 7 часов ( и 5 смен по 6 часов)
+    // И на ночные смены будет гарантировано проставлены все 5 смен по 7 часов ( и 5 смен по 6 часов)
     //
     // Если распределение часов: 7 часов * 15 дней + 6 часов * 5 дней = 135 часов
     // То вначале на все Ночные смены в процедуре fillWorkTimeByType ставим по 7 часов
@@ -65,6 +65,7 @@ public class MixedGraph extends DayGraph {
     // ----------------------------------------------- step 5 ----------------------------------------------------------
     // Т.к. индексация массива с 0, а пользователь вводит даты в обычном виде - прибавляем 1 к indexDay при запросе codeDay
     // Если день является сокращенным - ищем однодневный график на час больше (сокращение на 1 час будет в шаге 6)
+    // Если перед праздничным ночным тоже была ночная смена - нужно использовать "C_33", а не искать в libHours
     @Override
     protected void setWorkTimeSign(ReportingPeriod period, Hours libHours) throws Exception {
 
@@ -73,10 +74,12 @@ public class MixedGraph extends DayGraph {
             Integer codeDay = period.getCopyShortAndHolidays().get(indexDay + 1);
             if(codeDay != null) {
                 if(getRuleOfDay(indexDay) != WEEKEND && codeDay == CODE_SHORT_DAY) ++hour;
-                if(codeDay == CODE_HOLIDAY && getExtraTime() == hour &&
-                    getRuleOfDay(indexDay) == NIGHT && getRuleOfDay(indexDay - 1) == NIGHT) {
-                        setWorkTimeSign(indexDay, SECOND_NIGHT_SHIFT);
-                        continue;
+                if(codeDay == CODE_HOLIDAY
+                        && getExtraTime() == hour
+                        && getRuleOfDay(indexDay) == NIGHT
+                        && getRuleOfDay(indexDay - 1) == NIGHT) {
+                    setWorkTimeSign(indexDay, SECOND_NIGHT_SHIFT);
+                    continue;
                 }
             }
             if(getRuleOfDay(indexDay) == NIGHT) {

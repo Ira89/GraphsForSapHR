@@ -28,7 +28,10 @@ public class GraphsContainer {
 
     private List<Graph> graphs = new ArrayList<Graph>();
 
-
+    /**
+     * Инициализирует графики значениями из шаблона
+     * И устанавливает счетчики для каждого графика
+     */
     public GraphsContainer(ReportingPeriod period) throws Exception {
         createGraphsOnRules();
         readCounterForGraphs(period);
@@ -36,6 +39,7 @@ public class GraphsContainer {
 
     /**
      * Запускает генерацию по всем графикам, находящимся в шаблоне
+     * И записывает новый счетчик (для следующего месяца)
      */
     public void startGenerating(ReportingPeriod period, Hours libHours) throws Exception {
         for(Graph graph : graphs) {
@@ -228,7 +232,7 @@ public class GraphsContainer {
                     cell = row.createCell(COL_INDICATES_HOURS + indexDay * SIZE_STEP);
                     cell.setCellValue(graph.getWorkTimeSign(indexDay));
 
-                    // если день не выхдной - применяем заливку цветом
+                    // если день не выходной - применяем заливку цветом
                     if(isWorkingDay(graph.getId(), indexDay)) {
                         if(isNightTime(graph.getId(), indexDay)) cell.setCellStyle(styleForNightTime);
                         else cell.setCellStyle(styleForDaytime);

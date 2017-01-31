@@ -22,7 +22,7 @@ public class FiveDayGraph extends DayGraph {
     // ----------------------------------------------- step 3 ----------------------------------------------------------
     // Если день является выходным - ничего не делаем, т.к. нулевое рабочее время уже установлено на шаге 2
     // Индекс дня day.getKey() уменьшаем на 1, т.к. в массиве индексация с 0, а пользователь вводит числа в обычном виде
-    // Для стандартного пятидневного графика ставим 0 часов на выходные и перенесенные праздничные
+    // Для графика типа FiveDayGraph ставим 0 часов на праздничные дни и перенесенные праздничные дни
     @Override
     protected void setShortAndHolidays(ReportingPeriod period) throws Exception {
         for (Map.Entry<Integer, Integer> day : period.getCopyShortAndHolidays().entrySet()) {
@@ -34,7 +34,7 @@ public class FiveDayGraph extends DayGraph {
 
     // ----------------------------------------------- step 4 ----------------------------------------------------------
     // На все незаполненные дни ставим стандартное рабочее время
-    // и перезаписываем норму времени, т.к. она может не сходиться со стандартным (и это нормально)
+    // и перезаписываем норму времени, т.к. она может не сходиться со стандартным (и это нормально для данного типа графика)
     @Override
     protected void generateGraph(ReportingPeriod period) throws Exception {
         for(int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay){
@@ -56,7 +56,8 @@ public class FiveDayGraph extends DayGraph {
 
     // ----------------------------------------------- step 6 ----------------------------------------------------------
     // Индекс дня day.getKey() уменьшаем на 1, т.к. в массиве индексация с 0, а пользователь вводит числа в обычном виде
-    // Только для данного типа графиков устанавливаются признаки перенесенных дней (SIGN_OF_DAY)
+    // Признак праздничного дня устанавливается всегда, а признак сокращенного - только для рабочих дней (с ненулевым временем)
+    // Только для данного типа графиков и наследников класса (UniqueGraph) устанавливаются признаки перенесенных дней 'F'
     @Override
     protected void setShortAndHolidaysSign(ReportingPeriod period) throws Exception {
         for(Map.Entry<Integer, Integer> obj : period.getCopyShortAndHolidays().entrySet()) {

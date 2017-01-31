@@ -172,6 +172,7 @@ public class DayGraph implements Graph {
     // ----------------------------------------------- step 3 ----------------------------------------------------------
     // Если день является выходным - ничего не делаем, т.к. нулевое рабочее время уже установлено на шаге 2
     // Индекс дня day.getKey() уменьшаем на 1, т.к. в массиве индексация с 0, а пользователь вводит числа в обычном виде
+    // На сокращенные дни ставим время на 1 час меньше основного
     protected void setShortAndHolidays(ReportingPeriod period) throws Exception {
         for(Map.Entry<Integer, Integer> day : period.getCopyShortAndHolidays().entrySet()) {
             if(getRuleOfDay(day.getKey() - 1) == WEEKEND) continue;
@@ -217,7 +218,7 @@ public class DayGraph implements Graph {
 
     // Допустим, минимальное время 6 часов, максимальное время 7 часов. Нужно выйти на 125 часов при 20 рабочих днях
     // Получится, что 6 часов * 15 дней + 7 часов * 5 дней = 125 часов
-    // Возвращаем дни для минимального времени - т.к. 15 дней
+    // Возвращаем дни для минимального времени - т.е. 15 дней
     int calcDaysWithMinTime(int minWorkTime, int maxWorkTime, double sumWorkTime, int amountWorkDays) {
         int daysWithMinTime;
         for(daysWithMinTime = 0; daysWithMinTime <= amountWorkDays; ++daysWithMinTime) {
@@ -276,6 +277,7 @@ public class DayGraph implements Graph {
 
     // ----------------------------------------------- step 6 ----------------------------------------------------------
     // Индекс дня day.getKey() уменьшаем на 1, т.к. в массиве индексация с 0, а пользователь вводит числа в обычном виде
+    // Признак праздничного дня устанавливается всегда, а признак сокращенного - только для рабочих дней (с ненулевым временем)
     protected void setShortAndHolidaysSign(ReportingPeriod period) throws Exception {
         for(Map.Entry<Integer, Integer> day : period.getCopyShortAndHolidays().entrySet()) {
             if(day.getValue() == CODE_HOLIDAY) {

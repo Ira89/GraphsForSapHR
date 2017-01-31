@@ -10,8 +10,8 @@ public class DiurnalGraph extends DayGraph {
     }
 
     // Суточные - это 1 рабочий через 3 выходных
-    // Доп. смену будем ставить в середину, т.е. на второй выходной день
-    // Доп. смена не может быть ночью, это дневная смена
+    // Дополнительную смену будем ставить в середину, т.е. на второй выходной день
+    // Дополнительная смена не может быть ночной, это смена дневная
     private void setAdditionalWorkDay(double additionalTime, ReportingPeriod period) throws Exception {
         final int INDEX_MIDDLE_DAY_OFF = 2;
         for(int indexDay = 0; indexDay < period.getDaysInMonth() && additionalTime != 0; ++indexDay) {
@@ -49,8 +49,9 @@ public class DiurnalGraph extends DayGraph {
             Integer codeDay = period.getCopyShortAndHolidays().get(indexDay + 1);
             if (codeDay != null) {
                 if (getRuleOfDay(indexDay) != WEEKEND && codeDay == CODE_SHORT_DAY) ++hour;
-                if (codeDay == CODE_HOLIDAY && getBasicTime() == hour &&
-                        getRuleOfDay(indexDay) == NIGHT && getRuleOfDay(indexDay - 1) == NIGHT) {
+                if (codeDay == CODE_HOLIDAY
+                        && getBasicTime() == hour
+                        && getRuleOfDay(indexDay) == NIGHT && getRuleOfDay(indexDay - 1) == NIGHT) {
                     setWorkTimeSign(indexDay, SECOND_NIGHT_SHIFT);
                     continue;
                 }
