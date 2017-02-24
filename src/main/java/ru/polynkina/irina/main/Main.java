@@ -21,7 +21,7 @@ public class Main {
             graphs.deleteOldCounter(period);
             graphs.printCheckResults();
 
-            System.out.println("Версия программы: 3.0.0");
+            System.out.println("Версия программы: 3.1.0");
         } catch (Exception exc) {
             exc.printStackTrace();
             System.exit(-1);

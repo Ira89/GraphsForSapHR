@@ -1,7 +1,6 @@
 package ru.polynkina.irina.graphs;
 
 import ru.polynkina.irina.hours.Hours;
-
 import java.util.Map;
 
 public class MixedGraph extends DayGraph {
@@ -64,7 +63,6 @@ public class MixedGraph extends DayGraph {
     }
 
     // ----------------------------------------------- step 5 ----------------------------------------------------------
-    // Т.к. индексация массива с 0, а пользователь вводит даты в обычном виде - прибавляем 1 к indexDay при запросе codeDay
     // Если день является сокращенным - ищем однодневный график на час больше (сокращение на 1 час будет в шаге 6)
     // Если перед праздничным ночным тоже была ночная смена - нужно использовать "C_33", а не искать в libHours
     @Override
@@ -72,7 +70,7 @@ public class MixedGraph extends DayGraph {
 
         for (int indexDay = 0; indexDay < daysInMonth; ++indexDay) {
             double hour = getWorkTime(indexDay);
-            Integer codeDay = shortAndHolidays.get(indexDay + 1);
+            Integer codeDay = shortAndHolidays.get(indexDay);
             if(codeDay != null) {
                 if(getRuleOfDay(indexDay) != WEEKEND && codeDay == CODE_SHORT_DAY) ++hour;
                 if(codeDay == CODE_HOLIDAY

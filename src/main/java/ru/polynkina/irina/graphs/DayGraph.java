@@ -79,22 +79,22 @@ public class DayGraph implements Graph {
     public double getNormTime(){ return normTime; }
 
     public double getWorkTime(int indexDay) throws ArrayIndexOutOfBoundsException {
-        if(indexDayIsNotValid(indexDay))throwException(indexDay);
+        if(indexDayIsNotValid(indexDay)) throwException(indexDay);
         return workTime[indexDay];
     }
 
     public String getWorkTimeSign(int indexDay) throws ArrayIndexOutOfBoundsException {
-        if(indexDayIsNotValid(indexDay))throwException(indexDay);
+        if(indexDayIsNotValid(indexDay)) throwException(indexDay);
         return workTimeSign[indexDay];
     }
 
     public char getHolidaysSign(int indexDay) throws ArrayIndexOutOfBoundsException {
-        if(indexDayIsNotValid(indexDay))throwException(indexDay);
+        if(indexDayIsNotValid(indexDay)) throwException(indexDay);
         return holidaysSign[indexDay];
     }
 
     public char getShortDaysSign(int indexDay) throws ArrayIndexOutOfBoundsException {
-        if(indexDayIsNotValid(indexDay))throwException(indexDay);
+        if(indexDayIsNotValid(indexDay)) throwException(indexDay);
         return shortDaysSign[indexDay];
     }
 
@@ -107,22 +107,22 @@ public class DayGraph implements Graph {
     // -------------------------------------------------- setters ------------------------------------------------------
 
     public void setWorkTime(int indexDay, double time) throws ArrayIndexOutOfBoundsException {
-        if(indexDayIsNotValid(indexDay))throwException(indexDay);
+        if(indexDayIsNotValid(indexDay)) throwException(indexDay);
         workTime[indexDay] = time;
     }
 
     public void setWorkTimeSign(int indexDay, String sign) throws ArrayIndexOutOfBoundsException {
-        if(indexDayIsNotValid(indexDay))throwException(indexDay);
+        if(indexDayIsNotValid(indexDay)) throwException(indexDay);
         workTimeSign[indexDay] = sign;
     }
 
     public void setHolidaysSign(int indexDay, char sign) throws ArrayIndexOutOfBoundsException {
-        if(indexDayIsNotValid(indexDay))throwException(indexDay);
+        if(indexDayIsNotValid(indexDay)) throwException(indexDay);
         holidaysSign[indexDay] = sign;
     }
 
     public void setShortDaysSign(int indexDay, char sign) throws ArrayIndexOutOfBoundsException {
-        if(indexDayIsNotValid(indexDay))throwException(indexDay);
+        if(indexDayIsNotValid(indexDay)) throwException(indexDay);
         shortDaysSign[indexDay] = sign;
     }
 
@@ -174,15 +174,15 @@ public class DayGraph implements Graph {
     }
 
     // ----------------------------------------------- step 3 ----------------------------------------------------------
-    // getKey() -> получаем день месяца (т.к. пользователь вводит даты в обычном виде, а в массиве дни идут с нуля - разница в индексах на 1)
+    // getKey() -> получаем день месяца
     // getValue() -> получаем код этого дня (0 - сокращенный, 1 - праздничный, 2 - перенесенный)
     // Если день является выходным - ничего не делаем, т.к. нулевое рабочее время уже установлено на шаге 2
     // На сокращенные дни ставим время на 1 час меньше основного
     protected void setShortAndHolidays(Map<Integer, Integer> shortAndHolidays) throws ArrayIndexOutOfBoundsException {
         for(Map.Entry<Integer, Integer> day : shortAndHolidays.entrySet()) {
-            if(getRuleOfDay(day.getKey() - 1) == WEEKEND) continue;
-            if(day.getValue() == CODE_SHORT_DAY) setWorkTime(day.getKey() - 1, getBasicTime() - 1);
-            else if(day.getValue() == CODE_HOLIDAY) setWorkTime(day.getKey() - 1, getBasicTime());
+            if(getRuleOfDay(day.getKey()) == WEEKEND) continue;
+            if(day.getValue() == CODE_SHORT_DAY) setWorkTime(day.getKey(), getBasicTime() - 1);
+            else if(day.getValue() == CODE_HOLIDAY) setWorkTime(day.getKey(), getBasicTime());
         }
     }
 
@@ -264,12 +264,11 @@ public class DayGraph implements Graph {
     }
 
     // ----------------------------------------------- step 5 ----------------------------------------------------------
-    // Т.к. индексация массива с 0, а пользователь вводит даты в обычном виде - прибавляем 1 к indexDay при запросе codeDay
     // Если день является сокращенным - ищем однодневный график на час больше (сокращение на 1 час будет в шаге 6)
     protected void setWorkTimeSign(int daysInMonth, Map<Integer, Integer> shortAndHolidays, Hours libHours) throws Exception {
         for (int indexDay = 0; indexDay < daysInMonth; ++indexDay) {
             double hour = getWorkTime(indexDay);
-            Integer codeDay = shortAndHolidays.get(indexDay + 1);
+            Integer codeDay = shortAndHolidays.get(indexDay);
             if(codeDay != null) {
                 if(getRuleOfDay(indexDay) != WEEKEND && codeDay == CODE_SHORT_DAY) ++hour;
             }
@@ -279,15 +278,15 @@ public class DayGraph implements Graph {
     }
 
     // ----------------------------------------------- step 6 ----------------------------------------------------------
-    // getKey() -> получаем день месяца (т.к. пользователь вводит даты в обычном виде, а в массиве дни идут с нуля - разница в индексах на 1)
+    // getKey() -> получаем день месяца
     // getValue() -> получаем код этого дня (0 - сокращенный, 1 - праздничный, 2 - перенесенный)
     // Признак праздничного дня устанавливается всегда, а признак сокращенного - только для рабочих дней (с ненулевым временем)
     protected void setShortAndHolidaysSign(Map<Integer, Integer> shortAndHolidays) throws ArrayIndexOutOfBoundsException {
         for(Map.Entry<Integer, Integer> day : shortAndHolidays.entrySet()) {
             if(day.getValue() == CODE_HOLIDAY) {
-                setHolidaysSign((day.getKey() - 1), SIGN_HOLIDAY);
-            } else if(day.getValue() == CODE_SHORT_DAY && getRuleOfDay(day.getKey() - 1) != WEEKEND) {
-                setShortDaysSign((day.getKey() - 1), SIGN_SHORT_DAY);
+                setHolidaysSign((day.getKey()), SIGN_HOLIDAY);
+            } else if(day.getValue() == CODE_SHORT_DAY && getRuleOfDay(day.getKey()) != WEEKEND) {
+                setShortDaysSign((day.getKey()), SIGN_SHORT_DAY);
             }
         }
     }

@@ -48,7 +48,15 @@ public class UserPeriod implements ReportingPeriod {
     public int getMonth() { return month; }
     public int getDaysInMonth() { return daysInMonth; }
     public double getNormTime() { return normTime; }
-    public Map<Integer, Integer> getCopyShortAndHolidays() { return new HashMap<Integer, Integer>(shortAndHolidays); }
+    public Map<Integer, Integer> getCopyShortAndHolidays() {
+        Map<Integer, Integer> copyShortAndHolidays = new HashMap<Integer, Integer>();
+        for(Map.Entry<Integer, Integer> copy : shortAndHolidays.entrySet()) {
+            Integer indexDay = copy.getKey() - 1;
+            Integer codeDay = copy.getValue();
+            copyShortAndHolidays.put(indexDay, codeDay);
+        }
+        return copyShortAndHolidays;
+    }
 
 
     public int getNextMonth() {
@@ -105,9 +113,10 @@ public class UserPeriod implements ReportingPeriod {
     private void takeShortAndHolidays(String pathFile, int beginRow, int endRow, int indexColumn) throws Exception {
         final int AMOUNT_OF_HEADERS = 3;
         for(int indexRow = beginRow; indexRow <= endRow; ++indexRow) {
+            int indexCol = indexColumn;
             while(true) {
                 try {
-                    int date = (int) readUserData(pathFile, indexRow, indexColumn);
+                    int date = (int) readUserData(pathFile, indexRow, indexCol);
                     if(date == 0) {
                         throw new NullPointerException();
                     } else if(shortAndHolidays.containsValue(date)) {
@@ -116,7 +125,7 @@ public class UserPeriod implements ReportingPeriod {
                         throw new Exception("Дата должна быть в диапазоне от 1 до " + daysInMonth);
                     }
                     shortAndHolidays.put(date, indexRow - AMOUNT_OF_HEADERS);
-                    ++indexColumn;
+                    ++indexCol;
                 } catch (NullPointerException exc) {
                     break;
                 }

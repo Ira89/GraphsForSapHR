@@ -11,14 +11,14 @@ public class ClassForTestPeriod implements ReportingPeriod  {
     private int month;
     private int daysInMonth;
     private double normTime;
-    private Map<Integer, Integer> shortAnsHolidays = new HashMap<Integer, Integer>();
+    private Map<Integer, Integer> shortAndHolidays = new HashMap<Integer, Integer>();
 
     public ClassForTestPeriod(int year, int month, int daysInMonth, double normTime, Map<Integer, Integer> days) {
         this.year = year;
         this.month = month;
         this.daysInMonth = daysInMonth;
         this.normTime = normTime;
-        shortAnsHolidays.putAll(days);
+        shortAndHolidays.putAll(days);
     }
 
     public int getYear() { return year; }
@@ -27,7 +27,13 @@ public class ClassForTestPeriod implements ReportingPeriod  {
     public double getNormTime() { return normTime; }
 
     public Map<Integer, Integer> getCopyShortAndHolidays() {
-        return new HashMap<Integer, Integer>(shortAnsHolidays);
+        Map<Integer, Integer> copyShortAndHolidays = new HashMap<Integer, Integer>();
+        for(Map.Entry<Integer, Integer> copy : shortAndHolidays.entrySet()) {
+            Integer indexDay = copy.getKey() - 1;
+            Integer codeDay = copy.getValue();
+            copyShortAndHolidays.put(indexDay, codeDay);
+        }
+        return copyShortAndHolidays;
     }
 
     public int getNextMonth() {

@@ -1,8 +1,6 @@
 package ru.polynkina.irina.graphs;
 
 import ru.polynkina.irina.hours.Hours;
-import ru.polynkina.irina.period.ReportingPeriod;
-
 import java.util.Map;
 
 public class UniqueGraph extends FiveDayGraph {
@@ -25,7 +23,7 @@ public class UniqueGraph extends FiveDayGraph {
     private String getExtraTimeSign(){ return extraTimeSign; }
 
     // ----------------------------------------------- step 3 ----------------------------------------------------------
-    // getKey() -> получаем день месяца (т.к. пользователь вводит даты в обычном виде, а в массиве дни идут с нуля - разница в индексах на 1)
+    // getKey() -> получаем день месяца
     // getValue() -> получаем код этого дня (0 - сокращенный, 1 - праздничный, 2 - перенесенный)
     // Если день является выходным - ничего не делаем, т.к. нулевое рабочее время уже установлено на шаге 2
     // На сокращенные дни ставим время на 1 час меньше основного или дополнительного ('d' или 'u' в rule)
@@ -33,11 +31,11 @@ public class UniqueGraph extends FiveDayGraph {
     @Override
     protected void setShortAndHolidays(Map<Integer, Integer> shortAndHolidays) throws ArrayIndexOutOfBoundsException {
         for (Map.Entry<Integer, Integer> day : shortAndHolidays.entrySet()) {
-            if (getRuleOfDay(day.getKey() - 1) == WEEKEND) continue;
+            if (getRuleOfDay(day.getKey()) == WEEKEND) continue;
             if (day.getValue() == CODE_SHORT_DAY) {
-                if (getRuleOfDay(day.getKey() - 1) == DAY) setWorkTime(day.getKey() - 1, getBasicTime() - 1);
-                else setWorkTime(day.getKey() - 1, getExtraTime() - 1);
-            } else if(day.getValue() == CODE_HOLIDAY || day.getValue() == CODE_DAY_OFF) setWorkTime(day.getKey() - 1, 0);
+                if (getRuleOfDay(day.getKey()) == DAY) setWorkTime(day.getKey(), getBasicTime() - 1);
+                else setWorkTime(day.getKey(), getExtraTime() - 1);
+            } else if(day.getValue() == CODE_HOLIDAY || day.getValue() == CODE_DAY_OFF) setWorkTime(day.getKey(), 0);
         }
     }
 

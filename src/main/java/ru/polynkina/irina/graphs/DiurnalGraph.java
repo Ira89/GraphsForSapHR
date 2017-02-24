@@ -1,7 +1,6 @@
 package ru.polynkina.irina.graphs;
 
 import ru.polynkina.irina.hours.Hours;
-
 import java.util.Map;
 
 public class DiurnalGraph extends DayGraph {
@@ -44,15 +43,15 @@ public class DiurnalGraph extends DayGraph {
     // Если доп. смена попадает на сокращенный день - часы на 1 не увеличиваем, и сокращение на 1 час в шаге 6 не делаем
     @Override
     protected void setWorkTimeSign(int daysInMonth, Map<Integer, Integer> shortAndHolidays, Hours libHours) throws Exception {
-
         for (int indexDay = 0; indexDay < daysInMonth; ++indexDay) {
             double hour = getWorkTime(indexDay);
-            Integer codeDay = shortAndHolidays.get(indexDay + 1);
+            Integer codeDay = shortAndHolidays.get(indexDay);
             if (codeDay != null) {
                 if (getRuleOfDay(indexDay) != WEEKEND && codeDay == CODE_SHORT_DAY) ++hour;
-                if (codeDay == CODE_HOLIDAY
-                        && getBasicTime() == hour
-                        && getRuleOfDay(indexDay) == NIGHT && getRuleOfDay(indexDay - 1) == NIGHT) {
+                if     (codeDay == CODE_HOLIDAY &&
+                        getBasicTime() == hour &&
+                        getRuleOfDay(indexDay) == NIGHT &&
+                        getRuleOfDay(indexDay - 1) == NIGHT) {
                     setWorkTimeSign(indexDay, SECOND_NIGHT_SHIFT);
                     continue;
                 }

@@ -242,13 +242,13 @@ public class GraphsContainer {
                     // устанавливаем признак короткого дня
                     if(graph.getShortDaysSign(indexDay) != ' ') {
                         cell = row.createCell(COL_INDICATES_HOURS + indexDay * SIZE_STEP + OFFSET_FOR_SHORT_DAYS);
-                        cell.setCellValue(graph.getHolidaysSign(indexDay));
+                        cell.setCellValue(Character.toString(graph.getShortDaysSign(indexDay)));
                     }
 
                     // устанавливаем признак выходного дня
                     if(graph.getHolidaysSign(indexDay) != ' ') {
                         cell = row.createCell(COL_INDICATES_HOURS + indexDay * SIZE_STEP + OFFSET_FOR_HOLIDAYS);
-                        cell.setCellValue(graph.getHolidaysSign(indexDay));
+                        cell.setCellValue(Integer.parseInt(Character.toString(graph.getHolidaysSign(indexDay))));
                     }
                 }
                 ++indexRow;
@@ -285,7 +285,7 @@ public class GraphsContainer {
             Cell cell = row.createCell(COL_INDICATES_NAME);
             cell.setCellValue(graph.getName());
             cell = row.createCell(COL_INDICATES_NORM_TIME);
-            cell.setCellValue(graph.getName());
+            cell.setCellValue(graph.getNormTime());
             for (int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay) {
                 if(graph.getWorkTime(indexDay) != 0) {
                     cell = row.createCell(COL_INDICATES_HOUR + indexDay);
