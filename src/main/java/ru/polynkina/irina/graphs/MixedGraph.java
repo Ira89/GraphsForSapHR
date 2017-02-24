@@ -1,7 +1,8 @@
 package ru.polynkina.irina.graphs;
 
 import ru.polynkina.irina.hours.Hours;
-import ru.polynkina.irina.period.ReportingPeriod;
+
+import java.util.Map;
 
 public class MixedGraph extends DayGraph {
 
@@ -17,9 +18,9 @@ public class MixedGraph extends DayGraph {
         this.extraTimeSign = extraTimeSign;
     }
 
-    private void fillWorkTimeByType(char dayType, double setValue, int maxAmountSetting, ReportingPeriod period) throws Exception {
+    private void fillWorkTimeByType(char dayType, double setValue, int maxAmountSetting, int daysInMonth) throws Exception {
         int amountSetting = 0;
-        for(int indexDay = 0; indexDay < period.getDaysInMonth() && amountSetting <= maxAmountSetting; ++indexDay) {
+        for(int indexDay = 0; indexDay < daysInMonth && amountSetting <= maxAmountSetting; ++indexDay) {
             if(getRuleOfDay(indexDay) == dayType && getWorkTime(indexDay) == UNINITIALIZED_WORK_TIME) {
                 setWorkTime(indexDay, setValue);
                 ++amountSetting;
@@ -47,9 +48,9 @@ public class MixedGraph extends DayGraph {
     // А затем запускаем родительскую функцию генерации
     // В таком случае на все ночные смены мы поставим гарантированно бОльшие часы (все смены по 7 часов)
     @Override
-    protected void generateGraph(ReportingPeriod period) throws Exception {
-        int amountBlankDays = calcBlankDays(period);
-        double missingTime = calcMissingTime(period);
+    protected void generateGraph(int daysInMonth) throws Exception {
+        int amountBlankDays = calcBlankDays(daysInMonth);
+        double missingTime = calcMissingTime(daysInMonth);
         int minWorkTime = amountBlankDays == 0 ? (int) missingTime : (int) missingTime / amountBlankDays;
         int maxWorkTime = minWorkTime + 1;
 
@@ -57,9 +58,9 @@ public class MixedGraph extends DayGraph {
         int amountDaysWithMaxTime = amountBlankDays - amountDaysWithMinTime;
 
         if(amountDaysWithMinTime >= amountDaysWithMaxTime)
-            fillWorkTimeByType(DAY, minWorkTime, amountDaysWithMinTime, period);
-        else fillWorkTimeByType(NIGHT, maxWorkTime, amountDaysWithMaxTime, period);
-        super.generateGraph(period);
+            fillWorkTimeByType(DAY, minWorkTime, amountDaysWithMinTime, daysInMonth);
+        else fillWorkTimeByType(NIGHT, maxWorkTime, amountDaysWithMaxTime, daysInMonth);
+        super.generateGraph(daysInMonth);
     }
 
     // ----------------------------------------------- step 5 ----------------------------------------------------------
@@ -67,11 +68,11 @@ public class MixedGraph extends DayGraph {
     // Если день является сокращенным - ищем однодневный график на час больше (сокращение на 1 час будет в шаге 6)
     // Если перед праздничным ночным тоже была ночная смена - нужно использовать "C_33", а не искать в libHours
     @Override
-    protected void setWorkTimeSign(ReportingPeriod period, Hours libHours) throws Exception {
+    protected void setWorkTimeSign(int daysInMonth, Map<Integer, Integer> shortAndHolidays, Hours libHours) throws Exception {
 
-        for (int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay) {
+        for (int indexDay = 0; indexDay < daysInMonth; ++indexDay) {
             double hour = getWorkTime(indexDay);
-            Integer codeDay = period.getCopyShortAndHolidays().get(indexDay + 1);
+            Integer codeDay = shortAndHolidays.get(indexDay + 1);
             if(codeDay != null) {
                 if(getRuleOfDay(indexDay) != WEEKEND && codeDay == CODE_SHORT_DAY) ++hour;
                 if(codeDay == CODE_HOLIDAY

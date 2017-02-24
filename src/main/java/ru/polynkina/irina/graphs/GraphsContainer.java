@@ -152,6 +152,7 @@ public class GraphsContainer {
             for(Graph graph : graphs) {
                 int idGraph = graph.getId();
                 if(idGraph != wb.getSheetAt(0).getRow(idGraph).getCell(COL_INDEX_ID).getNumericCellValue()) {
+                    wb.close();
                     throw new Exception("Файл " + filename + " поврежден!");
                 }
                 int counter = (int) wb.getSheetAt(0).getRow(idGraph).getCell(COL_INDEX_VALUE).getNumericCellValue();

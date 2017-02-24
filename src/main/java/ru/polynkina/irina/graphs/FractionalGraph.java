@@ -1,7 +1,5 @@
 package ru.polynkina.irina.graphs;
 
-import ru.polynkina.irina.period.ReportingPeriod;
-
 public class FractionalGraph extends DayGraph {
 
     public FractionalGraph(int id, String name, String rule, double basicTime, String basicTimeSign, String text) throws Exception {
@@ -9,7 +7,7 @@ public class FractionalGraph extends DayGraph {
     }
 
     // Смены с минутами тоже ставим с учетом частоты, чтобы они были равномерно распределены в рамках целого месяца
-    private void setFloatDay(double floatTime, int amountFloatDays, int amountMissingDays, ReportingPeriod period) throws Exception {
+    private void setFloatDay(double floatTime, int amountFloatDays, int amountMissingDays, int daysInMonth) throws Exception {
         int amountIntegerDays = amountMissingDays - amountFloatDays;
         double frequency = calcFrequency(amountFloatDays, amountIntegerDays);
 
@@ -17,7 +15,7 @@ public class FractionalGraph extends DayGraph {
         int counterFloatDays = 0;
         int counterIntegerDays = 0;
 
-        for(int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay) {
+        for(int indexDay = 0; indexDay < daysInMonth; ++indexDay) {
             if(getWorkTime(indexDay) != UNINITIALIZED_WORK_TIME) continue;
             if(currentFrequency < frequency && counterIntegerDays < amountIntegerDays || counterFloatDays == amountFloatDays) {
                 ++counterIntegerDays;
@@ -51,17 +49,17 @@ public class FractionalGraph extends DayGraph {
     // для начала избавляемся от минут путем выставления 4-х смен по 7,2 (136,8 - 4 * 7,2 = 108)
     // а затем вызываем родительскую функцию генерации
     @Override
-    protected void generateGraph(ReportingPeriod period) throws Exception {
+    protected void generateGraph(int daysInMonth) throws Exception {
         final double MINUTE_FOR_FLOAT_TIME = 0.2;
-        int amountBlankDays = calcBlankDays(period);
-        double missingTime = calcMissingTime(period);
+        int amountBlankDays = calcBlankDays(daysInMonth);
+        double missingTime = calcMissingTime(daysInMonth);
         double averageWorkTime = amountBlankDays != 0 ? missingTime / amountBlankDays : missingTime;
         double floatTime = (int) averageWorkTime + MINUTE_FOR_FLOAT_TIME;
 
         int amountFloatDays = 0;
         while((missingTime - floatTime * amountFloatDays + 1.0e-10) % 1 > 0.001) ++amountFloatDays;
 
-        if(amountFloatDays != 0) setFloatDay(floatTime, amountFloatDays, amountBlankDays, period);
-        super.generateGraph(period);
+        if(amountFloatDays != 0) setFloatDay(floatTime, amountFloatDays, amountBlankDays, daysInMonth);
+        super.generateGraph(daysInMonth);
     }
 }

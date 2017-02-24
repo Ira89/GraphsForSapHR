@@ -25,13 +25,14 @@ public class UniqueGraph extends FiveDayGraph {
     private String getExtraTimeSign(){ return extraTimeSign; }
 
     // ----------------------------------------------- step 3 ----------------------------------------------------------
+    // getKey() -> получаем день месяца (т.к. пользователь вводит даты в обычном виде, а в массиве дни идут с нуля - разница в индексах на 1)
+    // getValue() -> получаем код этого дня (0 - сокращенный, 1 - праздничный, 2 - перенесенный)
     // Если день является выходным - ничего не делаем, т.к. нулевое рабочее время уже установлено на шаге 2
-    // Индекс дня day.getKey() уменьшаем на 1, т.к. в массиве индексация с 0, а пользователь вводит числа в обычном виде
     // На сокращенные дни ставим время на 1 час меньше основного или дополнительного ('d' или 'u' в rule)
-    // На выходные и перенесенные выходные ставим 0 часов
+    // Для графика типа UniqueGraph ставим 0 часов на праздничные дни и перенесенные праздничные дни
     @Override
-    protected void setShortAndHolidays(ReportingPeriod period) throws Exception {
-        for (Map.Entry<Integer, Integer> day : period.getCopyShortAndHolidays().entrySet()) {
+    protected void setShortAndHolidays(Map<Integer, Integer> shortAndHolidays) throws ArrayIndexOutOfBoundsException {
+        for (Map.Entry<Integer, Integer> day : shortAndHolidays.entrySet()) {
             if (getRuleOfDay(day.getKey() - 1) == WEEKEND) continue;
             if (day.getValue() == CODE_SHORT_DAY) {
                 if (getRuleOfDay(day.getKey() - 1) == DAY) setWorkTime(day.getKey() - 1, getBasicTime() - 1);
@@ -44,22 +45,22 @@ public class UniqueGraph extends FiveDayGraph {
     // На все незаполненные дни ставим стандартное или дополнительное рабочее время ('d' или 'u' в rule)
     // и перезаписываем норму времени, т.к. она может не сходиться со стандартным (и это нормально для данного типа графиков)
     @Override
-    protected void generateGraph(ReportingPeriod period) throws Exception {
-        for(int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay){
+    protected void generateGraph(int daysInMonth) throws ArrayIndexOutOfBoundsException {
+        for(int indexDay = 0; indexDay < daysInMonth; ++indexDay){
             if(getWorkTime(indexDay) == UNINITIALIZED_WORK_TIME){
                 if(getRuleOfDay(indexDay) == DAY) setWorkTime(indexDay, getBasicTime());
                 else setWorkTime(indexDay, getExtraTime());
             }
         }
-        overwriteNormTime(period);
+        overwriteNormTime(daysInMonth);
     }
 
     // ----------------------------------------------- step 5 ----------------------------------------------------------
     // Ставим или стандартное время, дополнительное время, или выходной
     @Override
-    protected void setWorkTimeSign(ReportingPeriod period, Hours libHours) throws Exception {
+    protected void setWorkTimeSign(int daysInMonth, Map<Integer, Integer> shortAndHolidays, Hours libHours) throws Exception {
 
-        for (int indexDay = 0; indexDay < period.getDaysInMonth(); ++indexDay) {
+        for (int indexDay = 0; indexDay < daysInMonth; ++indexDay) {
             if (getRuleOfDay(indexDay) != WEEKEND) {
                 if(getRuleOfDay(indexDay) == DAY) setWorkTimeSign(indexDay, getBasicTimeSign());
                 else setWorkTimeSign(indexDay, getExtraTimeSign());
