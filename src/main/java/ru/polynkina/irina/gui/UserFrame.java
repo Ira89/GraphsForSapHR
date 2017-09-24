@@ -2,7 +2,9 @@ package ru.polynkina.irina.gui;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Calendar;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.*;
 
 public class UserFrame extends JFrame {
 
@@ -18,6 +20,13 @@ public class UserFrame extends JFrame {
     private static final int OVERAGE_NORM_TIME = 168;
     private static final int WORK_HOURS_IN_DAY = 8;
     private static final String[] calendars = {"RU", "RB", "RT", "RC", "RI", "RD", "RK", "RS", "YF"};
+
+    private int userYear;
+    private int userMonth;
+    private int userNormTime;
+    private Set<Integer> setShortDays = new HashSet<Integer>();
+    private Set<Integer> setHolidays = new HashSet<Integer>();
+    private Set<Integer> setOffDays = new HashSet<Integer>();
 
     private Calendar calendar = Calendar.getInstance();
 
@@ -162,10 +171,118 @@ public class UserFrame extends JFrame {
         panelAction = new JPanel();
         textErrors = new JLabel("");
         action = new JButton("Генерировать");
-
+        action.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if(inputValueIsCorrect()) generateGraphs();
+            }
+        });
         panelAction.setLayout(new BorderLayout());
         panelAction.add(textErrors);
         panelAction.add(action, BorderLayout.EAST);
         add(panelAction);
+    }
+
+    private boolean inputValueIsCorrect() {
+        try {
+            inputYearIsCorrect();
+            inputMonthIsCorrect();
+            inputNormTimeIsCorrect();
+            inputDaysIsCorrect();
+            findEqualsValues();
+
+            System.out.println(userYear + " " + userMonth + " " + userNormTime);
+            System.out.println("short list: " + setShortDays);
+            System.out.println("holiday list: " + setHolidays);
+            System.out.println("off day list: " + setOffDays);
+            textErrors.setForeground(Color.BLUE);
+            textErrors.setText("Данные введены корректно. Начинаю генерировать графики.");
+            return true;
+        } catch(Exception exc) {
+            reset();
+            textErrors.setForeground(Color.RED);
+            textErrors.setText(exc.getMessage());
+            return false;
+        }
+    }
+
+    private void inputYearIsCorrect() throws NumberFormatException {
+        try {
+            userYear = Integer.parseInt(spinnerYear.getValue().toString());
+        } catch(NumberFormatException exc) {
+            throw new NumberFormatException("Некорректно введен год!");
+        }
+    }
+
+    private void inputMonthIsCorrect() throws NumberFormatException {
+        try {
+            userMonth = Integer.parseInt(spinnerMonth.getValue().toString());
+        } catch(NumberFormatException exc) {
+            throw new NumberFormatException("Некорректно введен месяц!");
+        }
+    }
+
+    private void inputNormTimeIsCorrect() throws NumberFormatException {
+        try {
+            userNormTime = Integer.parseInt(spinnerNormTime.getValue().toString());
+        } catch(NumberFormatException exc) {
+            throw new NumberFormatException("Некорректно введена норма времени!");
+        }
+    }
+
+    private void inputDaysIsCorrect() throws NumberFormatException, IndexOutOfBoundsException {
+        parseDays(fieldsShortDays, setShortDays);
+        parseDays(fieldsHolidays, setHolidays);
+        parseDays(fieldsOffDays, setOffDays);
+    }
+
+    private void parseDays(JTextField[] fields, Set<Integer> listDays) {
+        int valueDay = 0;
+        try {
+            for(int i = 0; i < MAX_AMOUNT_FIELDS; ++i) {
+                String textDay = fields[i].getText().trim();
+                if(!textDay.equals("")) {
+                    valueDay = Integer.parseInt(textDay);
+                    if(valueDay < 1 || valueDay > calendar.getActualMaximum(Calendar.DAY_OF_MONTH)) {
+                        throw new IndexOutOfBoundsException();
+                    } else listDays.add(valueDay);
+                }
+            }
+        } catch(NumberFormatException exc) {
+            throw new NumberFormatException("Некорректно введены дни!");
+        } catch(IndexOutOfBoundsException exc) {
+            throw new IndexOutOfBoundsException("В месяце " + calendar.getActualMaximum(Calendar.DAY_OF_MONTH) +
+                    " дней, дата " + valueDay + " некорректна");
+        }
+    }
+
+    private void findEqualsValues() throws IndexOutOfBoundsException {
+        if(!setShortDays.isEmpty() && !setHolidays.isEmpty()) {
+            if(!Collections.disjoint(setShortDays, setHolidays))
+                throw new IndexOutOfBoundsException("Короткие дни не могут одновременно являться праздничными!");
+        }
+
+        if(!setHolidays.isEmpty() && !setOffDays.isEmpty()) {
+            if(!Collections.disjoint(setShortDays, setOffDays))
+                throw new IndexOutOfBoundsException("Короткие дни не могут одновременно являться выходными!");
+        }
+
+        if(!setHolidays.isEmpty() && !setOffDays.isEmpty()) {
+            if(!Collections.disjoint(setHolidays, setOffDays))
+                throw new IndexOutOfBoundsException("Праздничные дни не могут одновременно являться выходными!");
+        }
+    }
+
+    private void generateGraphs() {
+        // TODO generation()
+        reset();
+    }
+
+    private void reset() {
+        userYear = 0;
+        userMonth = 0;
+        userNormTime = 0;
+        setShortDays.clear();
+        setHolidays.clear();
+        setOffDays.clear();
     }
 }
