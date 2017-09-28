@@ -5,39 +5,30 @@ import org.junit.*;
 import java.util.*;
 import ru.polynkina.irina.regions.RegionsContainer;
 
+import javax.swing.*;
+
 public class TestRegions {
 
-    private static final int AMOUNT_REGIONS = 9;
+    private static JCheckBox container = new JCheckBox();
+    private static  List<String> ru = Arrays.asList("NORM", "NEP4", "SUT4");
     private static RegionsContainer regions;
-    private static List<String> nameRegions = new ArrayList<String>();
-    private static int indexRegionRU;
 
     @BeforeClass
     public static void init() throws Exception {
-        regions = new RegionsContainer();
-        nameRegions.add("RU");
 
-        for(int indexRegion = 0; indexRegion < AMOUNT_REGIONS; ++indexRegion) {
-            if(nameRegions.contains(regions.getNameRegion(indexRegion))) {
-                indexRegionRU = indexRegion;
-                break;
-            }
-        }
+        container.setText("RU");
+        container.setSelected(true);
+        regions = new RegionsContainer(container, ru);
     }
 
     @Test
-    public void getAmountRegion() {
-        Assert.assertEquals(AMOUNT_REGIONS, regions.getAmountRegions());
-    }
-
-    @Test
-    public void getNameRegion() {
-        Assert.assertEquals("RU", (regions.getNameRegion(indexRegionRU)));
+    public void testDetNameRegion() {
+        Assert.assertEquals("RU", (regions.getNameRegion(0)));
     }
 
     @Test
     public void generationNeededForRegion() {
-        Assert.assertEquals(true, regions.generationNeededForRegion(indexRegionRU));
+        Assert.assertEquals(true, regions.generationNeededForRegion(0));
     }
 
     @Test

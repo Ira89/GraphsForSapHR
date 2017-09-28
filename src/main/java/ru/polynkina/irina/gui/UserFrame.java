@@ -1,9 +1,18 @@
 package ru.polynkina.irina.gui;
 
+import ru.polynkina.irina.graphs.GraphsContainer;
+import ru.polynkina.irina.hours.Hours;
+import ru.polynkina.irina.hours.LibHours;
+import ru.polynkina.irina.period.ReportingPeriod;
+import ru.polynkina.irina.period.UserPeriod;
+import ru.polynkina.irina.regions.RegionsContainer;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.*;
 
 public class UserFrame extends JFrame {
@@ -60,8 +69,11 @@ public class UserFrame extends JFrame {
     private JCheckBox[] checkBoxCalendars;
     private JButton action;
 
+    private JPopupMenu popupMenu;
+
     public UserFrame() {
         super("Генерация графиков");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
         width = size.width / 2;
         height = size.height / 2;
@@ -81,6 +93,7 @@ public class UserFrame extends JFrame {
         initPanelOffDays();
         initPanelCalendars();
         initPanelAction();
+        initPopupMenu();
     }
 
     private void initPanelYear() {
@@ -173,13 +186,49 @@ public class UserFrame extends JFrame {
         action = new JButton("Генерировать");
         action.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if(inputValueIsCorrect()) generateGraphs();
+                if(inputValueIsCorrect()) {
+                    action.setEnabled(false);
+                    action.doClick();
+                    generateGraphs();
+                }
             }
         });
         panelAction.setLayout(new BorderLayout());
-        panelAction.add(textErrors);
+        panelAction.add(new JScrollPane(textErrors));
         panelAction.add(action, BorderLayout.EAST);
         add(panelAction);
+    }
+
+    private void initPopupMenu() {
+
+        class MousePopupListener extends MouseAdapter {
+
+            public void mouseReleased(MouseEvent e) {
+                checkPopup(e);
+            }
+
+            private void checkPopup(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    popupMenu.show(panelYear, e.getX(), e.getY());
+                }
+            }
+        }
+
+        popupMenu = new JPopupMenu();
+        ActionListener menuListener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                InfoFrame infoFrame = new InfoFrame(null, "О программе",
+                        "version: 4.0.0" +
+                                "<br>release: 28/09/2017" +
+                                "<br>author: Irina Polynkina" +
+                                "<br>email: irina.polynkina.dev@yandex.ru");
+                infoFrame.setVisible(true);
+            }
+        };
+        JMenuItem info = new JMenuItem("О программе");
+        info.addActionListener(menuListener);
+        popupMenu.add(info);
+        addMouseListener(new MousePopupListener());
     }
 
     private boolean inputValueIsCorrect() {
@@ -189,13 +238,6 @@ public class UserFrame extends JFrame {
             inputNormTimeIsCorrect();
             inputDaysIsCorrect();
             findEqualsValues();
-
-            System.out.println(userYear + " " + userMonth + " " + userNormTime);
-            System.out.println("short list: " + setShortDays);
-            System.out.println("holiday list: " + setHolidays);
-            System.out.println("off day list: " + setOffDays);
-            textErrors.setForeground(Color.BLUE);
-            textErrors.setText("Данные введены корректно. Начинаю генерировать графики.");
             return true;
         } catch(Exception exc) {
             reset();
@@ -262,18 +304,33 @@ public class UserFrame extends JFrame {
         }
 
         if(!setHolidays.isEmpty() && !setOffDays.isEmpty()) {
-            if(!Collections.disjoint(setShortDays, setOffDays))
-                throw new IndexOutOfBoundsException("Короткие дни не могут одновременно являться выходными!");
-        }
-
-        if(!setHolidays.isEmpty() && !setOffDays.isEmpty()) {
             if(!Collections.disjoint(setHolidays, setOffDays))
                 throw new IndexOutOfBoundsException("Праздничные дни не могут одновременно являться выходными!");
+        }
+
+        if(!setShortDays.isEmpty() && !setOffDays.isEmpty()) {
+            if(!Collections.disjoint(setShortDays, setOffDays))
+                throw new IndexOutOfBoundsException("Короткие дни не могут одновременно являться выходными!");
         }
     }
 
     private void generateGraphs() {
-        // TODO generation()
+        try {
+            ReportingPeriod period = new UserPeriod(userYear, userMonth, userNormTime, setShortDays, setHolidays, setOffDays);
+            Hours libHours = new LibHours();
+            RegionsContainer regions = new RegionsContainer(checkBoxCalendars);
+            GraphsContainer graphs = new GraphsContainer(period);
+            graphs.startGenerating(period, libHours);
+            graphs.writeGraphsInFile(period, regions);
+            graphs.deleteOldCounter(period);
+            textErrors.setForeground(Color.BLUE);
+            textErrors.setText(graphs.getCheckResults());
+        } catch(Exception exc) {
+            textErrors.setForeground(Color.RED);
+            textErrors.setText(exc.getMessage());
+        }
+
+        action.setEnabled(true);
         reset();
     }
 
