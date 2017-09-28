@@ -3,34 +3,38 @@ package ru.polynkina.irina.regions;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 
+import javax.swing.*;
 import java.io.FileInputStream;
 import java.util.*;
 
 /**
- * <br> При создании экземпляра класса создается массив объектов Region </br>
- * <br> Инициализация каждого объекта Region происходит при создании экземпляра класса RegionsContainer </br>
- * <br> Для инициализации берутся значения: </br>
- *      <br> из файла userForm.xls (значения данного файла изменяются пользователем) </br>
- *      <br> из папки regions (значения не изменяются) </br>
- * <br> Если один из файлов отсутствует - возбуждается исключение типа Exception </br>
+ * <br> Список регионов для генерации получаем от GUI </br>
+ * <br> Список графиков для каждого региона берется из папки regions (значения не изменяются) </br>
+ * <br> Если файлы в папке regions отсутствуют - возбуждается исключение типа Exception </br>
  */
 public class RegionsContainer {
 
     private List<Region> allUserRegions = new ArrayList<Region>();
-    private Map<String, Boolean> regions = new HashMap<String, Boolean>();
     private List<String> graphsInRegion = new ArrayList<String>();
 
 
-    public RegionsContainer() throws Exception {
-        readUserRegions();
-        for(Map.Entry<String, Boolean> region : regions.entrySet()) {
+    public RegionsContainer(JCheckBox[] containers) throws Exception {
+        for(JCheckBox region : containers) {
             graphsInRegion.clear();
-            readGraphsInRegions(region.getKey());
-            allUserRegions.add(new UserRegion(region.getKey(), region.getValue(), graphsInRegion));
+            readGraphsInRegions(region.getText());
+            allUserRegions.add(new UserRegion(region.getText(), region.isSelected(), graphsInRegion));
         }
     }
 
-    public int getAmountRegions() { return allUserRegions.size(); }
+
+    public RegionsContainer(JCheckBox region, List<String> graphs) throws Exception {
+        allUserRegions.add(new UserRegion(region.getText(), region.isSelected(), graphs));
+    }
+
+
+    public int getAmountRegions() {
+        return allUserRegions.size();
+    }
 
 
     public String getNameRegion(int indexRegion) {
@@ -46,34 +50,6 @@ public class RegionsContainer {
     public boolean graphUsedInRegion(int indexRegion, String nameGraphs) {
         return allUserRegions.get(indexRegion).graphIsUsedInRegion(nameGraphs);
     }
-
-
-    // При возникновении NullPointerException чтение из файла завершается
-    // NullPointerException игнорируется, т.к. его появление указывает на то, что мы прочитали все данные
-    private void readUserRegions() throws Exception {
-        final String PATH_TO_USER_FILE = "./_files/userForm/userForm.xls";
-        final int COL_INDICATES_DATE = 1;
-        final int ROW_INDICATES_REGION = 7;
-        final int ROW_STATUS_REGION = 8;
-        final int GENERATION_IS_NEEDED = 1;
-
-        FileInputStream fis = new FileInputStream(PATH_TO_USER_FILE);
-        Workbook wb = new HSSFWorkbook(fis);
-        int indexCol = COL_INDICATES_DATE;
-        while(true) {
-            try {
-                String nameRegion = wb.getSheetAt(0).getRow(ROW_INDICATES_REGION).getCell(indexCol).getStringCellValue();
-                int statusRegion = (int) wb.getSheetAt(0).getRow(ROW_STATUS_REGION).getCell(indexCol).getNumericCellValue();
-                regions.put(nameRegion, statusRegion == GENERATION_IS_NEEDED);
-                ++indexCol;
-            } catch (NullPointerException exc) {
-                break;
-            }
-        }
-        wb.close();
-        fis.close();
-    }
-
 
     // При возникновении NullPointerException чтение из файла завершается
     // NullPointerException игнорируется, т.к. его появление указывает на то, что мы прочитали все данные

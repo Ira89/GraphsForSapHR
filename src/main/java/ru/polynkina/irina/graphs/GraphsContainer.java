@@ -71,20 +71,21 @@ public class GraphsContainer {
     /**
      * Если месячная норма отличается от фактически сгенерированных часов - в консоль будет выведено предупреждение
      */
-    public void printCheckResults() throws Exception {
+    public String getCheckResults() throws Exception {
         boolean graphIsCorrect = true;
+        String textError = "";
         for(Graph graph : graphs) {
             double plannedTime = graph.getNormTime();
             double actualTime = graph.calcRealNormTime();
             if(Math.abs(plannedTime - actualTime) > 0.001) {
-                System.out.println("ВНИМАНИЕ!");
-                System.out.println("Для графика " + graph.getName() + " норма времени должна быть: " + plannedTime);
-                System.out.println(" Фактические часы составляют: " + actualTime);
-                System.out.println();
+                textError = "ВНИМАНИЕ!<br>";
+                textError += "Для графика " + graph.getName() + " норма времени должна быть: " + plannedTime + "<br>";
+                textError += " Фактические часы составляют: " + actualTime;
                 graphIsCorrect = false;
             }
         }
-        if(graphIsCorrect) System.out.println("Генерация графиков завершена успешно!");
+        if(graphIsCorrect)textError = "Генерация графиков завершена успешно!";
+        return textError;
     }
 
 
