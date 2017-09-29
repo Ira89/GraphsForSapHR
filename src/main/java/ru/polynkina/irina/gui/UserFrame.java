@@ -153,7 +153,7 @@ public class UserFrame extends JFrame {
 
     private void initPanelOffDays() {
         panelOffDays = new JPanel();
-        textOffDays = new JLabel("Выходные дни");
+        textOffDays = new JLabel("Перенесенные выходные");
         panelOffDays.add(textOffDays);
 
         fieldsOffDays = new JTextField[MAX_AMOUNT_FIELDS];
@@ -218,7 +218,7 @@ public class UserFrame extends JFrame {
         ActionListener menuListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 InfoFrame infoFrame = new InfoFrame(null, "О программе",
-                        "version: 4.0.0" +
+                        "version: 4.0.1" +
                                 "<br>release: 28/09/2017" +
                                 "<br>author: Irina Polynkina" +
                                 "<br>email: irina.polynkina.dev@yandex.ru");

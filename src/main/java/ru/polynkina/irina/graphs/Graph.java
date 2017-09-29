@@ -23,6 +23,7 @@ public interface Graph {
     String DIURNAL_TYPE = "DIURNAL";
     String UNIQUE_TYPE = "UNIQUE";
     String MIXED_TYPE = "MIX";
+    String SMALL_TYPE = "SMALL";
 
     char UNIVERSAL_DAY = 'u';
     char WEEKEND = 'f';
