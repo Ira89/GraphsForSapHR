@@ -153,7 +153,7 @@ public class UserFrame extends JFrame {
 
     private void initPanelOffDays() {
         panelOffDays = new JPanel();
-        textOffDays = new JLabel("Выходные дни");
+        textOffDays = new JLabel("Перенесенные выходные");
         panelOffDays.add(textOffDays);
 
         fieldsOffDays = new JTextField[MAX_AMOUNT_FIELDS];
