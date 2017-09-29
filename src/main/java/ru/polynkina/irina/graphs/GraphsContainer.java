@@ -137,6 +137,7 @@ public class GraphsContainer {
         else if(type.equals(FRACTIONAL_TYPE)) return new FractionalGraph(id, name, rule, time, sign, text);
         else if(type.equals(DIURNAL_TYPE)) return new DiurnalGraph(id, name, rule, time, sign, text);
         else if(type.equals(UNIQUE_TYPE)) return new UniqueGraph(id, name, rule, time, sign, text, addTime, addSign);
+        else if(type.equals(SMALL_TYPE)) return new SmallGraph(id, name, rule, time, sign, text);
         else return new MixedGraph(id, name, rule, time, sign, text, addTime, addSign);
     }
 

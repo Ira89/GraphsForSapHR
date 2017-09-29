@@ -178,6 +178,31 @@ public class TestGraphs {
     }
 
     @Test
+    public void testSmallGraph() throws Exception {
+        final double correctNormTime = 17;
+        final String correctGraph[] = {
+                "4AC1", "4AC1", "4AC1", "FREE", "FREE", "FREE", "4AC1",
+                "4AC1", "4AC1", "4AC1", "FREE", "FREE", "FREE", "4AC1",
+                "4AC1", "4AC1", "4AC1", "FREE", "FREE", "FREE", "4AC1",
+                "4AC1", "4AC1", "4AC1", "FREE", "FREE", "FREE", "4AC1",
+                "4AC1", "4AC1", "4AC1"
+        };
+
+        Map<Integer, Integer> shortAndHolidays = new HashMap<Integer, Integer>();
+        shortAndHolidays.put(29, 0);
+        shortAndHolidays.put(30, 1);
+        shortAndHolidays.put(31, 2);
+        ClassForTestPeriod period = new ClassForTestPeriod(2017, 1, 31, 166, shortAndHolidays);
+
+        DayGraph actualGraph = new SmallGraph(1, "SMALL", "ddddfff", 1, "4AC1", "text");
+        actualGraph.setCounter(1);
+        actualGraph.startGenerating(period, libHours);
+
+        if(!graphsIsEquals(actualGraph, correctGraph, correctNormTime))
+            fail("SMALL (SO01) " + makeDebugInfo(actualGraph, correctGraph, correctNormTime));
+    }
+
+    @Test
     public void testRoundingHours() throws Exception {
         final double correctNormTime = 128.6;
         final String correctGraph[] = {
