@@ -19,6 +19,7 @@ public class UserFrame extends JFrame {
 
     private static final int MAX_AMOUNT_PANEL = 8;
     private static final int MAX_AMOUNT_FIELDS = 8;
+    private static final int MAX_AMOUNT_GRAPHS = 9;
 
     private static final int MIN_INDEX_YEAR = 2017;
     private static final int MAX_INDEX_YEAR = 2117;
@@ -170,8 +171,8 @@ public class UserFrame extends JFrame {
         textCalendars = new JLabel("Календари для генерации");
         panelCalendars.add(textCalendars);
 
-        checkBoxCalendars = new JCheckBox[MAX_AMOUNT_FIELDS];
-        for(int i = 0; i < MAX_AMOUNT_FIELDS; ++i) {
+        checkBoxCalendars = new JCheckBox[MAX_AMOUNT_GRAPHS];
+        for(int i = 0; i < MAX_AMOUNT_GRAPHS; ++i) {
             checkBoxCalendars[i] = new JCheckBox(calendars[i]);
             checkBoxCalendars[i].setSelected(true);
             panelCalendars.add(checkBoxCalendars[i]);
@@ -218,8 +219,8 @@ public class UserFrame extends JFrame {
         ActionListener menuListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 InfoFrame infoFrame = new InfoFrame(null, "О программе",
-                        "version: 4.0.1" +
-                                "<br>release: 28/09/2017" +
+                        "version: 4.1.1" +
+                                "<br>release: 17/10/2017" +
                                 "<br>author: Irina Polynkina" +
                                 "<br>email: irina.polynkina.dev@yandex.ru");
                 infoFrame.setVisible(true);
