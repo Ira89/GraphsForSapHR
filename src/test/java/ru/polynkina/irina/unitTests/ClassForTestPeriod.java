@@ -2,6 +2,8 @@ package ru.polynkina.irina.unitTests;
 
 import ru.polynkina.irina.period.ReportingPeriod;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,5 +50,16 @@ public class ClassForTestPeriod implements ReportingPeriod  {
         int nextYear = year;
         if (month + 1 > MAX_INDEX_MONTH) ++nextYear;
         return nextYear;
+    }
+
+    @Override
+    public int calculateDayOfWeek(DayOfWeek dayOfWeek) {
+        int counter = 0;
+        for(int i = 1; i < daysInMonth; ++i) {
+            if(dayOfWeek.equals(LocalDate.of(year, month, i).getDayOfWeek())) {
+                ++counter;
+            }
+        }
+        return counter;
     }
 }

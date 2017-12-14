@@ -106,6 +106,10 @@ public class DayGraph implements Graph {
 
     // -------------------------------------------------- setters ------------------------------------------------------
 
+    protected void setNormTime(double normTime) {
+        this.normTime = normTime;
+    }
+
     public void setWorkTime(int indexDay, double time) throws ArrayIndexOutOfBoundsException {
         if(indexDayIsNotValid(indexDay)) throwException(indexDay);
         workTime[indexDay] = time;
@@ -137,7 +141,7 @@ public class DayGraph implements Graph {
     public void startGenerating(ReportingPeriod period, Hours libHours) throws Exception {
 
         createEmptyArrays(period.getDaysInMonth());                                             // step 0
-        setNormTime(period.getNormTime());                                                      // step 1
+        setNormTime(period);                                                                    // step 1
         setWeekend(period.getDaysInMonth());                                                    // step 2
         setShortAndHolidays(period.getCopyShortAndHolidays());                                  // step 3
         generateGraph(period.getDaysInMonth());                                                 // step 4
@@ -163,7 +167,7 @@ public class DayGraph implements Graph {
 
     // ----------------------------------------------- step 1 ----------------------------------------------------------
 
-    protected void setNormTime(double normTime){ this.normTime = normTime; }
+    protected void setNormTime(ReportingPeriod period){ this.normTime = period.getNormTime(); }
 
     // ----------------------------------------------- step 2 ----------------------------------------------------------
 

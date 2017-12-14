@@ -1,5 +1,7 @@
 package ru.polynkina.irina.graphs;
 
+import ru.polynkina.irina.period.ReportingPeriod;
+
 public class ShortGraph extends DayGraph {
 
     public ShortGraph(int id, String name, String rule, double basicTime, String basicTimeSign, String text) throws Exception{
@@ -15,7 +17,8 @@ public class ShortGraph extends DayGraph {
     // Пусть основное время для графика типа ShortGraph равно 4 часам
     // Норма для ShortGraph должна составить 82 часа (168 / 8 * 4 часа - 2 часа, на которые мы увеличивали)
     @Override
-    protected void setNormTime(double normTime) {
+    protected void setNormTime(ReportingPeriod period) {
+        double normTime = period.getNormTime();
         int reducedHours = 0;
         while(normTime % STANDARD_TIME_IN_DAY != 0) {
             ++normTime;

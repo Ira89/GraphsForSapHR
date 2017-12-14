@@ -2,6 +2,8 @@ package ru.polynkina.irina.period;
 
 import ru.polynkina.irina.graphs.Graph;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -63,6 +65,18 @@ public class UserPeriod implements ReportingPeriod {
         int nextYear = year;
         if (month + 1 > MAX_INDEX_MONTH) ++nextYear;
         return nextYear;
+    }
+
+    public int calculateDayOfWeek(DayOfWeek dayOfWeek) {
+        int counter = 0;
+        for(int i = 1; i <= daysInMonth; ++i) {
+            if(dayOfWeek.equals(LocalDate.of(year, month, i).getDayOfWeek())) {
+                if(!shortAndHolidays.containsKey(i - 1) || shortAndHolidays.get(i - 1) == 0) {
+                    ++counter;
+                }
+            }
+        }
+        return counter;
     }
 
     private int getDaysInMonth(int month, int year) {

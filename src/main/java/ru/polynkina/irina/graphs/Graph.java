@@ -24,6 +24,7 @@ public interface Graph {
     String UNIQUE_TYPE = "UNIQUE";
     String MIXED_TYPE = "MIX";
     String SMALL_TYPE = "SMALL";
+    String PERSONAL_TYPE = "PERSONAL";
 
     char UNIVERSAL_DAY = 'u';
     char WEEKEND = 'f';

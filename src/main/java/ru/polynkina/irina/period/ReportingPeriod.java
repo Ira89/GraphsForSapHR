@@ -1,5 +1,6 @@
 package ru.polynkina.irina.period;
 
+import java.time.DayOfWeek;
 import java.util.Map;
 
 public interface ReportingPeriod {
@@ -12,5 +13,6 @@ public interface ReportingPeriod {
 
     int getNextMonth();
     int getYearAfterIncreaseMonth();
+    int calculateDayOfWeek(DayOfWeek dayOfWeek);
 
 }

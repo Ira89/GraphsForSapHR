@@ -1,5 +1,7 @@
 package ru.polynkina.irina.graphs;
 
+import ru.polynkina.irina.period.ReportingPeriod;
+
 public class FractionalGraph extends DayGraph {
 
     public FractionalGraph(int id, String name, String rule, double basicTime, String basicTimeSign, String text) throws Exception {
@@ -31,7 +33,8 @@ public class FractionalGraph extends DayGraph {
     // ----------------------------------------------- step 1 ----------------------------------------------------------
     // Рабочие часы за день в данном графике не 8 часов, а 7,2, поэтому пересчитываем месячную норму и перезаписываем ее
     @Override
-    protected void setNormTime(double normTime) {
+    protected void setNormTime(ReportingPeriod period) {
+        double normTime = period.getNormTime();
         final double FLOAT_TIME_IN_DAY = 7.2;
         final double STANDARD_TIME_IN_DAY = 8.0;
 
