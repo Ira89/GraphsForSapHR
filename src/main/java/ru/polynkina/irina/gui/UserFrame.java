@@ -219,8 +219,8 @@ public class UserFrame extends JFrame {
         ActionListener menuListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 InfoFrame infoFrame = new InfoFrame(null, "О программе",
-                        "version: 4.1.1" +
-                                "<br>release: 17/10/2017" +
+                        "version: 5.0.0" +
+                                "<br>release: 15/12/2017" +
                                 "<br>author: Irina Polynkina" +
                                 "<br>email: irina.polynkina.dev@yandex.ru");
                 infoFrame.setVisible(true);

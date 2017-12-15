@@ -71,7 +71,10 @@ public class UserPeriod implements ReportingPeriod {
         int counter = 0;
         for(int i = 1; i <= daysInMonth; ++i) {
             if(dayOfWeek.equals(LocalDate.of(year, month, i).getDayOfWeek())) {
-                if(!shortAndHolidays.containsKey(i - 1) || shortAndHolidays.get(i - 1) == 0) {
+                if(shortAndHolidays.containsKey(i)) {
+                    for(Map.Entry<Integer, Integer> date : shortAndHolidays.entrySet())
+                        if(date.getKey() == i && date.getValue() == 0) ++counter;
+                } else {
                     ++counter;
                 }
             }

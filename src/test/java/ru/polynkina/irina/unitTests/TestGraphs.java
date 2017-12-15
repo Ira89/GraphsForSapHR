@@ -2,29 +2,29 @@ package ru.polynkina.irina.unitTests;
 
 import ru.polynkina.irina.graphs.*;
 import ru.polynkina.irina.hours.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.*;
+import ru.polynkina.irina.period.UserPeriod;
+
 import static org.junit.Assert.fail;
 
 public class TestGraphs {
 
-    private static Map<Integer, Integer> shortAndHolidays = new HashMap<Integer, Integer>();
-    private static ClassForTestPeriod period;
+    private static Set<Integer> shortDays = new HashSet<>();
+    private static Set<Integer> holidays = new HashSet<>();
+    private static Set<Integer> offDays = new HashSet<>();
+    private static UserPeriod period;
     private static LibHours libHours;
-
-    private static final int INDEX_SHORT_DAY = 0;
-    private static final int INDEX_HOLIDAY = 1;
-    private static final int INDEX_DAY_OFF = 2;
 
     @BeforeClass
     public static void init() throws Exception {
-        shortAndHolidays.put(1, INDEX_SHORT_DAY);
-        shortAndHolidays.put(2, INDEX_HOLIDAY);
-        shortAndHolidays.put(3, INDEX_DAY_OFF);
+        shortDays.add(1);
+        holidays.add(2);
+        offDays.add(3);
 
-        period = new ClassForTestPeriod(2017, 1, 31, 167, shortAndHolidays);
+        period = new UserPeriod(2017, 1, 167, shortDays, holidays, offDays);
         libHours = new LibHours();
     }
 
@@ -37,7 +37,7 @@ public class TestGraphs {
         return textInfo;
     }
 
-    private boolean graphsIsEquals(DayGraph actualGraph, String correctGraph[], double correctNormTime) throws Exception {
+    private boolean graphsIsEquals(DayGraph actualGraph, String correctGraph[], double correctNormTime) {
         for(int i = 0; i < period.getDaysInMonth(); ++i) {
             if (!correctGraph[i].equals(actualGraph.getWorkTimeSign(i))) return false;
         }
@@ -188,11 +188,16 @@ public class TestGraphs {
                 "4AC1", "4AC1", "4AC1"
         };
 
-        Map<Integer, Integer> shortAndHolidays = new HashMap<Integer, Integer>();
-        shortAndHolidays.put(29, 0);
-        shortAndHolidays.put(30, 1);
-        shortAndHolidays.put(31, 2);
-        ClassForTestPeriod period = new ClassForTestPeriod(2017, 1, 31, 166, shortAndHolidays);
+        Set<Integer> shortDays = new HashSet<>();
+        shortDays.add(29);
+
+        Set<Integer> holidays = new HashSet<>();
+        holidays.add(30);
+
+        Set<Integer> offDays = new HashSet<>();
+        offDays.add(31);
+
+        UserPeriod period = new UserPeriod(2017, 1, 166, shortDays, holidays, offDays);
 
         DayGraph actualGraph = new SmallGraph(1, "SMALL", "ddddfff", 1, "4AC1", "text");
         actualGraph.setCounter(1);
@@ -200,6 +205,36 @@ public class TestGraphs {
 
         if(!graphsIsEquals(actualGraph, correctGraph, correctNormTime))
             fail("SMALL (SO01) " + makeDebugInfo(actualGraph, correctGraph, correctNormTime));
+    }
+
+    @Test
+    public  void testPersonalGraph() throws Exception {
+        final double correctNormTime = 148;
+        final String correctGraph[] = {
+                "NORM", "4AC7", "FREE", "FREE", "4AC7", "4AC6", "4AC7",
+                "NORM", "4AC7", "FREE", "FREE", "4AC6", "4AC7", "4AC7",
+                "4AC6", "4AC7", "FREE", "FREE", "4AC7", "4AC6", "4AC7",
+                "4AC7", "4AC6", "FREE", "FREE", "4AC7", "4AC7", "4AC6",
+                "4AC7", "4AC6", "FREE"
+        };
+
+        Set<Integer> shortDays = new HashSet<>();
+        shortDays.add(1);
+
+        Set<Integer> holidays = new HashSet<>();
+        holidays.add(8);
+
+        Set<Integer> offDays = new HashSet<>();
+        offDays.add(15);
+
+        UserPeriod period = new UserPeriod(2017, 12, 151, shortDays, holidays, offDays);
+
+        DayGraph actualGraph = new PersonalGraph(1, "PERSONAL", "dddddff", 8, "NORM", "text");
+        actualGraph.setCounter(3);
+        actualGraph.startGenerating(period, libHours);
+
+        if(!graphsIsEquals(actualGraph, correctGraph, correctNormTime))
+            fail("PERSONAL (DIR2) " + makeDebugInfo(actualGraph, correctGraph, correctNormTime));
     }
 
     @Test
@@ -213,7 +248,7 @@ public class TestGraphs {
                 "4AC5", "NO52", "FREE"
         };
 
-        ClassForTestPeriod period = new ClassForTestPeriod(2017, 1, 31, 143, shortAndHolidays);
+        UserPeriod period = new UserPeriod(2017, 1, 143, shortDays, holidays, offDays);
         DayGraph actualGraph = new FractionalGraph(1, "FLOAT", "dddddff", 7.2, "NO72", "text");
         actualGraph.setCounter(3);
         actualGraph.startGenerating(period, libHours);
@@ -233,12 +268,17 @@ public class TestGraphs {
                 "4AC6", "4AC7", "NO62"
         };
 
-        Map<Integer, Integer> shortAndHolidays = new HashMap<Integer, Integer>();
-        shortAndHolidays.put(7, 0);
-        shortAndHolidays.put(8, 1);
-        shortAndHolidays.put(27, 0);
-        shortAndHolidays.put(28, 1);
-        ClassForTestPeriod period = new ClassForTestPeriod(2017, 1, 31, 166, shortAndHolidays);
+        Set<Integer> shortDays = new HashSet<>();
+        shortDays.add(7);
+        shortDays.add(27);
+
+        Set<Integer> holidays = new HashSet<>();
+        holidays.add(8);
+        holidays.add(28);
+
+        Set<Integer> offDays = new HashSet<>();
+
+        UserPeriod period = new UserPeriod(2017, 1, 166, shortDays, holidays, offDays);
         DayGraph actualGraph = new FractionalGraph(1, "FLOAT", "dddddff", 7.2, "NO72", "text");
         actualGraph.setCounter(1);
         actualGraph.startGenerating(period, libHours);

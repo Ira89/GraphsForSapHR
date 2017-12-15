@@ -37,7 +37,7 @@ public class TestHours {
     }
 
     @Test(expected = Exception.class)
-    public void findIncorrectNegativeNighrHours() throws Exception {
+    public void findIncorrectNegativeNightHours() throws Exception {
         libHours.findSignNightHours(-8);
     }
 
