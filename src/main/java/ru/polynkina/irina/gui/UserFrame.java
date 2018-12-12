@@ -1,5 +1,9 @@
 package ru.polynkina.irina.gui;
 
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import ru.polynkina.irina.beans.SAPCalendar;
 import ru.polynkina.irina.graphs.GraphsContainer;
 import ru.polynkina.irina.hours.Hours;
 import ru.polynkina.irina.hours.LibHours;
@@ -19,7 +23,6 @@ public class UserFrame extends JFrame {
 
     private static final int MAX_AMOUNT_PANEL = 8;
     private static final int MAX_AMOUNT_FIELDS = 8;
-    private static final int MAX_AMOUNT_GRAPHS = 9;
 
     private static final int MIN_INDEX_YEAR = 2017;
     private static final int MAX_INDEX_YEAR = 2117;
@@ -29,7 +32,6 @@ public class UserFrame extends JFrame {
     private static final int MAX_NORM_TIME = 200;
     private static final int OVERAGE_NORM_TIME = 168;
     private static final int WORK_HOURS_IN_DAY = 8;
-    private static final String[] calendars = {"RU", "RB", "RT", "RC", "RI", "RD", "RK", "RS", "YF"};
 
     private int userYear;
     private int userMonth;
@@ -77,7 +79,7 @@ public class UserFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
         width = size.width / 2;
-        height = size.height / 2;
+        height = size.height / 3 * 2;
         setSize(width, height);
         setLocationRelativeTo(null);
         initFrame();
@@ -167,13 +169,17 @@ public class UserFrame extends JFrame {
     }
 
     private void initPanelCalendars() {
+        ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext("./spring/spring.xml");
+        SAPCalendar calendars = ctx.getBean(SAPCalendar.class);
+
         panelCalendars = new JPanel();
         textCalendars = new JLabel("Календари для генерации");
         panelCalendars.add(textCalendars);
 
+        int MAX_AMOUNT_GRAPHS = calendars.getCalendars().size();
         checkBoxCalendars = new JCheckBox[MAX_AMOUNT_GRAPHS];
         for(int i = 0; i < MAX_AMOUNT_GRAPHS; ++i) {
-            checkBoxCalendars[i] = new JCheckBox(calendars[i]);
+            checkBoxCalendars[i] = new JCheckBox(calendars.getCalendarByIndex(i));
             checkBoxCalendars[i].setSelected(true);
             panelCalendars.add(checkBoxCalendars[i]);
         }
@@ -219,8 +225,8 @@ public class UserFrame extends JFrame {
         ActionListener menuListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 InfoFrame infoFrame = new InfoFrame(null, "О программе",
-                        "version: 5.0.0" +
-                                "<br>release: 15/12/2017" +
+                        "version: 6.0.0" +
+                                "<br>release: 12/12/2018" +
                                 "<br>author: Irina Polynkina" +
                                 "<br>email: irina.polynkina.dev@yandex.ru");
                 infoFrame.setVisible(true);

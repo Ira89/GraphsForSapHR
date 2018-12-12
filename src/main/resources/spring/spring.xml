@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="calendar" class="ru.polynkina.irina.beans.SAPCalendar">
+        <constructor-arg>
+            <list>
+                <value>RU</value>
+                <value>RB</value>
+                <value>RT</value>
+                <value>RC</value>
+                <value>RI</value>
+                <value>RD</value>
+                <value>RK</value>
+                <value>RS</value>
+                <value>YF</value>
+                <value>RA</value>
+                <value>RE</value>
+                <value>RF</value>
+                <value>RH</value>
+                <value>RL</value>
+                <value>RP</value>
+                <value>RV</value>
+                <value>RZ</value>
+            </list>
+        </constructor-arg>
+    </bean>
+
+</beans>
