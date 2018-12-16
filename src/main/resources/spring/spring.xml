@@ -27,4 +27,18 @@
         </constructor-arg>
     </bean>
 
+    <bean id="year" class="ru.polynkina.irina.beans.MinMaxYear">
+        <constructor-arg index="0" value="2018"/>
+        <constructor-arg index="1" value="2118"/>
+    </bean>
+
+    <bean id="normTime" class="ru.polynkina.irina.beans.MinMaxNormTime">
+        <constructor-arg index="0" value="104"/>
+        <constructor-arg index="1" value="200"/>
+    </bean>
+
+    <bean id="dates" class="ru.polynkina.irina.beans.UserDates">
+        <constructor-arg value="8"/>
+    </bean>
+
 </beans>

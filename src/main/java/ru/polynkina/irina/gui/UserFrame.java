@@ -3,7 +3,10 @@ package ru.polynkina.irina.gui;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import ru.polynkina.irina.beans.MinMaxNormTime;
+import ru.polynkina.irina.beans.MinMaxYear;
 import ru.polynkina.irina.beans.SAPCalendar;
+import ru.polynkina.irina.beans.UserDates;
 import ru.polynkina.irina.graphs.GraphsContainer;
 import ru.polynkina.irina.hours.Hours;
 import ru.polynkina.irina.hours.LibHours;
@@ -21,15 +24,12 @@ import java.util.*;
 
 public class UserFrame extends JFrame {
 
+    private static ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext("./spring/spring.xml");
+    private static UserDates userDates = ctx.getBean(UserDates.class);
+    private static final int MAX_AMOUNT_FIELDS = userDates.getAmount();
     private static final int MAX_AMOUNT_PANEL = 8;
-    private static final int MAX_AMOUNT_FIELDS = 8;
-
-    private static final int MIN_INDEX_YEAR = 2017;
-    private static final int MAX_INDEX_YEAR = 2117;
     private static final int MIN_INDEX_MONTH = 1;
     private static final int MAX_INDEX_MONTH = 12;
-    private static final int MIN_NORM_TIME = 104;
-    private static final int MAX_NORM_TIME = 200;
     private static final int OVERAGE_NORM_TIME = 168;
     private static final int WORK_HOURS_IN_DAY = 8;
 
@@ -102,7 +102,9 @@ public class UserFrame extends JFrame {
     private void initPanelYear() {
         panelYear = new JPanel();
         textYear = new JLabel("Год");
-        spinnerYear = new JSpinner(new SpinnerNumberModel(calendar.get(Calendar.YEAR), MIN_INDEX_YEAR, MAX_INDEX_YEAR, 1));
+        MinMaxYear minMaxYear = ctx.getBean(MinMaxYear.class);
+        spinnerYear = new JSpinner(new SpinnerNumberModel(calendar.get(Calendar.YEAR),
+                minMaxYear.getMinYear(), minMaxYear.getMaxYear(), 1));
         panelYear.add(textYear);
         panelYear.add(spinnerYear);
         add(panelYear);
@@ -120,7 +122,9 @@ public class UserFrame extends JFrame {
     private void initPanelNormTime() {
         panelNormTime = new JPanel();
         textNormTime = new JLabel("Норма времени");
-        spinnerNormTime = new JSpinner(new SpinnerNumberModel(OVERAGE_NORM_TIME, MIN_NORM_TIME, MAX_NORM_TIME, WORK_HOURS_IN_DAY));
+        MinMaxNormTime minMaxNormTime = ctx.getBean(MinMaxNormTime.class);
+        spinnerNormTime = new JSpinner(new SpinnerNumberModel(OVERAGE_NORM_TIME,
+                minMaxNormTime.getMinNormTime(), minMaxNormTime.getMaxNormTime(), WORK_HOURS_IN_DAY));
         panelNormTime.add(textNormTime);
         panelNormTime.add(spinnerNormTime);
         add(panelNormTime);
@@ -169,7 +173,6 @@ public class UserFrame extends JFrame {
     }
 
     private void initPanelCalendars() {
-        ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext("./spring/spring.xml");
         SAPCalendar calendars = ctx.getBean(SAPCalendar.class);
 
         panelCalendars = new JPanel();
@@ -225,8 +228,8 @@ public class UserFrame extends JFrame {
         ActionListener menuListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 InfoFrame infoFrame = new InfoFrame(null, "О программе",
-                        "version: 6.0.0" +
-                                "<br>release: 12/12/2018" +
+                        "version: 6.1.0" +
+                                "<br>release: 16/12/2018" +
                                 "<br>author: Irina Polynkina" +
                                 "<br>email: irina.polynkina.dev@yandex.ru");
                 infoFrame.setVisible(true);
